@@ -112,18 +112,39 @@ TODO:
         - opencv based "pedestrian detect" filter
         - drop if unchanged filter (?)
 
+    - http ui:
+        - bottle
+            - or is this better done in nodejs?
+                - can we have the access that we need across py/nodejs?
+        - websockets possibly?
+            - https://github.com/zeekay/bottle-websocket
+            - socket.io in nodejs
+        - show the latest data
+            - latest picture captured
+        - timeline ui of some kind?
+        - show status
+            - probes configured
+            - probes currently running
+            - filters?
+        - start/stop system?
+
     - what about:
         - Motion?
 
     - potential problems:
         - wifi dongle no moitor mode: cannot do packet sniffing
             - pos. re-compile kernel?
+        - when wifi dongle is in monitor mode for sniffing
+            - cannot do wifi scan?
+                - sniffing => wifi scan?
+            - cannot do fake AP?
         - usb storage drive draws too much power?
             - use bigger sdhc card?
         - general performance problems
             - use netbook?
         - opencv on arm?
             - seems python-opencv package is available
+
 
 
 """
@@ -142,7 +163,14 @@ from config.config import config
 
 
 def main():
-    print "MEERKAT"
+    # read in probes from config 
+
+    # read in filters
+
+
+
+
+    
 
 
 if __name__ == '__main__':
