@@ -10,48 +10,57 @@ config = {
     "datafile": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'data', 'meerkat.db')),
     "probe_path": os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', 'meerkat', 'probes')),
+                                 '..', 'meerkat', 'probe')),
 
-    "probes": [
+    "probes": {
+        "meerkat.probe.dummy_data": {
+            "command": ["dummy_data.sh", "128"],
+            "type": meerkat.probe.TYPE_PERIODIC,
+            "delay": 10,
+            "data_type": meerkat.probe.DATA_TYPE_DATA
+        },
         "meerkat.probe.bluetooth": {
-            "command": ["bluetooth"],
-            "type": meerkat.probe.PROBE_DURATION,
+            "command": ["bluetooth_scan.py"],
+            "type": meerkat.probe.TYPE_DURATION,
             "duration": 30,
             "delay": 60,
-            "data_type": meerkat.probe.TYPE_JSON,
+            "data_type": meerkat.probe.DATA_TYPE_JSON,
             "filters": [
-                "meerkat.filter.drop_unchanged"
+                "meerkat.filters.dummy.Uppercase"
             ]
-        },
+        }
+    }
+}
+
+'''
         "meerkat.probe.wifi_scan": {
-            "type": meerkat.probe.PROBE_PERIODIC,
+            "type": meerkat.probe.TYPE_PERIODIC,
             "delay": 30,
-            "data_type": meerkat.probe.TYPE_JSON,
+            "data_type": meerkat.probe.DATA_TYPE_JSON,
             "filters": [
-                "meerkat.filter.drop_unchanged"
+                "meerkat.filters.drop_unchanged"
             ]
         },
         "meerkat.probe.wifi_fake_ap": {
-            "type": meerkat.probe.PROBE_CONTINUOUS,
-            "data_type": meerkat.probe.TYPE_JSON
+            "type": meerkat.probe.TYPE_CONTINUOUS,
+            "data_type": meerkat.probe.DATA_TYPE_JSON
         },
         "meerkat.probe.wifi_packet_sniff": {
-            "type": meerkat.probe.PROBE_DURATION,
+            "type": meerkat.probe.TYPE_DURATION,
             "duration": 30,
             "delay": 30,
-            "data_type": meerkat.probe.TYPE_JSON,
+            "data_type": meerkat.probe.DATA_TYPE_JSON,
             "filters": [
-                "meerkat.filter.packet_filter"
+                "meerkat.filters.packet_filter"
             ]
         },
         "meerkat.probe.photo": {
-            "type": meerkat.probe.PROBE_PERIODIC,
+            "type": meerkat.probe.TYPE_PERIODIC,
             "delay": 30,
-            "data_type": meerkat.probe.TYPE_JSON, # this matches the output of all filters
+            "data_type": meerkat.probe.DATA_TYPE_JSON, # this matches the output of all filters
             "filters": [
-                "meerkat.filter.opencv_pedestrian_count"
+                "meerkat.filters.opencv_pedestrian_count"
             ]
         }
-    ]
-}
+'''
 

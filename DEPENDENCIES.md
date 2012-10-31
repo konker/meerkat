@@ -7,3 +7,5 @@ apt:
     - python-scapy
     - python-opencv
     - python-imaging
+pip:
+    - apscheduler

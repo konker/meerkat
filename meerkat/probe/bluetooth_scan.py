@@ -11,7 +11,6 @@
 from bluetooth import DeviceDiscoverer
 import json
 
-# http://people.csail.mit.edu/albert/bluez-intro/x339.html
 class JsonDeviceDiscoverer(DeviceDiscoverer, object):
     def pre_inquiry(self):
         self.results = []

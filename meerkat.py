@@ -148,6 +148,7 @@ TODO:
 
 
 """
+import os
 import sys
 
 if sys.version < '2.5':                                                               
@@ -157,20 +158,122 @@ import pathhack
 
 import logging
 from threading import Thread
+from subprocess import Popen, PIPE
+from kronos import Scheduler, method
 
 # NOTE: edit config.rb as appropriate
 from config.config import config
 
+import meerkat.probe
+
+FILTER_PACKAGE = 'meerkat.filters'
+FILTER_CLASS = 'Filter'
+
+scheduler = Scheduler()
+
 
 def main():
     # read in probes from config 
+    for id, probe in config["probes"].items():
+        check_command(id, probe)
 
-    # read in filters
+        # load filters
+        load_filters(id, probe)
+
+        # schedule/start
+        schedule(id, probe)
+
+        #print id, probe
 
 
+def make_schedule_function(id, command, filters):
+    def _func():
+        #print command
+        pipe = Popen(command, stdout=PIPE).stdout
+        data = pipe.read()
+        for filter in filters:
+            data = filter.filter(data)
+
+        print id, " -> ", data
+
+    return _func
 
 
-    
+def schedule(id, probe):
+    if not "type" in probe:
+        raise ValueError("Bad config: %s does not have a 'type' attribute" % id)
+
+    if probe["type"] == meerkat.probe.TYPE_DURATION:
+        print "TYPE_DURATION"
+        if not "delay" in probe or not "duration" in probe:
+            raise ValueError("Bad config: %s: probes of this type must have a 'delay' attribute \
+                              and a 'duration' attribute" % id)
+        make_schedule_function(id, probe["command"], probe["filters"])()
+        '''
+        scheduler.add_interval_task(
+                make_schedule_function(id, probe["command"], probe["filters"]),
+                id,
+                0,
+                probe["delay"],
+                method.sequential, None, None)
+        '''
+    elif probe["type"] == meerkat.probe.TYPE_PERIODIC:
+        print "TYPE_PERIODIC"
+        if not "delay" in probe:
+            raise ValueError("Bad config: %s: probes of this type must have a 'delay' attribute" % id)
+        make_schedule_function(id, probe["command"], probe["filters"])()
+        '''
+        scheduler.add_interval_task(
+                make_schedule_function(id, probe["command"], probe["filters"]),
+                id,
+                0,
+                probe["delay"],
+                method.sequential, None, None)
+        '''
+    elif probe["type"] == meerkat.probe.TYPE_CONTINUOUS:
+        print "TYPE_CONTINUOUS"
+        make_schedule_function(id, probe["command"])()
+    else:
+        raise NotImplementedError("No such probe type: %s" % probe["type"])
+
+
+def load_filters(id, probe):
+    if not "filters" in probe:
+        probe["filters"] = []
+        return
+
+    # Dynamically load filters for the probe.
+    # Replace the module/class name with an actual instance.
+    for i, module in enumerate(probe["filters"]):
+        try:
+            parts = module.split(".")
+            cls = parts[-1]
+            module = ".".join(parts[:-1])
+
+            __import__(module, locals(), globals())
+        except:
+            raise "ERROR0"
+
+        if sys.modules.has_key(module):
+            if hasattr(sys.modules[module], cls):
+                probe["filters"][i] = getattr(sys.modules[module], cls)()
+            else:
+                raise "ERROR1"
+        else:
+            raise "ERROR2"
+
+
+def check_command(id, probe):
+    # sanity check the probe command
+    if not "command" in probe or len(probe["command"]) == 0:
+        raise ValueError("Bad config: %s: missing or empty 'command' attribute" % id)
+
+    if not type(probe["command"]) == type([]):
+        raise ValueError("Bad config: %s: 'command' should be an array of strings" % id)
+
+    # expand the command, saves doing this each time
+    probe["command"][0] = os.path.join(config["probe_path"], probe["command"][0])
+
 
 
 if __name__ == '__main__':
