@@ -71,7 +71,7 @@ class Storage(BaseStorage):
     def _ddl(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS accessory_data
                             (
-                               channel_id   INT,
+                               probe_id,    VARCHAR,
                                timestamp    REAL,
                                length       INT,
                                data         BLOB

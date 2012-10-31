@@ -163,6 +163,7 @@ from kronos import Scheduler, method
 
 # NOTE: edit config.rb as appropriate
 from config.config import config
+from storage.sqlite import Storage
 
 import meerkat.probe
 
@@ -170,7 +171,7 @@ FILTER_PACKAGE = 'meerkat.filters'
 FILTER_CLASS = 'Filter'
 
 scheduler = Scheduler()
-
+storage = Storage(config['datafile'])
 
 def main():
     # read in probes from config 
@@ -186,13 +187,16 @@ def main():
         #print id, probe
 
 
-def make_schedule_function(id, command, filters):
+def make_schedule_function(id, command, filters, storage=None):
     def _func():
         #print command
         pipe = Popen(command, stdout=PIPE).stdout
         data = pipe.read()
         for filter in filters:
             data = filter.filter(data)
+
+        if storage:
+            storage.write_str(id, data)
 
         print id, " -> ", data
 
@@ -208,7 +212,7 @@ def schedule(id, probe):
         if not "delay" in probe or not "duration" in probe:
             raise ValueError("Bad config: %s: probes of this type must have a 'delay' attribute \
                               and a 'duration' attribute" % id)
-        make_schedule_function(id, probe["command"], probe["filters"])()
+        make_schedule_function(id, probe["command"], probe["filters"], storage)()
         '''
         scheduler.add_interval_task(
                 make_schedule_function(id, probe["command"], probe["filters"]),
@@ -221,7 +225,7 @@ def schedule(id, probe):
         print "TYPE_PERIODIC"
         if not "delay" in probe:
             raise ValueError("Bad config: %s: probes of this type must have a 'delay' attribute" % id)
-        make_schedule_function(id, probe["command"], probe["filters"])()
+        make_schedule_function(id, probe["command"], probe["filters"], storage)()
         '''
         scheduler.add_interval_task(
                 make_schedule_function(id, probe["command"], probe["filters"]),
@@ -232,7 +236,8 @@ def schedule(id, probe):
         '''
     elif probe["type"] == meerkat.probe.TYPE_CONTINUOUS:
         print "TYPE_CONTINUOUS"
-        make_schedule_function(id, probe["command"])()
+        raise NotImplementedError("Probe type not yet implemented: %s" % probe["type"])
+
     else:
         raise NotImplementedError("No such probe type: %s" % probe["type"])
 
