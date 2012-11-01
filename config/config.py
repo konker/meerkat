@@ -13,6 +13,13 @@ config = {
                                  '..', 'meerkat', 'probe')),
 
     "probes": {
+        "meerkat.probe.sleeper": {
+            "command": ["sleeper.sh", "60"],
+            "type": meerkat.probe.TYPE_DURATION,
+            "duration": 5,
+            "interval": 4,
+            "data_type": meerkat.probe.DATA_TYPE_DATA
+        },
         "meerkat.probe.dummy_data": {
             "command": ["dummy_data.sh", "128"],
             "type": meerkat.probe.TYPE_PERIODIC,
