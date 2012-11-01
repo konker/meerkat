@@ -78,9 +78,16 @@ class Probe(object):
 
     # read any data available from stdout pipe
     def io_stdout_cb(self, watcher, revents):
-        logging.info(self.process.stdout.read())
+        data = self.process.stdout.read()
         self.cancel_io()
         self.active = False
+
+        for filter in self.filters:
+            data = filter.filter(data)
+
+        if self.storage:
+            logging.debug("%s: -> %s" % (self.id, data))
+            self.storage.write_str(self.id, data)
 
 
     # read any data available from stdout pipe

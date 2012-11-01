@@ -17,7 +17,7 @@ config = {
             "command": ["sleeper.sh", "60"],
             "type": meerkat.probe.TYPE_DURATION,
             "duration": 5,
-            "interval": 4,
+            "interval": 6,
             "data_type": meerkat.probe.DATA_TYPE_DATA
         },
         "meerkat.probe.dummy_data": {

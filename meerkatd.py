@@ -26,8 +26,6 @@ import meerkat.probe
 
 
 def main():
-    storage = storage.sqlite.Storage(config["datafile"])
-
     loop = pyev.default_loop()
 
     # initialize and start a signal watcher
@@ -35,6 +33,7 @@ def main():
     sig.start()
     loop.data = [sig]
 
+    storage = Storage(config["datafile"])
     # read in probes from config 
     for id, probe_conf in config["probes"].items():
         check_command(id, probe_conf)
