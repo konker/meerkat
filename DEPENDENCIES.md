@@ -7,5 +7,6 @@ apt:
     - python-scapy
     - python-opencv
     - python-imaging
-pip:
-    - apscheduler
+
+easy_install:
+    - pyev

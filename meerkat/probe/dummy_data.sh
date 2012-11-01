@@ -6,4 +6,4 @@ if [ -z "$1" ]; then
 fi
 
 #echo `tr -dc A-Za-z0-9 </dev/urandom |  head -c $CHARS`
-echo "DUMMY DATA"
+echo -n "DUMMY DATA"

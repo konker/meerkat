@@ -35,21 +35,18 @@ class Probe(object):
         self.interval = interval
         self.duration = duration
         self.timeout = timeout
-        self.watchers = {"timer": None, "io": None, "duration": None, "timeout": None}
+        self.active = False
+        self.last_error = None
 
-    # execute the command
-    def timer_cb(self, watcher, revents):
-        logging.info(self.command)
-        self.pipe = Popen(self.command, stdout=PIPE).stdout
-        self.watchers["io"] = watcher.loop.io(self.pipe, pyev.EV_READ, self.io_cb)
-        self.watchers["io"].start()
-
-    # read any data available
-    def io_cb(self, watcher, revents):
-        logging.info('---- read----')
-        logging.info(self.pipe.read())
-        logging.info('----/read----')
-        self.watchers["io"].stop()
+        self.watchers = {
+            "timer": None,
+            "io": {
+                "stdout": None,
+                "stderr": None
+            },
+            "duration": None,
+            "timeout": None
+        }
 
     def register(self, loop):
         self.watchers["timer"] = loop.timer(0, self.interval, self.timer_cb)
@@ -63,6 +60,35 @@ class Probe(object):
             self.watchers["timeout"] = loop.timer(0, self.timeout, self.timeout_cb)
             self.watchers["timeout"].start()
 
+    # execute the command
+    def timer_cb(self, watcher, revents):
+        self.active = True
+        self.process = Popen(self.command, stdout=PIPE, stderr=PIPE)
+        self.watchers["io"]["stdout"] = watcher.loop.io(self.process.stdout, pyev.EV_READ, self.io_stdout_cb)
+        self.watchers["io"]["stdout"].start()
+        self.watchers["io"]["stderr"] = watcher.loop.io(self.process.stderr, pyev.EV_READ, self.io_stderr_cb)
+        self.watchers["io"]["stderr"].start()
+
+    # read any data available from stdout pipe
+    def io_stdout_cb(self, watcher, revents):
+        logging.info(self.id)
+        logging.info(self.process.stdout.read())
+        self.watchers["io"]["stdout"].stop()
+        self.active = False
+
+    # read any data available from stdout pipe
+    def io_stderr_cb(self, watcher, revents):
+        self.last_error = self.process.stderr.read()
+        if self.last_error == '':
+            logging.last_error = None
+        else:
+            logging.info("Error in probe: %s." % self.id)
+            logging.debug(self.last_error)
+
+        self.watchers["io"]["stderr"].stop()
+        self.watchers["io"]["stdout"].stop()
+        self.active = False
+
     def duration_cb(self, watcher, revents):
         # [FIXME: kill the subprocess?]
         pass
@@ -71,10 +97,19 @@ class Probe(object):
         # [FIXME: kill the subprocess?]
         pass
 
-    def stop(self):
-        for k,w in self.watchers.items():
+    def stop(self, watchers=None):
+        if watchers == None:
+            watchers = self.watchers
+
+        for k,w in watchers.items():
             if w:
-                w.stop()
+                if type(w) == type({}):
+                    # recurse
+                    self.stop(w)
+                else:
+                    w.stop()
+
+        self.active = False
 
 
 def main():
@@ -173,7 +208,7 @@ def signal_cb(watcher, revents):
 if __name__ == '__main__':
 
     # configure logging
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         #filename=config['logfile'],
                         stream=sys.stdout,
                         format='%(asctime)s [%(threadName)s] %(message)s',
