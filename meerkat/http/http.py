@@ -27,7 +27,7 @@ class HttpServer(object):
 
     def start(self):
         self.http_thread = Thread(target=bottle.run,
-                                  kwargs=dict(host='0.0.0.0', port='8080'),
+                                  kwargs=dict(host='0.0.0.0', port='80'),
                                   name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()

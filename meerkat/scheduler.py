@@ -14,7 +14,7 @@ import signal
 import pyev
 
 from meerkat.exception import MeerkatException
-import meerkat.probe
+import meerkat.probe.probe as probe
 
 
 class Scheduler(object):
@@ -120,16 +120,16 @@ class Scheduler(object):
         if not "type" in probe_conf:
             raise ValueError("Bad config: %s does not have a 'type' attribute" % id)
 
-        if probe_conf["type"] == meerkat.probe.TYPE_DURATION:
+        if probe_conf["type"] == probe.TYPE_DURATION:
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
                                   and a 'duration' attribute" % id)
-            return meerkat.probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
-        elif probe_conf["type"] == meerkat.probe.TYPE_PERIODIC:
+            return probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
+        elif probe_conf["type"] == probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % id)
-            return meerkat.probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
-        elif probe_conf["type"] == meerkat.probe.TYPE_CONTINUOUS:
+            return probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
+        elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
 
         else:

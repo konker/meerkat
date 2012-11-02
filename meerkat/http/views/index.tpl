@@ -39,6 +39,9 @@
         </div>
       %end
   </section>
+  <section class="row">
+    <img src="static/images/latest.tiff" />
+  </section>
 
   <!-- Latest version of jQuery -->
   <script src="static/javascripts/jquery.js"></script>

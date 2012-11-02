@@ -1,5 +1,5 @@
 import os
-import meerkat.probe
+import meerkat.probe.probe as probe
 
 config = {
     # paths relative from this config file
@@ -10,21 +10,21 @@ config = {
     "datafile": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'data', 'meerkat.db')),
     "probe_path": os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', 'meerkat', 'probe')),
+                                 '..', 'meerkat', 'probe', 'bin')),
 
     "probes": {
         "meerkat.probe.sleeper": {
             "command": ["sleeper.sh", "60"],
-            "type": meerkat.probe.TYPE_DURATION,
+            "type": probe.TYPE_DURATION,
             "duration": 5,
             "interval": 6,
-            "data_type": meerkat.probe.DATA_TYPE_DATA
+            "data_type": probe.DATA_TYPE_DATA
         },
         "meerkat.probe.camera_photo": {
             "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
-            "type": meerkat.probe.TYPE_PERIODIC,
+            "type": probe.TYPE_PERIODIC,
             "interval": 10,
-            "data_type": meerkat.probe.DATA_TYPE_DATA,
+            "data_type": probe.DATA_TYPE_DATA,
             "filters": [
             ],
             "error_filters": [
@@ -33,16 +33,16 @@ config = {
         },
         "meerkat.probe.dummy_data": {
             "command": ["dummy_data.sh", "128"],
-            "type": meerkat.probe.TYPE_PERIODIC,
+            "type": probe.TYPE_PERIODIC,
             "interval": 10,
-            "data_type": meerkat.probe.DATA_TYPE_DATA
+            "data_type": probe.DATA_TYPE_DATA
         },
         "meerkat.probe.bluetooth": {
             "command": ["bluetooth_scan.py"],
-            "type": meerkat.probe.TYPE_DURATION,
+            "type": probe.TYPE_DURATION,
             "duration": 30,
             "interval": 30,
-            "data_type": meerkat.probe.DATA_TYPE_JSON,
+            "data_type": probe.DATA_TYPE_JSON,
             "filters": [
                 "meerkat.filters.dummy.Uppercase"
             ]
@@ -52,30 +52,30 @@ config = {
 
 '''
         "meerkat.probe.wifi_scan": {
-            "type": meerkat.probe.TYPE_PERIODIC,
+            "type": probe.TYPE_PERIODIC,
             "interval": 30,
-            "data_type": meerkat.probe.DATA_TYPE_JSON,
+            "data_type": probe.DATA_TYPE_JSON,
             "filters": [
                 "meerkat.filters.drop_unchanged"
             ]
         },
         "meerkat.probe.wifi_fake_ap": {
-            "type": meerkat.probe.TYPE_CONTINUOUS,
+            "type": probe.TYPE_CONTINUOUS,
             "data_type": meerkat.probe.DATA_TYPE_JSON
         },
         "meerkat.probe.wifi_packet_sniff": {
-            "type": meerkat.probe.TYPE_DURATION,
+            "type": probe.TYPE_DURATION,
             "duration": 30,
             "interval": 30,
-            "data_type": meerkat.probe.DATA_TYPE_JSON,
+            "data_type": probe.DATA_TYPE_JSON,
             "filters": [
                 "meerkat.filters.packet_filter"
             ]
         },
         "meerkat.probe.photo": {
-            "type": meerkat.probe.TYPE_PERIODIC,
+            "type": probe.TYPE_PERIODIC,
             "interval": 30,
-            "data_type": meerkat.probe.DATA_TYPE_JSON, # this matches the output of all filters
+            "data_type": probe.DATA_TYPE_JSON, # this matches the output of all filters
             "filters": [
                 "meerkat.filters.opencv_pedestrian_count"
             ]

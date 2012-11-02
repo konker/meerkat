@@ -1,6 +1,20 @@
 TODO
 ==============================================================================
 
+- move code out of __init__.py modules
+
+- command-line args for daemon
+    - logfile
+    - debug
+    - http host?
+    - http port?
+
+- change to tornado?
+    - websockets?
+
+- duration timeout -> kill -> doesn't read output?
+- continuous -> will io watcher work?
+
 - meerkat.probes package holds small stand-alone probe programs
     - each probe writes JSON/binary data(?) to it's stdout
     - can be called from command line
@@ -10,55 +24,8 @@ TODO
             - or should the master program terminate a probe after n secs?
                 - what about data in inconsisitent state?
 
-
     - do we need a Probe base class?
 
-- probes are configured by config.config
-    "global_filters": [
-        # or just repeat this in each filters array?
-        # XXX: does this imply that all probes have BINARY data_type?
-        "meerkat.filter.ecrypt"
-    ],
-    - "probes": [
-        "meerkat.probe.bluetooth": {
-            "type": "PROBE_DURATION",
-            "duration": 30,
-            "delay": 60,
-            "data_type": "JSON",
-            "filters": [
-                "meerkat.filter.drop_unchanged"
-            ]
-        },
-        "meerkat.probe.wifi_scan": {
-            "type": "PROBE_PERIODIC",
-            "delay": 30,
-            "data_type": "JSON",
-            "filters": [
-                "meerkat.filter.drop_unchanged"
-            ]
-        },
-        "meerkat.probe.wifi_fake_ap": {
-            "type": "PROBE_CONTINUOUS",
-            "data_type": "JSON"
-        },
-        "meerkat.probe.wifi_packet_sniff": {
-            "type": "PROBE_DURATION",
-            "duration": 30,
-            "delay": 30,
-            "data_type": "JSON",
-            "filters": [
-                "meerkat.filter.packet_filter"
-            ]
-        },
-        "meerkat.probe.photo": {
-            "type": "PROBE_PERIODIC",
-            "delay": 30,
-            "data_type": "JSON", # this matches the output of all filters
-            "filters": [
-                "meerkat.filter.opencv_pedestrian_count"
-            ]
-        }
-    ]
 
 - main program loads and manages each probe
     - responsible for scheduling probe calls:
@@ -71,22 +38,6 @@ TODO
     - probes are called using multiprocessing with pipes for probe stdout
     - event loop for reading on file descriptors?
         - pyev
-
-- main program provides storage
-    - sqlite
-    - pos. encrypt
-
-- main program manages filters
-    - plugins loaded from meerkat.filters
-    - filters provide a filter(data) method
-    - config.config configures which filters are applied to which probes
-    - could be multiple filters pipelined for one probe
-    - e.g. photo try and detect faces, send that meta-data,
-      drop actual photo
-    - maybe encryption could be a fitler?
-        - a way to configure 'global' filters that automatically apply
-          to all probes?
-    - do we need a Filter base class?
 
 - proposed probes:
     - wifi ap scan
@@ -118,21 +69,10 @@ TODO
         - filters?
     - start/stop system?
 
-- what about:
-    - Motion?
-
 - potential problems:
-    - wifi dongle no moitor mode: cannot do packet sniffing
-        - pos. re-compile kernel?
-    - when wifi dongle is in monitor mode for sniffing
-        - cannot do wifi scan?
-            - sniffing => wifi scan?
-        - cannot do fake AP?
     - usb storage drive draws too much power?
         - use bigger sdhc card?
     - general performance problems
         - use netbook?
-    - opencv on arm?
-        - seems python-opencv package is available
 
 
