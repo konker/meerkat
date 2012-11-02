@@ -25,7 +25,7 @@ from meerkat.http.http import HttpServer
 
 def main():
     # configure logging
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=logging.DEBUG,
                         #filename=config['logfile'],
                         stream=sys.stdout,
                         format='%(asctime)s [%(threadName)s] %(message)s',

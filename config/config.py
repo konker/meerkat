@@ -13,17 +13,17 @@ config = {
                                  '..', 'meerkat', 'probe', 'bin')),
 
     "probes": {
-        "meerkat.probe.sleeper": {
-            "command": ["sleeper.sh", "60"],
+        "meerkat.probe.tick_sleeper": {
+            "command": ["tick_sleeper.sh", "20"],
             "type": probe.TYPE_DURATION,
-            "duration": 5,
-            "interval": 6,
+            "duration": 6,
+            "interval": 8,
             "data_type": probe.DATA_TYPE_DATA
         },
         "meerkat.probe.camera_photo": {
             "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
             "type": probe.TYPE_PERIODIC,
-            "interval": 10,
+            "interval": 100,
             "data_type": probe.DATA_TYPE_DATA,
             "filters": [
             ],

@@ -1,6 +1,9 @@
 TODO
 ==============================================================================
 
+- add pause / unpause
+    - stop probes, but not destroy
+
 - move code out of __init__.py modules
 
 - command-line args for daemon

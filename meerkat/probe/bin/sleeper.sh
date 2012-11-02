@@ -5,5 +5,5 @@ if [ -z "$1" ]; then
     LEN=60
 fi
 
-sleep $LEN
-echo -n "slept for $LEN seconds"
+exec sleep $LEN
+echo -n "{\"status\":\"END\",\"data\":\"slept for $LEN seconds\"}"
