@@ -22,11 +22,12 @@ DATA_TYPE_DATA = 16
 
 
 class Probe(object):
-    def __init__(self, id, storage, command, filters, interval, duration=-1, timeout=-1):
+    def __init__(self, id, storage, command, filters, error_filters, interval, duration=-1, timeout=-1):
         self.id = id
         self.storage = storage
         self.command = command
         self.filters = filters
+        self.error_filters = error_filters
         self.interval = interval
         self.duration = duration
         self.timeout = timeout
@@ -92,17 +93,21 @@ class Probe(object):
 
     # read any data available from stdout pipe
     def io_stderr_cb(self, watcher, revents):
-        self.last_error = self.process.stderr.read()
-        if self.last_error == '':
-            logging.last_error = None
-        else:
+        data = self.process.stderr.read()
+
+        for filter in self.error_filters:
+            data = filter.filter(data)
+
+        # check that it is an error after filters
+        if not data == '' and not data == None:
+            logging.last_error = data
             logging.error("Error in probe: %s." % self.id)
             logging.debug(self.last_error)
 
-        self.cancel_duration()
-        self.cancel_timeout()
-        self.cancel_io()
-        self.active = False
+            self.cancel_duration()
+            self.cancel_timeout()
+            self.cancel_io()
+            self.active = False
 
 
     def kill_process(self):

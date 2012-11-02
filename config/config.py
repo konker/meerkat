@@ -20,6 +20,17 @@ config = {
             "interval": 6,
             "data_type": meerkat.probe.DATA_TYPE_DATA
         },
+        "meerkat.probe.camera_photo": {
+            "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
+            "type": meerkat.probe.TYPE_PERIODIC,
+            "interval": 10,
+            "data_type": meerkat.probe.DATA_TYPE_DATA,
+            "filters": [
+            ],
+            "error_filters": [
+                "meerkat.filters.cv_filters.RemoveErrors"
+            ]
+        },
         "meerkat.probe.dummy_data": {
             "command": ["dummy_data.sh", "128"],
             "type": meerkat.probe.TYPE_PERIODIC,

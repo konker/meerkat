@@ -13,6 +13,7 @@ import logging
 import signal
 import pyev
 
+from meerkat.exception import MeerkatException
 import meerkat.probe
 
 
@@ -37,6 +38,9 @@ class Scheduler(object):
 
             # load filters
             self.load_filters(id, probe_conf)
+
+            # load error filters
+            self.load_error_filters(id, probe_conf)
         
             p = self.get_probe(id, probe_conf, storage)
             p.register(self.loop)
@@ -67,13 +71,21 @@ class Scheduler(object):
 
 
     def load_filters(self, id, probe_conf):
-        if not "filters" in probe_conf:
-            probe_conf["filters"] = []
+        self._load_filters(id, probe_conf, "filters")
+
+
+    def load_error_filters(self, id, probe_conf):
+        self._load_filters(id, probe_conf, "error_filters")
+
+
+    def _load_filters(self, id, probe_conf, filter_conf_key):
+        if not filter_conf_key in probe_conf:
+            probe_conf[filter_conf_key] = []
             return
 
         # Dynamically load filters for then probe.
         # Replace the module/class name with an actual instance.
-        for i, module in enumerate(probe_conf["filters"]):
+        for i, module in enumerate(probe_conf[filter_conf_key]):
             try:
                 parts = module.split(".")
                 cls = parts[-1]
@@ -85,7 +97,7 @@ class Scheduler(object):
 
             if sys.modules.has_key(module):
                 if hasattr(sys.modules[module], cls):
-                    probe_conf["filters"][i] = getattr(sys.modules[module], cls)()
+                    probe_conf[filter_conf_key][i] = getattr(sys.modules[module], cls)()
                 else:
                     raise MeerkatException("Module %s has no class %s" % (module, cls))
             else:
@@ -112,11 +124,11 @@ class Scheduler(object):
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
                                   and a 'duration' attribute" % id)
-            return meerkat.probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["interval"], probe_conf["duration"])
+            return meerkat.probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
         elif probe_conf["type"] == meerkat.probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % id)
-            return meerkat.probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["interval"])
+            return meerkat.probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
         elif probe_conf["type"] == meerkat.probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
 

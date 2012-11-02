@@ -6,7 +6,7 @@ apt:
     - python-bluez
     - python-scapy
     - python-opencv
-    - python-imaging
+    #- python-imaging
 
 easy_install:
     - pyev
