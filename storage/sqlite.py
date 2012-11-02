@@ -38,17 +38,17 @@ class Storage(BaseStorage):
         return "sqlite3"
 
 
-    def write_array(self, channel_id, array):
-        self.write_str(channel_id, array.tostring())
+    def write_array(self, probe_id, array):
+        self.write_str(probe_id, array.tostring())
 
 
-    def write_str(self, channel_id, s):
+    def write_str(self, probe_id, s):
         timestamp = time.time()
         length    = len(s)
 
-        self.buffer.append((channel_id, timestamp, length, sqlite3.Binary(s)))
+        self.buffer.append((probe_id, timestamp, length, sqlite3.Binary(s)))
         if (len(self.buffer) >= self.buffer_size):
-            self.cursor.executemany('''INSERT into accessory_data (channel_id, timestamp, length, data)
+            self.cursor.executemany('''INSERT into accessory_data (probe_id, timestamp, length, data)
                                        VALUES (?, ?, ?, ?)''',
                                        self.buffer)
             self.buffer = []

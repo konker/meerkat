@@ -17,15 +17,16 @@ config = {
             "command": ["tick_sleeper.sh", "20"],
             "type": probe.TYPE_DURATION,
             "duration": 6,
-            "interval": 8,
+            "interval": 14,
             "data_type": probe.DATA_TYPE_DATA
         },
         "meerkat.probe.camera_photo": {
             "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
             "type": probe.TYPE_PERIODIC,
-            "interval": 100,
+            "interval": 20,
             "data_type": probe.DATA_TYPE_DATA,
             "filters": [
+                "meerkat.filters.cv_filters.CreateLatestLink"
             ],
             "error_filters": [
                 "meerkat.filters.cv_filters.RemoveErrors"
@@ -40,7 +41,7 @@ config = {
         "meerkat.probe.bluetooth": {
             "command": ["bluetooth_scan.py"],
             "type": probe.TYPE_DURATION,
-            "duration": 30,
+            "duration": 60,
             "interval": 30,
             "data_type": probe.DATA_TYPE_JSON,
             "filters": [

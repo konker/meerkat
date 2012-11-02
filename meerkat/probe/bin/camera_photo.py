@@ -16,13 +16,15 @@ import cv
 
 DEFAULT_IMAGE_WIDTH = 1280
 DEFAULT_IMAGE_HEIGHT = 720
+DEFAULT_FORMAT = 'jpg'
 
 def main():
     id = sys.argv[1] if len(sys.argv) > 1 else "camera_photo"
     width = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_IMAGE_WIDTH
     height = sys.argv[3] if len(sys.argv) > 2 else DEFAULT_IMAGE_HEIGHT
+    format = sys.argv[4] if len(sys.argv) > 3 else DEFAULT_FORMAT
 
-    filename = "%s-%s.tiff" % (id, strftime("%Y-%m-%d_%H:%M:%S"))
+    filename = "%s-%s.%s" % (id, strftime("%Y-%m-%d_%H:%M:%S"), format)
     filename = os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'http', 'static', 'images', filename))
 
