@@ -40,6 +40,7 @@ section {
     margin: 1.5em;
     }
   section h2 {
+    color: #555;
     border-bottom: 1px dotted #002635;
     margin: 0;
     font-size: 160%;
