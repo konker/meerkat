@@ -34,8 +34,9 @@
   <div class="container-fluid" id="container">
     <section class="row-fluid" id="master">
       <h2>
+        <i class="icon-info-sign"></i>
         info
-        <button class="btn pull-right" id="masterToggle">ON/OFF</button>
+        <button type="button" class="btn pull-right" id="masterToggle"><i class="icon-off"></i> <span class="lbl">ON/OFF</span></button>
       </h2>
       <div class="inner">
         <dl class="dl-horizontal">
@@ -52,45 +53,43 @@
           <dt class="free_space">free space</dt>
           <dd class="free_space"><!-- [yMB] --></dd>
         </dl>
-        <button class="btn btn-info" id="masterRefresh">Refresh</button>
+        <button type="button" class="btn btn-info" id="masterRefresh"><i class="icon-refresh"></i> Refresh</button>
       </div>
     </section>
     <section class="row-fluid" id="probes">
-      <h2>probes</h2>
+      <h2><i class="icon-eye-open"></i> probes</h2>
       <div class="inner">
         <!--START:PROBE -->
         <div class="probe row-fluid" id="probe.label">
           <h3>
             <i class="icon-chevron-right"></i>
             <span class="probe-label">probe.label</span>
-              <button class="probeToggle btn pull-right">toggle</button>
+            <button type="button" class="probeToggle btn pull-right"><i class="icon-off"></i> <span class="lbl">ON/OFF</span></button>
           </h3>
           <div class="probe-body">
             <div class="row-fluid status probe-section">
-              <h4>
-                info
-              </h4>
+              <h4><i class="icon-info-sign"></i> info</h4>
               <dl class="dl-horizontal">
                 <dt class="status">status</dt>
                 <dd class="status"><!-- [on/off] --></dd>
               </dl>
-              <button class="probeRefresh btn btn-info">refresh</button>
+              <button type="button" class="probeRefresh btn btn-info"><i class="icon-refresh"></i> refresh</button>
             </div>
             <div class="row-fluid data probe-section">
-              <h4>data</h4>
+              <h4><i class="icon-th-list"></i> data</h4>
               <!-- data table here -->
               <div class="dbody">
               </div>
             </div>
             <div class="row-fluid filters probe-section">
-              <h4>filters</h4>
+              <h4><i class="icon-cog"></i> filters</h4>
               <!-- filters here -->
               <ol>
                 <li></li>
               </ol>
             </div>
             <div class="row-fluid error-filters probe-section">
-              <h4>error filters</h4>
+              <h4><i class="icon-cog"></i> error filters</h4>
               <!-- error filters here -->
               <ol>
                 <li></li>
@@ -102,7 +101,7 @@
       </div>
     </section>
     <section class="row-fluid" id="log">
-      <h2>log</h2>
+      <h2><i class="icon-list"></i> log</h2>
       <div class="inner">
         <!-- log here -->
         <pre>
@@ -112,7 +111,7 @@
   </div>
   <footer>
     <p>
-    Konrad Markus &lt;<a href="mailto:konker@gmail.com">konker@gmail.com</a>&gt;
+    Konrad Markus/HIIT &lt;<a href="mailto:konrad.markus@hiit.fi">konrad.markus@hiit.fi</a>&gt;
     </p>
   </footer>
 

@@ -20,9 +20,8 @@ header {
   header h1 {
     color: #fff;
     margin: 0;
-    font-family: verdana, sans-serif;
     font-weight: normal;
-    font-size: 320%;
+    font-size: 300%;
     background: url(../img/logo.png) 0 0 no-repeat;
     padding: 0 0 8px 94px;
     }
@@ -41,12 +40,15 @@ section {
     margin: 1.5em;
     }
   section h2 {
-    border-bottom: 1px solid #d97925;
+    border-bottom: 1px dotted #002635;
     margin: 0;
     font-size: 160%;
     line-height: 1.5;
     padding: 0 0.5em;
     }
+    section h2 i {
+      vertical-align: baseline !important;
+      }
 
     #master dd.status {
       font-weight: bold;
@@ -91,6 +93,9 @@ section {
     }
   section dl.dl-horizontal dd {
     margin-left: 9em !important;
+    }
+  section .btn {
+    min-width: 8em;
     }
   section .btn-info {
     margin-left: 2.5em;

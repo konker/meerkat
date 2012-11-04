@@ -85,6 +85,7 @@ var meerkat = (function($) {
                             $('#masterToggle')
                                 .removeClass('btn-danger')
                                 .addClass('btn-success')
+                                .find('.lbl')
                                 .text('Master ON');
                             $('#master dl')
                                 .find('dd.status')
@@ -95,6 +96,7 @@ var meerkat = (function($) {
                             $('#masterToggle')
                                 .removeClass('btn-success')
                                 .addClass('btn-danger')
+                                .find('.lbl')
                                 .text('Master OFF');
                             $('#master dl')
                                 .find('dd.status')
@@ -139,13 +141,15 @@ var meerkat = (function($) {
                 var p = $('#' + e.data.id);
                 if (p.hasClass('open')) {
                     p.removeClass('open').addClass('closed');
-                    p.find('i')
+                    p.find('h3 i')
+                        .first()
                         .removeClass('icon-chevron-down')
                         .addClass('icon-chevron-right');
                 }
                 else {
                     p.removeClass('closed').addClass('open');
-                    p.find('i')
+                    p.find('h3 i')
+                        .first()
                         .removeClass('icon-chevron-right')
                         .addClass('icon-chevron-down');
                 }
@@ -244,6 +248,7 @@ var meerkat = (function($) {
                         .find('.probeToggle')
                         .removeClass('btn-danger')
                         .addClass('btn-success')
+                        .find('.lbl')
                         .text('Probe ON');
 
                     probeHtml
@@ -256,6 +261,7 @@ var meerkat = (function($) {
                         .find('.probeToggle')
                         .removeClass('btn-success')
                         .addClass('btn-danger')
+                        .find('.lbl')
                         .text('Probe OFF');
 
                     probeHtml
