@@ -104,6 +104,9 @@ var meerkat = (function($) {
                                 .addClass('text-error');
                         }
 
+                        /* show it */
+                        $('#master .section-body').show();
+
                         meerkat.loading.off();
                     }
                 });
@@ -175,6 +178,10 @@ var meerkat = (function($) {
                         for (var p in data.body.probes) {
                             meerkat.probes.renderProbe(p);
                         }
+
+                        /* show it */
+                        $('#probes .section-body').show();
+
                         meerkat.loading.off();
                     }
                 });
@@ -193,6 +200,10 @@ var meerkat = (function($) {
 
                         /* render the data */
                         meerkat.probes.renderProbe(p);
+
+                        /* show it */
+                        $('#probes .section-body').show();
+
                         meerkat.loading.off();
                     }
                 });
@@ -270,10 +281,11 @@ var meerkat = (function($) {
                         .addClass('text-error');
                 }
 
-                /* show it */
                 if (!probeHtml.hasClass('open') && !probeHtml.hasClass('closed')) {
                     probeHtml.addClass('closed');
                 }
+                /* show it */
+                $('#probes .section-body').show();
             },
             directives: {
                 main: {
@@ -318,6 +330,10 @@ var meerkat = (function($) {
                         /*[TODO: error handling ]*/
                         data.body.log = data.body.log.join("\n");
                         $('#log').render(data.body, meerkat.log.directives.main);
+
+                        /* show it */
+                        $('#log .section-body').show();
+
                         meerkat.loading.off();
                     }
                 });

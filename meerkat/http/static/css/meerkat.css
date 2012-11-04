@@ -28,16 +28,19 @@ header {
     header h1.loading {
       background: url(../img/loading.gif) 28px 8px no-repeat;
       }
+
 body {
   min-width: 800px;
+  background: #ddd;
   }
 
 section {
   margin: 1.5em 0;
   border-radius: 6px;
   }
-  section .inner {
+  section .section-body {
     margin: 1.5em;
+    display: none;
     }
   section h2 {
     color: #555;
@@ -98,7 +101,7 @@ section {
   section .btn {
     min-width: 8em;
     }
-  section .btn-info {
+  section .btn {
     margin-left: 2.5em;
     }
 

@@ -1,6 +1,36 @@
 TODO
 ==============================================================================
 
+- Leave websockets for later
+    - !!
+
+- test out opencv
+- test out network sniffing
+- create wifi client sniffer
+- find out more about clock/gps/ntp
+- "sessions"
+    - another db table:
+        id: id
+        start: datetime
+        end: datetime
+        user: user.id (?)
+        data_size_start: number
+        data_size_end: number
+
+
+- change to tornado?
+    - class based route handlers
+    - better ajax support?
+    - better auth support
+    - websockets?
+        - later
+
+- add some kind of auth
+    - can be manually controlled
+
+- add warning prompts for toggle buttons
+- add error indicators when ajax errors occur
+
 - add pause / unpause
     - stop probes, but not destroy
 
@@ -11,9 +41,6 @@ TODO
     - debug
     - http host?
     - http port?
-
-- change to tornado?
-    - websockets?
 
 - duration timeout -> kill -> doesn't read output?
 - continuous -> will io watcher work?
