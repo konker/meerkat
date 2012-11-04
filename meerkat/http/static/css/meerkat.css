@@ -26,6 +26,9 @@ header {
     background: url(../img/logo.png) 0 0 no-repeat;
     padding: 0 0 8px 94px;
     }
+    header h1.loading {
+      background: url(../img/loading.gif) 28px 8px no-repeat;
+      }
 body {
   min-width: 800px;
   }
@@ -88,6 +91,9 @@ section {
     }
   section dl.dl-horizontal dd {
     margin-left: 9em !important;
+    }
+  section .btn-info {
+    margin-left: 2.5em;
     }
 
   .probe h4 {
