@@ -31,12 +31,12 @@
       <h1>meerkat</h1>
     </div>
   </header>
-  <div class="container-fluid" id="container">
-    <section class="row-fluid" id="master">
+  <div class="container" id="container">
+    <section class="row" id="master">
       <h2>
         <i class="icon-info-sign"></i>
         info
-        <button type="button" class="btn pull-right" id="masterToggle"><i class="icon-off"></i> <span class="lbl">ON/OFF</span></button>
+        <button type="button" class="btn pull-right" id="masterToggle"><i class="icon-off icon-white"></i> <span class="lbl">ON/OFF</span></button>
       </h2>
       <div class="section-body">
         <dl class="dl-horizontal">
@@ -54,20 +54,24 @@
           <dd class="free_space"><!-- [yMB] --></dd>
         </dl>
         <button type="button" class="btn refresh" id="masterRefresh"><i class="icon-refresh"></i> Refresh</button>
+
+        <div id="latest-img">
+          <a href="static/img/test.jpg"><img src="static/img/test.jpg"/></a>
+        </div>
       </div>
     </section>
-    <section class="row-fluid" id="probes">
+    <section class="row" id="probes">
       <h2><i class="icon-eye-open"></i> probes</h2>
       <div class="section-body">
         <!--START:PROBE -->
-        <div class="probe row-fluid" id="probe.label">
+        <div class="probe row" id="probe.label">
           <h3>
             <i class="icon-chevron-right"></i>
             <span class="probe-label">probe.label</span>
-            <button type="button" class="probeToggle btn pull-right"><i class="icon-off"></i> <span class="lbl">ON/OFF</span></button>
+            <button type="button" class="probeToggle btn pull-right"><i class="icon-off icon-white"></i> <span class="lbl">ON/OFF</span></button>
           </h3>
           <div class="probe-body">
-            <div class="row-fluid status probe-section">
+            <div class="row status probe-section">
               <h4><i class="icon-info-sign"></i> info</h4>
               <dl class="dl-horizontal">
                 <dt class="status">status</dt>
@@ -75,21 +79,21 @@
               </dl>
               <button type="button" class="probeRefresh btn refresh"><i class="icon-refresh"></i> refresh</button>
             </div>
-            <div class="row-fluid data probe-section">
+            <div class="row data probe-section">
               <h4><i class="icon-th-list"></i> data</h4>
               <!-- data table here -->
               <div class="dbody">
               </div>
             </div>
-            <div class="row-fluid filters probe-section">
-              <h4><i class="icon-cog"></i> filters</h4>
+            <div class="row filters probe-section">
+              <h4><i class="icon-wrench"></i> filters</h4>
               <!-- filters here -->
               <ol>
                 <li></li>
               </ol>
             </div>
-            <div class="row-fluid error-filters probe-section">
-              <h4><i class="icon-cog"></i> error filters</h4>
+            <div class="row error-filters probe-section">
+              <h4><i class="icon-wrench"></i> error filters</h4>
               <!-- error filters here -->
               <ol>
                 <li></li>
@@ -100,7 +104,7 @@
         <!--END:PROBE -->
       </div>
     </section>
-    <section class="row-fluid" id="log">
+    <section class="row" id="log">
       <h2><i class="icon-list"></i> log</h2>
       <div class="section-body">
         <!-- log here -->
@@ -111,7 +115,7 @@
   </div>
   <footer>
     <p>
-    Konrad Markus/HIIT &lt;<a href="mailto:konrad.markus@hiit.fi">konrad.markus@hiit.fi</a>&gt;
+    <i class="icon-hand-right"></i> Konrad Markus/HIIT &lt;<a href="mailto:konrad.markus@hiit.fi">konrad.markus@hiit.fi</a>&gt;
     </p>
   </footer>
 

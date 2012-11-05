@@ -8,6 +8,7 @@ TODO
 - test out network sniffing
 - create wifi client sniffer
 - find out more about clock/gps/ntp
+
 - "sessions"
     - another db table:
         id: id
@@ -17,6 +18,9 @@ TODO
         data_size_start: number
         data_size_end: number
 
+- "latest image"
+    - have a function to grab a frame from the camera and save as latest.jpg
+        - can be called via web
 
 - change to tornado?
     - class based route handlers
