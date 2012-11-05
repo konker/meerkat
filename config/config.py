@@ -12,6 +12,11 @@ config = {
     "probe_path": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probe', 'bin')),
 
+    "http_host": "0.0.0.0",
+    "http_port": 80,
+    "ssl_cert": None,
+    "ssl_key": None,
+
     "probes": {
         "meerkat.probe.tick_sleeper": {
             "command": ["tick_sleeper.sh", "20"],

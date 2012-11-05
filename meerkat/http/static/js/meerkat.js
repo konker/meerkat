@@ -1,8 +1,8 @@
 
 var meerkat = (function($) {
-    var PROBES_JSON_URL = 'probes.json';
-    var MASTER_JSON_URL = 'master.json';
-    var LOG_JSON_URL = 'log.json';
+    var PROBES_JSON_URL = '/probes.json';
+    var MASTER_JSON_URL = '/master.json';
+    var LOG_JSON_URL = '/log.json';
 
     return {
         init: function() {
@@ -10,113 +10,114 @@ var meerkat = (function($) {
             meerkat.probes.init();
             meerkat.log.init();
         },
-        loading: {
-            _stack: 0,
-            on: function() {
-                meerkat.loading._stack++;
-                meerkat.loading._setLoading(true);
-            },
-            off: function() {
-                meerkat.loading._stack--;
-                if (meerkat.loading._stack <= 0) {
-                    meerkat.loading._setLoading(false);
-                }
-            },
-            _setLoading: function(on) {
-                if (on) {
-                    $('h1').addClass('loading');
-                }
-                else {
-                    $('h1').removeClass('loading');
-                    meerkat.loading._stack = 0;
-                }
-            }
-        },
         master: {
+            master: null,
+
             init: function() {
-                meerkat.loading.on();
                 meerkat.master.refresh();
             },
-            masterToggle: function() {
-                /* TODO */
-                meerkat.loading.on();
-                meerkat.master.refresh();
-                return false;
-            },
-            masterRefresh: function() {
-                meerkat.loading.on();
-                meerkat.master.refresh();
+            toggle: function() {
+                meerkat.util.loading.on();
+
+                var command = 'ON';
+                if (meerkat.master.master.status == 'ON') {
+                    command = 'OFF';
+                }
+
+                $.ajax({
+                    url: MASTER_JSON_URL,
+                    type: 'POST',
+                    data: {'command': command},
+                    dataType: 'json',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        alert(errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        meerkat.master.master = data.body;
+                        meerkat.master.renderMaster();
+
+                        meerkat.probes.refresh();
+                        meerkat.util.loading.off();
+                    }
+                });
                 return false;
             },
             refresh: function() {
+                meerkat.util.loading.on();
+
                 /* fetch JSON data from the server */
                 $.ajax({
-                    url: 'master.json',
+                    url: MASTER_JSON_URL,
                     dataType: 'json',
                     error: function(data, textStatus, jqXHR) {
                         /*[TODO: error handling ]*/
                         alert(errorThrown);
-                        meerkat.loading.off();
+                        meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
-                        /*[TODO: error handling ]*/
-                        /* extra formatting */
-                        data.body.uptime_ms =
-                            meerkat.util.format_ms(data.body.uptime_ms);
-                        data.body.data_size_mb =
-                            meerkat.util.format_mb(data.body.data_size_mb);
-                        data.body.free_space_mb =
-                            meerkat.util.format_mb(data.body.free_space_mb);
-
-                        /* render the data */
-                        $('#master').render(data.body, meerkat.master.directives.main);
-
-                        /* event handlers */
-                        $('#masterToggle')
-                            .unbind('click')
-                            .bind('click', meerkat.master.masterToggle);
-
-                        $('#masterRefresh')
-                            .unbind('click')
-                            .bind('click', meerkat.master.masterRefresh);
-
-                        /* visual aids */
-                        if (data.body.status == 'ON') {
-                            $('#masterToggle')
-                                .removeClass('btn-danger')
-                                .addClass('btn-success')
-                                .find('.lbl')
-                                .text('Master ON');
-                            $('#master dl')
-                                .find('dd.status')
-                                .removeClass('text-error')
-                                .addClass('text-success');
-                        }
-                        else {
-                            $('#masterToggle')
-                                .removeClass('btn-success')
-                                .addClass('btn-danger')
-                                .find('.lbl')
-                                .text('Master OFF');
-                            $('#master dl')
-                                .find('dd.status')
-                                .removeClass('text-success')
-                                .addClass('text-error');
-                        }
-
-                        /* show it */
-                        $('#master .section-body').show();
-
-                        meerkat.loading.off();
+                        meerkat.master.master = data.body;
+                        meerkat.master.renderMaster();
+                        meerkat.util.loading.off();
                     }
                 });
+                return false;
+            },
+            renderMaster: function() {
+                /* extra formatting */
+                meerkat.master.master.uptime_secs =
+                    meerkat.util.format_secs(meerkat.master.master.uptime_secs);
+                meerkat.master.master.data_size_mb =
+                    meerkat.util.format_mb(meerkat.master.master.data_size_mb);
+                meerkat.master.master.free_space_mb =
+                    meerkat.util.format_mb(meerkat.master.master.free_space_mb);
+
+                /* render the data */
+                $('#master').render(meerkat.master.master, meerkat.master.directives.main);
+
+                /* event handlers */
+                $('#masterToggle')
+                    .unbind('click')
+                    .bind('click', meerkat.master.toggle);
+
+                $('#masterRefresh')
+                    .unbind('click')
+                    .bind('click', meerkat.master.refresh);
+
+                /* visual aids */
+                if (meerkat.master.master.status == 'ON') {
+                    $('#masterToggle')
+                        .removeClass('btn-danger')
+                        .addClass('btn-success')
+                        .find('.lbl')
+                        .text('Master ON');
+                    $('#master dl')
+                        .find('dd.status')
+                        .removeClass('text-error')
+                        .addClass('text-success');
+                }
+                else {
+                    $('#masterToggle')
+                        .removeClass('btn-success')
+                        .addClass('btn-danger')
+                        .find('.lbl')
+                        .text('Master OFF');
+                    $('#master dl')
+                        .find('dd.status')
+                        .removeClass('text-success')
+                        .addClass('text-error');
+                }
+
+                /* show it */
+                $('#master .section-body').show();
             },
             directives: {
                 main: {
                     'dd.status': 'status',
                     'dd.ip_address': 'ip_address',
                     'dd.host': 'host',
-                    'dd.uptime': 'uptime_ms',
+                    'dd.uptime': 'uptime_secs',
                     'dd.data_size': 'data_size_mb',
                     'dd.free_space': 'free_space_mb',
                 }
@@ -126,19 +127,106 @@ var meerkat = (function($) {
             probes: null,
 
             init: function() {
-                meerkat.loading.on();
-                meerkat.probes.refresh();
+                meerkat.probes.loadProbes();
             },
-            probeToggle: function(e) {
-                /* TODO */
-                meerkat.loading.on();
-                meerkat.probes.refreshProbe(e.data.p);
+            loadProbes: function() {
+                meerkat.util.loading.on();
+
+                $.ajax({
+                    url: PROBES_JSON_URL,
+                    dataType: 'json',
+                    error: function(data, textStatus, jqXHR) {
+                        /*[TODO: error handling ]*/
+                        alert(errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        /*[TODO: error handling ]*/
+
+                        meerkat.probes.probes = data.body.probes;
+
+                        /* render the data */
+                        $('#probes').render(data.body, meerkat.probes.directives.main);
+
+                        for (var p in data.body.probes) {
+                            meerkat.probes.renderProbe(p);
+                        }
+
+                        /* show it */
+                        $('#probes .section-body').show();
+
+                        meerkat.util.loading.off();
+                    }
+                });
                 return false;
             },
-            probeRefresh: function(e) {
-                meerkat.loading.on();
-                meerkat.probes.refreshProbe(e.data.p);
+            toggle: function(e) {
+                meerkat.util.loading.on();
+                var probe = meerkat.probes.probes[e.data.p];
+                var command = 'ON';
+                if (probe.status == 'ON') {
+                    command = 'OFF';
+                }
+
+                $.ajax({
+                    url: '/' + probe.id + '.json',
+                    type: 'POST',
+                    data: {'command': command},
+                    dataType: 'json',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        alert(errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        meerkat.probes.probes[e.data.p] = data.body;
+
+                        /* render the data */
+                        meerkat.probes.renderProbe(e.data.p);
+
+                        /* show it */
+                        $('#probes .section-body').show();
+
+                        /* make sure master is up to date */
+                        meerkat.master.refresh();
+
+                        meerkat.util.loading.off();
+                    }
+                });
                 return false;
+            },
+            refresh: function() {
+                for (var p in meerkat.probes.probes) {
+                    meerkat.probes.refreshOne(p);
+                }
+            },
+            probeRefreshCB: function(e) {
+                meerkat.probes.refreshOne(e.data.p);
+                return false;
+            },
+            refreshOne: function(p) {
+                meerkat.util.loading.on();
+
+                $.ajax({
+                    url: '/' + meerkat.probes.probes[p].id + '.json',
+                    dataType: 'json',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        alert(errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        meerkat.probes.probes[p] = data.body;
+
+                        /* render the data */
+                        meerkat.probes.renderProbe(p);
+
+                        /* show it */
+                        $('#probes .section-body').show();
+
+                        meerkat.util.loading.off();
+                    }
+                });
             },
             toggleOpenProbe: function(e) {
                 var p = $('#' + e.data.id);
@@ -157,56 +245,6 @@ var meerkat = (function($) {
                         .addClass('icon-chevron-down');
                 }
                 return false;
-            },
-            refresh: function() {
-                $.ajax({
-                    url: 'probes.json',
-                    dataType: 'json',
-                    error: function(data, textStatus, jqXHR) {
-                        /*[TODO: error handling ]*/
-                        alert(errorThrown);
-                        meerkat.loading.off();
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        /*[TODO: error handling ]*/
-
-                        meerkat.probes.probes = data.body.probes;
-
-                        /* render the data */
-                        $('#probes').render(data.body, meerkat.probes.directives.main);
-
-                        for (var p in data.body.probes) {
-                            meerkat.probes.renderProbe(p);
-                        }
-
-                        /* show it */
-                        $('#probes .section-body').show();
-
-                        meerkat.loading.off();
-                    }
-                });
-            },
-            refreshProbe: function(p) {
-                $.ajax({
-                    url: meerkat.probes.probes[p].id + '.json',
-                    dataType: 'json',
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        /*[TODO: error handling ]*/
-                        alert(errorThrown);
-                        meerkat.loading.off();
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        meerkat.probes.probes[p] = data.body;
-
-                        /* render the data */
-                        meerkat.probes.renderProbe(p);
-
-                        /* show it */
-                        $('#probes .section-body').show();
-
-                        meerkat.loading.off();
-                    }
-                });
             },
             renderProbe: function(p) {
                 var probeHtml = $('#' + meerkat.probes.probes[p].id);
@@ -246,12 +284,12 @@ var meerkat = (function($) {
                 probeHtml
                     .find('.probeToggle')
                     .unbind('click')
-                    .bind('click', {p: p, id: meerkat.probes.probes[p].id}, meerkat.probes.probeToggle);
+                    .bind('click', {p: p, id: meerkat.probes.probes[p].id}, meerkat.probes.toggle);
 
                 probeHtml
                     .find('.probeRefresh')
                     .unbind('click')
-                    .bind('click', {p: p, id: meerkat.probes.probes[p].id}, meerkat.probes.probeRefresh);
+                    .bind('click', {p: p}, meerkat.probes.probeRefreshCB);
 
                 /* visual aids */
                 if (meerkat.probes.probes[p].status == 'ON') {
@@ -297,7 +335,9 @@ var meerkat = (function($) {
                     }
                 },
                 single: {
-                    'dd.status': 'status'
+                    'dd.status': 'status',
+                    'dd.interval': 'interval',
+                    'dd.duration': 'duration'
                 },
                 filters: {
                     'li': {
@@ -317,24 +357,29 @@ var meerkat = (function($) {
         },
         log: {
             init: function() {
-                meerkat.loading.on();
+                meerkat.log.refresh();
+            },
+            refresh: function() {
+                meerkat.util.loading.on();
                 $.ajax({
-                    url: 'log.json',
+                    url: LOG_JSON_URL,
                     dataType: 'json',
                     error: function(data, textStatus, jqXHR) {
                         /*[TODO: error handling ]*/
                         alert(errorThrown);
-                        meerkat.loading.off();
+                        meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
-                        /*[TODO: error handling ]*/
-                        data.body.log = data.body.log.join("\n");
+                        data.body.log = data.body.log.join("");
                         $('#log').render(data.body, meerkat.log.directives.main);
-
+                        $('#log')
+                            .find('.logRefresh')
+                            .unbind('click')
+                            .bind('click', meerkat.log.refresh);
                         /* show it */
                         $('#log .section-body').show();
 
-                        meerkat.loading.off();
+                        meerkat.util.loading.off();
                     }
                 });
             },
@@ -345,10 +390,34 @@ var meerkat = (function($) {
             }
         },
         util: {
-            format_ms: function(ms) {
-                return (ms / 1000) + " secs";
+            loading: {
+                _stack: 0,
+                on: function() {
+                    meerkat.util.loading._stack++;
+                    meerkat.util.loading._setLoading(true);
+                },
+                off: function() {
+                    meerkat.util.loading._stack--;
+                    if (meerkat.util.loading._stack <= 0) {
+                        meerkat.util.loading._setLoading(false);
+                    }
+                },
+                _setLoading: function(on) {
+                    if (on) {
+                        $('h1').addClass('loading');
+                    }
+                    else {
+                        $('h1').removeClass('loading');
+                        meerkat.util.loading._stack = 0;
+                    }
+                }
+            },
+            format_secs: function(secs) {
+                /*[TODO]*/
+                return secs + " secs";
             },
             format_mb: function(mb) {
+                /*[TODO]*/
                 return mb + " MB";
             }
         }

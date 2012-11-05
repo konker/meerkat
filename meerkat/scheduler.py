@@ -19,6 +19,9 @@ import meerkat.probe.probe as probe
 
 class Scheduler(object):
     def __init__(self, probe_path, probe_confs, storage, signal_cb):
+        self.active = False
+        self.active_probes = 0
+
         self.probe_path = probe_path
         def extra_signal_cb():
             signal_cb()
@@ -49,23 +52,56 @@ class Scheduler(object):
 
     def sigint_cb(self, watcher, revents):
         logging.info("SIGINT caught. Exiting..")
-        self.stop()
+        self.halt()
         self.extra_signal_cb()
 
 
-    def start(self):
+    def start(self, paused=False):
+        if not paused:
+            self.start_probes()
+
         logging.info("Event loop start")
         self.loop.start()
 
 
-    def stop(self):
+    def start_probes(self):
+        logging.info("Start all probes")
+        for p in xrange(len(self.probes)):
+            self.start_probe(p)
+
+
+    def start_probe(self, p):
+        logging.info("Start probe: %s" % self.probes[p].id)
+        if not self.probes[p].running:
+            self.active_probes = self.active_probes + 1
+        self.probes[p].start()
+        self.active = True
+
+
+    def stop_probes(self):
+        logging.info("Stop all probes")
+        if self.probes:
+            for p in xrange(len(self.probes)):
+                self.stop_probe(p)
+
+
+    def stop_probe(self, p):
+        logging.info("Stop probe: %s" % self.probes[p].id)
+        if self.probes[p].running:
+            self.active_probes = self.active_probes - 1
+        self.probes[p].stop()
+        if self.active_probes == 0:
+            self.active = False
+
+
+    def halt(self):
+        logging.info("Halting...")
         if self.loop.data:
             while self.loop.data:
                 self.loop.data.pop().stop()
 
         if self.probes:
-            while self.probes:
-                self.probes.pop().stop()
+            self.stop_probes()
 
         self.loop.stop(pyev.EVBREAK_ALL)
 
@@ -86,6 +122,7 @@ class Scheduler(object):
         # Dynamically load filters for then probe.
         # Replace the module/class name with an actual instance.
         for i, module in enumerate(probe_conf[filter_conf_key]):
+            filter_id = module
             try:
                 parts = module.split(".")
                 cls = parts[-1]
@@ -97,7 +134,7 @@ class Scheduler(object):
 
             if sys.modules.has_key(module):
                 if hasattr(sys.modules[module], cls):
-                    probe_conf[filter_conf_key][i] = getattr(sys.modules[module], cls)()
+                    probe_conf[filter_conf_key][i] = getattr(sys.modules[module], cls)(filter_id)
                 else:
                     raise MeerkatException("Module %s has no class %s" % (module, cls))
             else:

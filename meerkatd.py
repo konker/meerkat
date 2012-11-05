@@ -15,6 +15,7 @@ if sys.version < '2.7':
 
 import pathhack
 import logging
+from optparse import OptionParser
 
 # NOTE: edit config.rb as appropriate
 from config.config import config
@@ -24,12 +25,42 @@ from meerkat.http.http import HttpServer
 
 
 def main():
+    parser = OptionParser()
+
+    parser.add_option('--debug', action='store_true', default=False,
+                      help='log debugging messages too')
+
+    parser.add_option('--log-stderr', dest='log_stderr',
+                      action='store_true', default=False,
+                      help='force log messages to stderr')
+
+    options, args = parser.parse_args()
+    if args:
+        parser.error('incorrect number of arguments')
+
     # configure logging
-    logging.basicConfig(level=logging.DEBUG,
-                        #filename=config['logfile'],
-                        stream=sys.stdout,
-                        format='%(asctime)s [%(threadName)s] %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
+    if options.debug:
+        if options.log_stderr:
+            logging.basicConfig(level=logging.DEBUG,
+                                stream=sys.stderr,
+                                format='%(asctime)s [%(threadName)s] %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S')
+        else:
+            logging.basicConfig(level=logging.DEBUG,
+                                filename=config['logfile'],
+                                format='%(asctime)s [%(threadName)s] %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S')
+    else:
+        if options.log_stderr:
+            logging.basicConfig(level=logging.INFO,
+                                stream=sys.stderr,
+                                format='%(asctime)s %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S')
+        else:
+            logging.basicConfig(level=logging.INFO,
+                                filename=config['logfile'],
+                                format='%(asctime)s %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S')
 
     # initialize storage
     storage = Storage(config["datafile"])
@@ -41,11 +72,11 @@ def main():
     scheduler = Scheduler(config["probe_path"], config["probes"], storage, signal_cb)
 
     # start http server
-    http_server = HttpServer(scheduler)
+    http_server = HttpServer(scheduler, config)
     http_server.start()
 
     # start the scheduler
-    scheduler.start()
+    scheduler.start(paused=True)
 
 
 if __name__ == '__main__':

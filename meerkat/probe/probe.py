@@ -32,6 +32,7 @@ class Probe(object):
         self.duration = duration
         self.timeout = timeout
         self.active = False
+        self.running = False
         self.last_error = None
 
         self.watchers = {
@@ -46,9 +47,13 @@ class Probe(object):
 
 
     def register(self, loop):
-        logging.info("Registered probe: %s" % self.id)
-        self.watchers["timer"] = loop.timer(0, self.interval, self.timer_cb)
+        if self.watchers["timer"] == None:
+            logging.info("Registered probe: %s" % self.id)
+            self.watchers["timer"] = loop.timer(0, self.interval, self.timer_cb)
+
+    def start(self):
         self.watchers["timer"].start()
+        self.running = True
 
 
     # execute the command
@@ -161,4 +166,5 @@ class Probe(object):
                     w.stop()
 
         self.active = False
+        self.running = False
 
