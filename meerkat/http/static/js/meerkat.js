@@ -223,7 +223,7 @@ var meerkat = (function($) {
                 }
                 probeHtml
                     .find('.dbody')
-                    .html(ConvertJsonToTable(data, null, 'table', null));
+                    .html(ConvertJsonToTable(data, null, 'table table-bordered', null));
 
                 /* render filters */
                 probeHtml
