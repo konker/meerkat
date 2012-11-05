@@ -57,6 +57,11 @@ class Storage(BaseStorage):
             self.conn.commit()
 
 
+    def get_records_by_probe_id(self, probe_id, n=1):
+        for row in self.cursor.execute('SELECT * FROM accessory_data where probe_id = ? LIMIT ?', (probe_id, n)):
+            yield row
+
+
     def reader(self):
         for row in self.cursor.execute('SELECT * FROM accessory_data'):
             yield row

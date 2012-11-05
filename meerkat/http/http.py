@@ -15,6 +15,7 @@ import json
 import socket
 import bottle
 from bottle import template, static_file, request
+from storage.sqlite import Storage
 
 bottle.TEMPLATE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), 'views')),
 STATIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), 'static'))
@@ -23,6 +24,7 @@ class HttpServer(object):
     def __init__(self, scheduler, config):
         self.scheduler = scheduler
         self.config = config
+        self.storage = None
 
         self.host = socket.gethostname()
         self.ip_address = socket.gethostbyname(self.host)
@@ -47,6 +49,9 @@ class HttpServer(object):
 
 
     def index(self):
+        if not self.storage:
+            self.storage = Storage(self.config['datafile'])
+
         return template('index', scheduler=self.scheduler)
 
 
@@ -66,7 +71,13 @@ class HttpServer(object):
 
 
     def helper_get_probe_data(self, probe):
-        return {}
+        ret = []
+        records = 3
+        for r in self.storage.get_records_by_probe_id(probe.id, records):
+            ret.append(r[:3])
+
+        print ret
+        return ret
 
 
     def helper_get_probe_filters(self, filters):
