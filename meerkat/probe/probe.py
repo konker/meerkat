@@ -168,3 +168,6 @@ class Probe(object):
         self.active = False
         self.running = False
 
+
+    def __str__(self):
+        return "<Probe: %s>" % self.id

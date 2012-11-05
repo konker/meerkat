@@ -26,7 +26,7 @@ def main():
 
     filename = "%s-%s.%s" % (id, strftime("%Y-%m-%d_%H:%M:%S"), format)
     filename = os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', 'http', 'static', 'images', filename))
+                                 '..', '..', 'http', 'static', 'img', filename))
 
     try:
         capture = cv.CaptureFromCAM(-1)
@@ -34,9 +34,10 @@ def main():
         cv.SetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_HEIGHT, height);
 
         img = cv.QueryFrame(capture)
-        if img:
-            cv.SaveImage(filename, img)
+        if not img:
+            raise ValueError("Nothing captured")
 
+        cv.SaveImage(filename, img)
         ret = {
             "status": "OK",
             "id": id,
@@ -46,11 +47,10 @@ def main():
         }
         sys.stdout.write(json.dumps(ret))
     except Exception as ex:
-        ret = { "status": "error", "trace": str(ex) }
+        ret = { "status": "ERROR", "trace": str(ex) }
         sys.stderr.write(json.dumps(ret))
 
 
 if __name__ == '__main__':
-    sys.stderr = open(os.devnull, 'w')
     main()
 

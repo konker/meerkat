@@ -58,7 +58,7 @@
         <button type="button" class="btn refresh" id="masterRefresh"><i class="icon-refresh"></i> Refresh</button>
 
         <div id="latest-img">
-          <a href="static/img/test.jpg"><img src="static/img/test.jpg"/></a>
+          <a href="static/img/latest.jpg"><img src="static/img/latest.jpg"/></a>
         </div>
       </div>
     </section>

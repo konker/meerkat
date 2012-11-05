@@ -18,6 +18,8 @@ TODO
         data_size_start: number
         data_size_end: number
 
+- auto_start flag for probes
+
 - "latest image"
     - have a function to grab a frame from the camera and save as latest.jpg
         - can be called via web
@@ -33,7 +35,11 @@ TODO
     - can be manually controlled
 
 - add warning prompts for toggle buttons
+    - LATER
 - add error indicators when ajax errors occur
+    - LATER
+
+- remove scroll from log?
 
 - add pause / unpause
     - stop probes, but not destroy

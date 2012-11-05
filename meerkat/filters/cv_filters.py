@@ -27,20 +27,22 @@ class CreateLatestLink(BaseFilter):
         struct = json.loads(data)
         if struct["status"] == "OK":
             dir, file = os.path.split(struct["image_path"])
-            filename, ext = file.split('.')
-            latest_path = os.path.join(dir, "latest.%s" % ext)
+            filename, ext = os.path.splitext(file)
+            latest_path = os.path.join(dir, "latest%s" % ext)
 
-            print struct["image_path"] 
-            print latest_path
+            os.unlink(latest_path)
             os.symlink(struct["image_path"], latest_path)
 
         return data
 
+
 def test():
-    data = '{ "status":"OK", "id":"meerkat.probe.camera_photo", "image_path":"/home/pi/WORKING/isoveli/meerkat/meerkat/http/static/images/test.jpg", "image_wdith":1280, "image_height":720}'
-    filter = CreateLatestLink()
-    print(filter.filter(data))
-    assert filter.filter(data) == data
+    data1 = '{ "status":"OK", "id":"meerkat.probe.camera_photo", "image_path":"/home/pi/WORKING/isoveli/meerkat/meerkat/http/static/img/test.jpg", "image_wdith":1280, "image_height":720}'
+
+    filter = CreateLatestLink('meerkat.filters.cv_filters.CreateLatestLink')
+
+    print(filter.filter(data1))
+    assert filter.filter(data1) == data1
 
 
 if __name__ == '__main__':
