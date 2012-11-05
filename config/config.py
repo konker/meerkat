@@ -9,6 +9,8 @@ config = {
                                 '..', 'log', 'meerkat.log')),
     "datafile": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'data', 'meerkat.db')),
+    "imagepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                 '..', 'meerkat', 'http', 'static','img')),
     "probe_path": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probe', 'bin')),
 
@@ -16,6 +18,8 @@ config = {
     "http_port": 80,
     "ssl_cert": None,
     "ssl_key": None,
+
+    "has_camera": True,
 
     "probes": {
         "meerkat.probe.tick_sleeper": {

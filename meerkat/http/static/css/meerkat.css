@@ -65,11 +65,15 @@ section {
       #master .section-body {
         position: relative;
         }
+
+    #masterCapture { display: none; }
     #latest-img {
       position: absolute;
       top: 6px;
       left: 24em;
       width: 33%;
+      border: 6px solid #aaa;
+      display: none;
     }
 
 .probe {

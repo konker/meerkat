@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# evtest
+# meerkat.http.http
 #
 # Copyright 2012 Konrad Markus
 #
@@ -16,6 +16,7 @@ import socket
 import bottle
 from bottle import template, static_file, request
 from storage.sqlite import Storage
+from util.photo_capture import PhotoCapture
 
 bottle.TEMPLATE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), 'views')),
 STATIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), 'static'))
@@ -25,6 +26,7 @@ class HttpServer(object):
         self.scheduler = scheduler
         self.config = config
         self.storage = None
+        self.photo_capture = PhotoCapture(config["imagepath"])
 
         self.host = socket.gethostname()
         self.ip_address = socket.gethostbyname(self.host)
@@ -34,6 +36,7 @@ class HttpServer(object):
         bottle.route('/', method='GET')(self.index)
         bottle.route('/master.json', method='GET')(self.master_json)
         bottle.route('/master.json', method='POST')(self.master_control_json)
+        bottle.route('/capture.json', method='POST')(self.capture_control_json)
         bottle.route('/probes.json', method='GET')(self.probes_json)
         bottle.route('/probe<p:int>.json', method='GET')(self.probe_json)
         bottle.route('/probe<p:int>.json', method='POST')(self.probe_control_json)
@@ -147,7 +150,8 @@ class HttpServer(object):
                     "host": self.host,
                     "uptime_secs": self.helper_get_uptime_secs(),
                     "data_size_mb": self.helper_get_data_size_mb(),
-                    "free_space_mb": self.helper_get_free_space()
+                    "free_space_mb": self.helper_get_free_space(),
+                    "has_camera": self.config["has_camera"]
                 }
               }
         if self.scheduler.active:
@@ -164,6 +168,19 @@ class HttpServer(object):
             self.scheduler.stop_probes()
 
         return self.master_json()
+
+    
+    def capture_control_json(self):
+        ret = {"status": "OK",
+                "body": None
+              }
+        try:
+            ret["body"] = self.photo_capture.capture()
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        return json.dumps(ret)
 
 
     def log_json(self):

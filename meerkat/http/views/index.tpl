@@ -61,6 +61,7 @@
           <dd class="free_space"><!-- [yMB] --></dd>
         </dl>
         <button type="button" class="btn refresh" id="masterRefresh"><i class="icon-refresh"></i> Refresh</button>
+        <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera"></i> Capture photo</button>
 
         <div id="latest-img">
           <a href="static/img/latest.jpg"><img src="static/img/latest.jpg"/></a>

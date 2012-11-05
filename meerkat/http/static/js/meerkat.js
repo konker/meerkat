@@ -1,8 +1,9 @@
 
 var meerkat = (function($) {
-    var PROBES_JSON_URL = '/probes.json';
-    var MASTER_JSON_URL = '/master.json';
-    var LOG_JSON_URL = '/log.json';
+    var PROBES_JSON_URL  = '/probes.json',
+        MASTER_JSON_URL  = '/master.json',
+        CAPTURE_JSON_URL = '/capture.json',
+        LOG_JSON_URL     = '/log.json';
 
     return {
         init: function() {
@@ -16,6 +17,31 @@ var meerkat = (function($) {
 
             init: function() {
                 meerkat.master.refresh();
+            },
+            capture: function() {
+                meerkat.util.loading.on();
+
+                $.ajax({
+                    url: CAPTURE_JSON_URL,
+                    type: 'POST',
+                    dataType: 'json',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        var img = $('#latest-img img');
+                        var src = img.attr('src');
+                        if (src.indexOf('?') != -1) {
+                            src = src.substr(0, src.indexOf('?'));
+                        }
+                        src = src + '?' + meerkat.master.capture_counter++;
+                        img.attr('src', src)
+                        meerkat.util.loading.off();
+                    }
+                });
+                return false;
             },
             toggle: function() {
                 meerkat.util.loading.on();
@@ -85,6 +111,18 @@ var meerkat = (function($) {
                 $('#masterRefresh')
                     .unbind('click')
                     .bind('click', meerkat.master.refresh);
+
+                if (meerkat.master.master.has_camera) {
+                    $('#masterCapture')
+                        .unbind('click')
+                        .bind('click', meerkat.master.capture)
+                        .show();
+                    $('#latest-img').show();
+                }
+                else {
+                    $('#masterCapture').hide();
+                    $('#latest-img').hide();
+                }
 
                 /* visual aids */
                 if (meerkat.master.master.status == 'ON') {
