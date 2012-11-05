@@ -72,9 +72,25 @@ class HttpServer(object):
 
     def helper_get_probe_data(self, probe):
         ret = []
-        records = 3
+        records = 1
         for r in self.storage.get_records_by_probe_id(probe.id, records):
-            ret.append(r[:3])
+            record = {
+                "metadata": {
+                    "probe_id": r[0],
+                    "timestamp": r[2],
+                    "length": r[3],
+                },
+                "data": str(r[4]).encode('utf-8')
+            }
+            if (record["data"].startswith('{') or record["data"].startswith('[')):
+                try:
+                    record["data"] = json.loads(record["data"])
+                    if type(record["data"]) == dict:
+                        record["data"] = [record["data"]]
+                except:
+                    pass
+
+            ret.append(record)
 
         print ret
         return ret

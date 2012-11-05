@@ -36,6 +36,7 @@ body {
 
 .alert {
     margin-top: 12px;
+    display: none;
     }
 
 section {
@@ -130,6 +131,10 @@ section {
     .probe .data .table {
       background: #fff;
       }
+      .probe .scalar {
+        background: #fff;
+        padding: 1.0em;
+        }
 
     .probe .probe-section ol li {
       background: #fff;

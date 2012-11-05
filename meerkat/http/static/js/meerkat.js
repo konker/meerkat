@@ -254,13 +254,31 @@ var meerkat = (function($) {
                     .render(meerkat.probes.probes[p], meerkat.probes.directives.single);
 
                 /* render data */
-                var data = meerkat.probes.probes[p].data.data;
+                var data = meerkat.probes.probes[p].data;
                 for (var r in data) {
-                    data[r].image_path = '<a href="' + data[r].image_path + '">' + data[r].image_path + '</a>';
+                   console.log(data[r]);
+                   console.log(data[r].data);
+                   console.log(typeof(data[r].data.length));
+                   console.log(typeof(data[r].data));
+
+                    probeHtml
+                        .find('.dbody')
+                        .empty()
+                        .append(ConvertJsonToTable([data[r].metadata], null,
+                                    'table table-bordered', null));
+
+                    if (typeof(data[r].data) == 'object') {
+                        probeHtml
+                            .find('.dbody')
+                            .append(ConvertJsonToTable(data[r].data, null,
+                                            'table table-bordered', null));
+                    }
+                    else {
+                        probeHtml
+                            .find('.dbody')
+                            .append('<div class="scalar">' + data[r].data + '</div>');
+                    }
                 }
-                probeHtml
-                    .find('.dbody')
-                    .html(ConvertJsonToTable(data, null, 'table table-bordered', null));
 
                 /* render filters */
                 probeHtml

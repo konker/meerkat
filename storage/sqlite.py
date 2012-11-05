@@ -58,7 +58,7 @@ class Storage(BaseStorage):
 
 
     def get_records_by_probe_id(self, probe_id, n=1):
-        for row in self.cursor.execute('SELECT * FROM accessory_data where probe_id = ? LIMIT ?', (probe_id, n)):
+        for row in self.cursor.execute('SELECT * FROM accessory_data where probe_id = ? ORDER BY timestamp DESC LIMIT ?', (probe_id, n)):
             yield row
 
 
