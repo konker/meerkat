@@ -34,6 +34,11 @@
     </div>
   </header>
   <div class="container" id="container">
+    <div id="alert" class="alert alert-error">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong class="title"></strong>
+        <span class="body"></span>
+    </div>
     <section class="row" id="master">
       <h2>
         <i class="icon-info-sign"></i>

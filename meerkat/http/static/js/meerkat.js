@@ -6,6 +6,7 @@ var meerkat = (function($) {
 
     return {
         init: function() {
+            meerkat.util.init();
             meerkat.master.init();
             meerkat.probes.init();
             meerkat.log.init();
@@ -31,7 +32,7 @@ var meerkat = (function($) {
                     dataType: 'json',
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
-                        alert(errorThrown);
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
                         meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
@@ -51,9 +52,9 @@ var meerkat = (function($) {
                 $.ajax({
                     url: MASTER_JSON_URL,
                     dataType: 'json',
-                    error: function(data, textStatus, jqXHR) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
-                        alert(errorThrown);
+                        meerkat.util.alert.show("Could not load master information.", errorThrown);
                         meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
@@ -135,14 +136,12 @@ var meerkat = (function($) {
                 $.ajax({
                     url: PROBES_JSON_URL,
                     dataType: 'json',
-                    error: function(data, textStatus, jqXHR) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
-                        alert(errorThrown);
+                        meerkat.util.alert.show("Could not load probes data.", errorThrown);
                         meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
-                        /*[TODO: error handling ]*/
-
                         meerkat.probes.probes = data.body.probes;
 
                         /* render the data */
@@ -175,7 +174,7 @@ var meerkat = (function($) {
                     dataType: 'json',
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
-                        alert(errorThrown);
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
                         meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
@@ -212,7 +211,7 @@ var meerkat = (function($) {
                     dataType: 'json',
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
-                        alert(errorThrown);
+                        meerkat.util.alert.show("Could not load probe data.", errorThrown);
                         meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
@@ -364,9 +363,9 @@ var meerkat = (function($) {
                 $.ajax({
                     url: LOG_JSON_URL,
                     dataType: 'json',
-                    error: function(data, textStatus, jqXHR) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
-                        alert(errorThrown);
+                        meerkat.util.alert.show("Could not load log data.", errorThrown);
                         meerkat.util.loading.off();
                     },
                     success: function(data, textStatus, jqXHR) {
@@ -390,6 +389,28 @@ var meerkat = (function($) {
             }
         },
         util: {
+            init: function() {
+                meerkat.util.alert.init();
+            },
+            alert: {
+                init: function() {
+                    //$('#alert').alert();
+                    $('#alert .close').bind('click', meerkat.util.alert.hide);
+                    $('#alert').hide();
+                },
+                show: function(body, title) {
+                    $('#alert')
+                        .find('.body').html(body);
+                    $('#alert')
+                        .find('.title').html(title);
+
+                    $('#alert').show();
+                },
+                hide: function() {
+                    //$('#alert').alert('close');
+                    $('#alert').hide();
+                }
+            },
             loading: {
                 _stack: 0,
                 on: function() {
