@@ -23,13 +23,15 @@ config = {
             "type": probe.TYPE_DURATION,
             "duration": 6,
             "interval": 14,
-            "data_type": probe.DATA_TYPE_DATA
+            "data_type": probe.DATA_TYPE_DATA,
+            "auto_start": False
         },
         "meerkat.probe.camera_photo": {
             "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
             "type": probe.TYPE_PERIODIC,
             "interval": 20,
             "data_type": probe.DATA_TYPE_DATA,
+            "auto_start": False,
             "filters": [
                 "meerkat.filters.cv_filters.CreateLatestLink"
             ],
@@ -41,7 +43,8 @@ config = {
             "command": ["dummy_data.sh", "128"],
             "type": probe.TYPE_PERIODIC,
             "interval": 10,
-            "data_type": probe.DATA_TYPE_DATA
+            "data_type": probe.DATA_TYPE_DATA,
+            "auto_start": True
         },
         "meerkat.probe.bluetooth": {
             "command": ["bluetooth_scan.py"],
@@ -49,6 +52,7 @@ config = {
             "duration": 60,
             "interval": 30,
             "data_type": probe.DATA_TYPE_JSON,
+            "auto_start": False,
             "filters": [
                 "meerkat.filters.dummy.Uppercase"
             ]

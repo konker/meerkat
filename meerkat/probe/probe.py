@@ -22,8 +22,9 @@ DATA_TYPE_DATA = 16
 
 
 class Probe(object):
-    def __init__(self, id, storage, command, filters, error_filters, interval, duration=-1, timeout=-1):
+    def __init__(self, id, index, storage, command, filters, error_filters, interval, duration=-1, timeout=-1):
         self.id = id
+        self.index = index
         self.storage = storage
         self.command = command
         self.filters = filters

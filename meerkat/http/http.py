@@ -54,7 +54,7 @@ class HttpServer(object):
         probes = []
         i = 0
         for p in self.scheduler.probes:
-            probes.append(self.helper_get_probe_struct(p, i))
+            probes.append(self.helper_get_probe_struct(p))
             i = i + 1
 
         ret = {"status": "OK",
@@ -76,9 +76,10 @@ class HttpServer(object):
         return ret
 
 
-    def helper_get_probe_struct(self, probe, i):
+    def helper_get_probe_struct(self, probe):
         ret = {
-            "id": "probe%s" % i,
+            "id": "probe%s" % probe.index,
+            "index": probe.index,
             "label": probe.id,
             "status": "OFF",
             "data": self.helper_get_probe_data(probe),
@@ -96,7 +97,7 @@ class HttpServer(object):
 
     def probe_json(self, p):
         ret = {"status": "OK",
-                "body": self.helper_get_probe_struct(self.scheduler.probes[p], p)
+                "body": self.helper_get_probe_struct(self.scheduler.probes[p])
               }
         return json.dumps(ret)
 

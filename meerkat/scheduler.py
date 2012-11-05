@@ -36,6 +36,7 @@ class Scheduler(object):
 
         # read in probes from config 
         self.probes = []
+        index = 0
         for id, probe_conf in probe_confs.items():
             self.check_command(id, probe_conf)
 
@@ -45,10 +46,14 @@ class Scheduler(object):
             # load error filters
             self.load_error_filters(id, probe_conf)
         
-            p = self.get_probe(id, probe_conf, storage)
+            p = self.get_probe(id, index, probe_conf, storage)
             p.register(self.loop)
             self.probes.append(p)
 
+            if probe_conf.get("auto_start", False):
+                self.start_probe(index)
+
+            index = index + 1
 
     def sigint_cb(self, watcher, revents):
         logging.info("SIGINT caught. Exiting..")
@@ -153,7 +158,8 @@ class Scheduler(object):
         probe_conf["command"][0] = os.path.join(self.probe_path, probe_conf["command"][0])
         
 
-    def get_probe(self, id, probe_conf, storage):
+    def get_probe(self, id, index, probe_conf, storage):
+        # [FIXME: this is a bit dense]
         if not "type" in probe_conf:
             raise ValueError("Bad config: %s does not have a 'type' attribute" % id)
 
@@ -161,11 +167,11 @@ class Scheduler(object):
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
                                   and a 'duration' attribute" % id)
-            return probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
+            return probe.Probe(id, index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
         elif probe_conf["type"] == probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % id)
-            return probe.Probe(id, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
+            return probe.Probe(id, index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
         elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
 
