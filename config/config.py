@@ -48,7 +48,7 @@ config = {
             "type": probe.TYPE_PERIODIC,
             "interval": 10,
             "data_type": probe.DATA_TYPE_DATA,
-            "auto_start": True
+            "auto_start": False
         },
         "meerkat.probe.bluetooth": {
             "command": ["bluetooth_scan.py"],

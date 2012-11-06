@@ -151,11 +151,18 @@ class HttpServer(object):
                     "uptime_secs": self.helper_get_uptime_secs(),
                     "data_size_mb": self.helper_get_data_size_mb(),
                     "free_space_mb": self.helper_get_free_space(),
-                    "has_camera": self.config["has_camera"]
+                    "has_camera": self.config["has_camera"],
+                    "available_memory_kb": 0,
+                    "free_memory_kb": 0
                 }
-              }
+        }
+
         if self.scheduler.active:
             ret["body"]["status"] = "ON"
+
+        available_mem, free_mem = self.helper_get_memory_info()
+        ret["body"]["available_memory_kb"] = available_mem
+        ret["body"]["free_memory_kb"] = free_mem
 
         return json.dumps(ret)
 
@@ -210,9 +217,17 @@ class HttpServer(object):
 
     def helper_get_uptime_secs(self):
         with open('/proc/uptime', 'r') as f:
-            secs = float(f.readline().split()[0])
+            secs = f.readline()
 
-        return secs
+        return float(secs.split()[0])
+
+
+    def helper_get_memory_info(self):
+        with open('/proc/meminfo', 'r') as f:
+            available_mem = f.readline()
+            free_mem = f.readline()
+
+        return (int(available_mem.split()[1]), int(free_mem.split()[1]))
 
 
     def helper_get_data_size_mb(self):

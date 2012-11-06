@@ -14,6 +14,7 @@ var meerkat = (function($) {
         },
         master: {
             master: null,
+            capture_counter: 0,
 
             init: function() {
                 meerkat.master.refresh();
@@ -99,6 +100,10 @@ var meerkat = (function($) {
                     meerkat.util.format_mb(meerkat.master.master.data_size_mb);
                 meerkat.master.master.free_space_mb =
                     meerkat.util.format_mb(meerkat.master.master.free_space_mb);
+                meerkat.master.master.available_memory_kb =
+                    meerkat.util.format_kb(meerkat.master.master.available_memory_kb);
+                meerkat.master.master.free_memory_kb =
+                    meerkat.util.format_kb(meerkat.master.master.free_memory_kb);
 
                 /* render the data */
                 $('#master').render(meerkat.master.master, meerkat.master.directives.main);
@@ -159,6 +164,8 @@ var meerkat = (function($) {
                     'dd.uptime': 'uptime_secs',
                     'dd.data_size': 'data_size_mb',
                     'dd.free_space': 'free_space_mb',
+                    'dd.available_memory': 'available_memory_kb',
+                    'dd.free_memory': 'free_memory_kb'
                 }
             }
         },
@@ -294,11 +301,10 @@ var meerkat = (function($) {
                 /* render data */
                 var data = meerkat.probes.probes[p].data;
                 for (var r in data) {
-                   console.log(data[r]);
-                   console.log(data[r].data);
-                   console.log(typeof(data[r].data.length));
-                   console.log(typeof(data[r].data));
-
+                    if (data[r].metadata.timestamp) {
+                        data[r].metadata.timestamp =
+                            meerkat.util.format_timestamp(data[r].metadata.timestamp);
+                    }
                     probeHtml
                         .find('.dbody')
                         .empty()
@@ -489,9 +495,17 @@ var meerkat = (function($) {
                     }
                 }
             },
+            format_timestamp: function(ts) {
+                /*[TODO]*/
+                return ts + " ms";
+            },
             format_secs: function(secs) {
                 /*[TODO]*/
                 return secs + " secs";
+            },
+            format_kb: function(kb) {
+                /*[TODO]*/
+                return kb + " KB";
             },
             format_mb: function(mb) {
                 /*[TODO]*/

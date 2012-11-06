@@ -59,6 +59,10 @@
           <dd class="data_size"><!-- [xMB] --></dd>
           <dt class="free_space">free space</dt>
           <dd class="free_space"><!-- [yMB] --></dd>
+          <dt class="available_memory">available RAM</dt>
+          <dd class="available_memory"><!-- [xKB] --></dd>
+          <dt class="free_memory">free RAM</dt>
+          <dd class="free_memory"><!-- [yKB] --></dd>
         </dl>
         <button type="button" class="btn refresh" id="masterRefresh"><i class="icon-refresh"></i> Refresh</button>
         <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera"></i> Capture photo</button>
