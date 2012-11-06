@@ -111,7 +111,8 @@ var meerkat = (function($) {
                 /* event handlers */
                 $('#masterToggle')
                     .unbind('click')
-                    .bind('click', meerkat.master.toggle);
+                    .bind('click', meerkat.master.toggle)
+                    .show();
 
                 $('#masterRefresh')
                     .unbind('click')
@@ -433,10 +434,11 @@ var meerkat = (function($) {
                     success: function(data, textStatus, jqXHR) {
                         data.body.log = data.body.log.join("");
                         $('#log').render(data.body, meerkat.log.directives.main);
-                        $('#log')
-                            .find('.logRefresh')
+                        $('#logRefresh')
                             .unbind('click')
-                            .bind('click', meerkat.log.refresh);
+                            .bind('click', meerkat.log.refresh)
+                            .show();
+
                         /* show it */
                         $('#log .section-body').show();
 

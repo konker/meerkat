@@ -43,7 +43,6 @@
       <h2>
         <i class="icon-info-sign"></i>
         info
-        <button type="button" class="btn pull-right" id="masterToggle"><i class="icon-off icon-white"></i> <span class="lbl">ON/OFF</span></button>
       </h2>
       <div class="section-body">
         <dl class="dl-horizontal">
@@ -64,8 +63,8 @@
           <dt class="free_memory">free RAM</dt>
           <dd class="free_memory"><!-- [yKB] --></dd>
         </dl>
-        <button type="button" class="btn refresh" id="masterRefresh"><i class="icon-refresh"></i> Refresh</button>
-        <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera"></i> Capture photo</button>
+        <button type="button" class="btn btn-warning refresh" id="masterRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
+        <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera icon-white"></i> Capture photo</button>
 
         <div id="latest-img">
           <a href="static/img/latest.jpg"><img src="static/img/latest.jpg"/></a>
@@ -73,14 +72,18 @@
       </div>
     </section>
     <section class="row" id="probes">
-      <h2><i class="icon-eye-open"></i> probes</h2>
+      <h2>
+        <i class="icon-eye-open"></i>
+        probes
+        <button type="button" class="btn pull-right" id="masterToggle"><i class="icon-off icon-white"></i> <span class="lbl">ON/OFF</span></button>
+      </h2>
       <div class="section-body">
         <!--START:PROBE -->
         <div class="probe row" id="probe.label">
           <h3>
             <i class="icon-chevron-right"></i>
             <span class="probe-label">probe.label</span>
-            <button type="button" class="probeToggle btn pull-right"><i class="icon-off icon-white"></i> <span class="lbl">ON/OFF</span></button>
+            <button type="button" class="probeToggle btn btn-small pull-right"><i class="icon-off icon-white"></i> <span class="lbl">ON/OFF</span></button>
           </h3>
           <div class="probe-body">
             <div class="row status probe-section">
@@ -93,7 +96,7 @@
                 <dt class="duration">duration</dt>
                 <dd class="duration"><!-- [duration] --></dd>
               </dl>
-              <button type="button" class="probeRefresh btn refresh"><i class="icon-refresh"></i> refresh</button>
+              <button type="button" class="probeRefresh btn btn-warning refresh"><i class="icon-refresh icon-white"></i> refresh</button>
             </div>
             <div class="row data probe-section">
               <h4><i class="icon-th-list"></i> data</h4>
@@ -123,7 +126,7 @@
     <section class="row" id="log">
       <h2>
         <i class="icon-list"></i> log
-        <button type="button" class="logRefresh btn refresh pull-right"><i class="icon-refresh"></i> refresh</button>
+        <button type="button" id="logRefresh" class="btn btn-warning refresh pull-right"><i class="icon-refresh icon-white"></i> refresh</button>
       </h2>
       <div class="section-body">
         <!-- log here -->

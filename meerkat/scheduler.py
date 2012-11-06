@@ -18,11 +18,11 @@ import meerkat.probe.probe as probe
 
 
 class Scheduler(object):
-    def __init__(self, probe_path, probe_confs, storage, signal_cb):
+    def __init__(self, probepath, probe_confs, storage, signal_cb):
         self.active = False
         self.active_probes = 0
 
-        self.probe_path = probe_path
+        self.probepath = probepath
         def extra_signal_cb():
             signal_cb()
 
@@ -37,16 +37,16 @@ class Scheduler(object):
         # read in probes from config 
         self.probes = []
         index = 0
-        for id, probe_conf in probe_confs.items():
-            self.check_command(id, probe_conf)
+        for probe_conf in probe_confs:
+            self.check_command(probe_conf)
 
             # load filters
-            self.load_filters(id, probe_conf)
+            self.load_filters(probe_conf)
 
             # load error filters
-            self.load_error_filters(id, probe_conf)
+            self.load_error_filters(probe_conf)
         
-            p = self.get_probe(id, index, probe_conf, storage)
+            p = self.get_probe(index, probe_conf, storage)
             p.register(self.loop)
             self.probes.append(p)
 
@@ -111,15 +111,15 @@ class Scheduler(object):
         self.loop.stop(pyev.EVBREAK_ALL)
 
 
-    def load_filters(self, id, probe_conf):
-        self._load_filters(id, probe_conf, "filters")
+    def load_filters(self, probe_conf):
+        self._load_filters(probe_conf, "filters")
 
 
-    def load_error_filters(self, id, probe_conf):
-        self._load_filters(id, probe_conf, "error_filters")
+    def load_error_filters(self, probe_conf):
+        self._load_filters(probe_conf, "error_filters")
 
 
-    def _load_filters(self, id, probe_conf, filter_conf_key):
+    def _load_filters(self, probe_conf, filter_conf_key):
         if not filter_conf_key in probe_conf:
             probe_conf[filter_conf_key] = []
             return
@@ -146,32 +146,32 @@ class Scheduler(object):
                 raise MeerkatException("Could not load filter module: %s" % module)
 
 
-    def check_command(self, id, probe_conf):
+    def check_command(self, probe_conf):
         # sanity check the probe command
         if not "command" in probe_conf or len(probe_conf["command"]) == 0:
-            raise ValueError("Bad config: %s: missing or empty 'command' attribute" % id)
+            raise ValueError("Bad config: %s: missing or empty 'command' attribute" % probe_conf["id"])
 
         if not type(probe_conf["command"]) == type([]):
-            raise ValueError("Bad config: %s: 'command' should be an array of strings" % id)
+            raise ValueError("Bad config: %s: 'command' should be an array of strings" % probe_conf["id"])
 
         # expand the command, saves doing this each time
-        probe_conf["command"][0] = os.path.join(self.probe_path, probe_conf["command"][0])
+        probe_conf["command"][0] = os.path.join(self.probepath, probe_conf["command"][0])
         
 
-    def get_probe(self, id, index, probe_conf, storage):
+    def get_probe(self, index, probe_conf, storage):
         # [FIXME: this is a bit dense]
         if not "type" in probe_conf:
-            raise ValueError("Bad config: %s does not have a 'type' attribute" % id)
+            raise ValueError("Bad config: %s does not have a 'type' attribute" % probe_conf["id"])
 
         if probe_conf["type"] == probe.TYPE_DURATION:
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
-                                  and a 'duration' attribute" % id)
-            return probe.Probe(id, index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
+                                  and a 'duration' attribute" % probe_conf["id"])
+            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
         elif probe_conf["type"] == probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
-                raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % id)
-            return probe.Probe(id, index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
+                raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % probe_conf["id"])
+            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
         elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
 

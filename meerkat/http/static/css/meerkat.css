@@ -66,15 +66,17 @@ section {
         position: relative;
         }
 
-    #masterCapture { display: none; }
-    #latest-img {
-      position: absolute;
-      top: 6px;
-      left: 24em;
-      width: 33%;
-      border: 6px solid #aaa;
-      display: none;
-    }
+#masterCapture { display: none; }
+#latest-img {
+  position: absolute;
+  top: 6px;
+  left: 24em;
+  width: 33%;
+  border: 6px solid #aaa;
+  display: none;
+}
+
+#masterToggle { display: none; }
 
 .probe {
   background: #ddd;
@@ -90,10 +92,14 @@ section {
     font-weight: normal;
     padding: 0 0.5em;
     border-radius: 6px;
+    cursor: pointer;
     }
     .probe h3 i {
       vertical-align: baseline;
       }
+    .probe h3 .btn-small {
+       margin-top: 7px !important;
+       }
 
     .probe.closed, .probe.open {
       display: block;
@@ -148,9 +154,9 @@ section {
       }
 
 #log pre {
-  max-height: 10em;
-  overflow: scroll;
+  background: #fff;
   }
+#logRefresh { display: none; }
 
 footer {
   background: #ddd;
