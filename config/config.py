@@ -27,9 +27,9 @@ config = {
         {
             "id": "meerkat.probe.bluetooth",
             "command": ["bluetooth_scan.py"],
-            "type": probe.TYPE_DURATION,
-            "duration": 60,
-            "interval": 30,
+            "type": probe.TYPE_PERIODIC,
+            "interval": 10,
+            "duration": -1,
             "data_type": probe.DATA_TYPE_JSON,
             "auto_start": False,
             "filters": [
@@ -51,13 +51,27 @@ config = {
             ]
         },
         {
+            "id": "meerkat.probe.wifi_client_scan",
+            "command": ["wifi_client_scan.py"],
+            "type": probe.TYPE_DURATION,
+            "interval": 10,
+            "duration": 30,
+            "data_type": probe.DATA_TYPE_TEXT,
+            "auto_start": False,
+            "filters": [
+            ],
+            "error_filters": [
+                "meerkat.filters.wifi_filters.RemoveWarnings"
+            ]
+        },
+        {
             "id": "meerkat.probe.json_tick_sleeper",
             "command": ["json_tick_sleeper.sh", "20"],
             "type": probe.TYPE_DURATION,
             "duration": 8,
             "interval": 4,
             "data_type": probe.DATA_TYPE_JSON,
-            "auto_start": True
+            "auto_start": False
         },
         {
             "id": "meerkat.probe.text_tick_sleeper",
@@ -66,7 +80,7 @@ config = {
             "duration": 8,
             "interval": 5,
             "data_type": probe.DATA_TYPE_TEXT,
-            "auto_start": True
+            "auto_start": False
         },
         {
             "id": "meerkat.probe.dummy_data",

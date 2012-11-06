@@ -97,23 +97,29 @@ class Probe(object):
 
         data = self.process.stdout.read()
 
-        # process the data and re-start the interval if not waiting for a duration
+        # process the data and re-start the interval
+        # if not waiting for a duration
         if self.duration < 0:
             # cancel outstanding watchers
             self.cancel_all()
 
             self.process_data(data)
+            self.last_error = None
 
             self.active = False
             self.init_interval()
         else:
-            self.buf.append(data)
+            # EOF
+            if data == '':
+                self.cancel_io()
+            else:
+                self.buf.append(data)
 
 
     # read any data available from stderr pipe
     def io_stderr_cb(self, watcher, revents):
         logging.debug("Stderr ready: %s." % self.id)
-        self.set_nonoblocking(self.process.stderr)
+        #self.set_nonoblocking(self.process.stderr)
 
         # read in error data
         data = self.process.stderr.read()
@@ -124,9 +130,8 @@ class Probe(object):
 
         # check that it is an error after filters
         if not data == '' and not data == None:
-            logging.last_error = data
-            logging.error("Error in probe: %s." % self.id)
-            logging.debug(self.last_error)
+            self.last_error = data
+            logging.error("Error in probe: %s: %s" % (self.id, self.last_error))
 
             # cancel outstanding watchers
             self.cancel_all()
@@ -147,6 +152,7 @@ class Probe(object):
 
         # deal with the collected data
         self.process_data(self.buf)
+        self.last_error = None
 
         # start the interval again
         self.active = False
@@ -195,9 +201,19 @@ class Probe(object):
 
     def process_data(self, data):
         # deal with a buffer
+        '''
+        print "processing data:"
+        print self.id
+        print type(data)
+        print data
+        '''
         if type(data) == list:
             if self.data_type == DATA_TYPE_JSON:
-                data = '[' + ','.join(data) + ']'
+                # XXX: bit of a hack
+                if len(data) == 1 and data[0].startswith('['):
+                    data = data[0]
+                else:
+                    data = '[' + ','.join(data) + ']'
             elif self.data_type == DATA_TYPE_TEXT:
                 # [FIXME: do we need this?]
                 data = ''.join(data)

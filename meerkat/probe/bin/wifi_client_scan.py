@@ -20,7 +20,7 @@ iface  = 'mon0'
 
 def main():
     sniff(iface=iface, prn=sniffCallback)
-    print json.dumps(unique)
+    #sys.stdout.write(json.dumps(unique))
 
 
 def sniffCallback(p): 
@@ -28,8 +28,8 @@ def sniffCallback(p):
         if p.type == MANAGEMENT_FRAME_TYPE and \
                 p.subtype in MANAGEMENT_FRAME_SUBTYPES:
             if p.addr2 not in unique:
-                unique.append(p.addr2)
-                print p.summary
+                print(p.addr2)
+                sys.stdout.flush()
 
 
 if __name__ == '__main__':

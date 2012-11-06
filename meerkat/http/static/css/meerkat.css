@@ -107,6 +107,9 @@ section {
     .probe.closed .probe-body {
       display: none;
     }
+  .probe dd.last_error pre {
+    color: #a00;
+    }
   .probe .probe-body {
     padding: 0 1.0em;
     }

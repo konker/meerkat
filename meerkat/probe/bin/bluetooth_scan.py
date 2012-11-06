@@ -8,6 +8,7 @@
 # Author: Konrad Markus <konker@gmail.com>
 #
 
+import sys
 from bluetooth import DeviceDiscoverer
 import json
 
@@ -19,7 +20,7 @@ class JsonDeviceDiscoverer(DeviceDiscoverer, object):
         self.results.append(dict(address=address, name=name, device_class=device_class))
 
     def inquiry_complete(self):
-        print json.dumps(self.results)
+        sys.stdout.write(json.dumps(self.results))
 
 
 def main():

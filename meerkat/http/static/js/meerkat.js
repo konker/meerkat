@@ -399,7 +399,9 @@ var meerkat = (function($) {
                 single: {
                     'dd.status': 'status',
                     'dd.interval': 'interval',
-                    'dd.duration': 'duration'
+                    'dd.duration': 'duration',
+                    'dd.command': 'command',
+                    'dd.last_error pre': 'last_error'
                 },
                 filters: {
                     'li': {

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# meerkat.meerkat.filters.uppercase
+# meerkat.meerkat.filters.cv_filters
 #
 # Copyright 2012 Konrad Markus
 #

@@ -95,11 +95,15 @@
                 <dd class="interval"><!-- [interval] --></dd>
                 <dt class="duration">duration</dt>
                 <dd class="duration"><!-- [duration] --></dd>
+                <dt class="command">command</dt>
+                <dd class="command"><!-- [command] --></dd>
+                <dt class="last_error">last error</dt>
+                <dd class="last_error"><pre><!-- [error] --></pre></dd>
               </dl>
               <button type="button" class="probeRefresh btn btn-warning refresh"><i class="icon-refresh icon-white"></i> refresh</button>
             </div>
             <div class="row data probe-section">
-              <h4><i class="icon-th-list"></i> data</h4>
+              <h4><i class="icon-th-list"></i> last data</h4>
               <!-- data table here -->
               <div class="dbody">
               </div>

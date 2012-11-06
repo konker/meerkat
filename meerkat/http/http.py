@@ -21,6 +21,7 @@ from util.photo_capture import PhotoCapture
 bottle.TEMPLATE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), 'views')),
 STATIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), 'static'))
 
+
 class HttpServer(object):
     def __init__(self, scheduler, config):
         self.scheduler = scheduler
@@ -162,6 +163,9 @@ class HttpServer(object):
 
 
     def static(self, filepath):
+        if 'latest' in filepath:
+            response.set_header('Cache-Control', 'No-store')
+
         return static_file(filepath, root=STATIC_ROOT)
 
 
@@ -188,7 +192,6 @@ class HttpServer(object):
 
             ret.append(record)
 
-        print ret
         return ret
 
 
@@ -205,6 +208,7 @@ class HttpServer(object):
             "index": probe.index,
             "label": probe.id,
             "status": "OFF",
+            "command": ' '.join(probe.command),
             "data": self.helper_get_probe_data(probe),
             "filters": self.helper_get_probe_filters(probe.filters),
             "error_filters": self.helper_get_probe_filters(probe.error_filters),
