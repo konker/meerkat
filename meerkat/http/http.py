@@ -14,7 +14,7 @@ from threading import Thread
 import json
 import socket
 import bottle
-from bottle import template, static_file, request
+from bottle import template, static_file, request, response
 from storage.sqlite import Storage
 from util.photo_capture import PhotoCapture
 
@@ -70,9 +70,102 @@ class HttpServer(object):
                     "probes": probes
                 }
               }
+        response.set_header('Cache-Control', 'No-store')
         return json.dumps(ret)
 
 
+    def probe_json(self, p):
+        ret = {"status": "OK",
+                "body": self.helper_get_probe_struct(self.scheduler.probes[p])
+              }
+        response.set_header('Cache-Control', 'No-store')
+        return json.dumps(ret)
+
+
+    def probe_control_json(self, p):
+        command = request.forms.command
+        if command == 'ON':
+            self.scheduler.start_probe(p)
+        elif command == 'OFF':
+            self.scheduler.stop_probe(p)
+
+        response.set_header('Cache-Control', 'No-store')
+        return self.probe_json(p)
+
+
+    def master_json(self):
+        ret = {"status": "OK",
+                "body": {
+                    "status": "OFF",
+                    "ip_address": self.ip_address,
+                    "host": self.host,
+                    "uptime_secs": self.helper_get_uptime_secs(),
+                    "data_size_mb": self.helper_get_data_size_mb(),
+                    "free_space_mb": self.helper_get_free_space(),
+                    "has_camera": self.config["has_camera"],
+                    "available_memory_kb": 0,
+                    "free_memory_kb": 0
+                }
+        }
+
+        if self.scheduler.active:
+            ret["body"]["status"] = "ON"
+
+        available_mem, free_mem = self.helper_get_memory_info()
+        ret["body"]["available_memory_kb"] = available_mem
+        ret["body"]["free_memory_kb"] = free_mem
+
+        response.set_header('Cache-Control', 'No-store')
+        return json.dumps(ret)
+
+    
+    def master_control_json(self):
+        command = request.forms.command
+        if command == 'ON':
+            self.scheduler.start_probes()
+        elif command == 'OFF':
+            self.scheduler.stop_probes()
+
+        response.set_header('Cache-Control', 'No-store')
+        return self.master_json()
+
+    
+    def capture_control_json(self):
+        ret = {"status": "OK",
+                "body": None
+              }
+        try:
+            ret["body"] = self.photo_capture.capture()
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header('Cache-Control', 'No-store')
+        return json.dumps(ret)
+
+
+    def log_json(self):
+        lines = request.query.n or 10
+        stdin,stdout = os.popen2("tail -n %s %s" % (lines, self.config['logfile']))
+        stdin.close()
+        log = stdout.readlines()
+        stdout.close()
+
+        ret = {"status": "OK",
+               "body": {
+                    "log": log,
+                }
+              }
+
+        response.set_header('Cache-Control', 'No-store')
+        return json.dumps(ret)  
+
+
+    def static(self, filepath):
+        return static_file(filepath, root=STATIC_ROOT)
+
+
+    ######### HELPERS ########################################################
     def helper_get_probe_data(self, probe):
         ret = []
         records = 1
@@ -123,90 +216,6 @@ class HttpServer(object):
             ret["status"] = "ON"
 
         return ret
-
-
-    def probe_json(self, p):
-        ret = {"status": "OK",
-                "body": self.helper_get_probe_struct(self.scheduler.probes[p])
-              }
-        return json.dumps(ret)
-
-
-    def probe_control_json(self, p):
-        command = request.forms.command
-        if command == 'ON':
-            self.scheduler.start_probe(p)
-        elif command == 'OFF':
-            self.scheduler.stop_probe(p)
-
-        return self.probe_json(p)
-
-
-    def master_json(self):
-        ret = {"status": "OK",
-                "body": {
-                    "status": "OFF",
-                    "ip_address": self.ip_address,
-                    "host": self.host,
-                    "uptime_secs": self.helper_get_uptime_secs(),
-                    "data_size_mb": self.helper_get_data_size_mb(),
-                    "free_space_mb": self.helper_get_free_space(),
-                    "has_camera": self.config["has_camera"],
-                    "available_memory_kb": 0,
-                    "free_memory_kb": 0
-                }
-        }
-
-        if self.scheduler.active:
-            ret["body"]["status"] = "ON"
-
-        available_mem, free_mem = self.helper_get_memory_info()
-        ret["body"]["available_memory_kb"] = available_mem
-        ret["body"]["free_memory_kb"] = free_mem
-
-        return json.dumps(ret)
-
-    
-    def master_control_json(self):
-        command = request.forms.command
-        if command == 'ON':
-            self.scheduler.start_probes()
-        elif command == 'OFF':
-            self.scheduler.stop_probes()
-
-        return self.master_json()
-
-    
-    def capture_control_json(self):
-        ret = {"status": "OK",
-                "body": None
-              }
-        try:
-            ret["body"] = self.photo_capture.capture()
-        except Exception as ex:
-            ret["status"] = "ERROR"
-            ret["body"] = str(ex)
-
-        return json.dumps(ret)
-
-
-    def log_json(self):
-        lines = request.query.n or 10
-        stdin,stdout = os.popen2("tail -n %s %s" % (lines, self.config['logfile']))
-        stdin.close()
-        log = stdout.readlines()
-        stdout.close()
-
-        ret = {"status": "OK",
-               "body": {
-                    "log": log,
-                }
-              }
-        return json.dumps(ret)  
-
-
-    def static(self, filepath):
-        return static_file(filepath, root=STATIC_ROOT)
 
 
     def helper_get_free_space(self):

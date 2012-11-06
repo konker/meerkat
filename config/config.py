@@ -41,7 +41,7 @@ config = {
             "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
             "type": probe.TYPE_PERIODIC,
             "interval": 20,
-            "data_type": probe.DATA_TYPE_DATA,
+            "data_type": probe.DATA_TYPE_JSON,
             "auto_start": False,
             "filters": [
                 "meerkat.filters.cv_filters.CreateLatestLink"
@@ -51,20 +51,29 @@ config = {
             ]
         },
         {
-            "id": "meerkat.probe.tick_sleeper",
-            "command": ["tick_sleeper.sh", "20"],
+            "id": "meerkat.probe.json_tick_sleeper",
+            "command": ["json_tick_sleeper.sh", "20"],
             "type": probe.TYPE_DURATION,
-            "duration": 6,
-            "interval": 14,
-            "data_type": probe.DATA_TYPE_DATA,
-            "auto_start": False
+            "duration": 8,
+            "interval": 4,
+            "data_type": probe.DATA_TYPE_JSON,
+            "auto_start": True
+        },
+        {
+            "id": "meerkat.probe.text_tick_sleeper",
+            "command": ["text_tick_sleeper.sh", "20"],
+            "type": probe.TYPE_DURATION,
+            "duration": 8,
+            "interval": 5,
+            "data_type": probe.DATA_TYPE_TEXT,
+            "auto_start": True
         },
         {
             "id": "meerkat.probe.dummy_data",
             "command": ["dummy_data.sh", "128"],
             "type": probe.TYPE_PERIODIC,
             "interval": 10,
-            "data_type": probe.DATA_TYPE_DATA,
+            "data_type": probe.DATA_TYPE_TEXT,
             "auto_start": False
         }
     ]

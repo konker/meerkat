@@ -39,6 +39,7 @@ class Scheduler(object):
         index = 0
         for probe_conf in probe_confs:
             self.check_command(probe_conf)
+            self.check_data_type(probe_conf)
 
             # load filters
             self.load_filters(probe_conf)
@@ -146,6 +147,13 @@ class Scheduler(object):
                 raise MeerkatException("Could not load filter module: %s" % module)
 
 
+    def check_data_type(self, probe_conf):
+        # sanity check the probe data type
+        if not "data_type" in probe_conf \
+            or not probe_conf["data_type"] in [probe.DATA_TYPE_TEXT, probe.DATA_TYPE_JSON, probe.DATA_TYPE_DATA]:
+            raise ValueError("Bad config: %s: missing or invalid 'data_type' attribute" % probe_conf["id"])
+
+
     def check_command(self, probe_conf):
         # sanity check the probe command
         if not "command" in probe_conf or len(probe_conf["command"]) == 0:
@@ -167,11 +175,11 @@ class Scheduler(object):
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
                                   and a 'duration' attribute" % probe_conf["id"])
-            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
+            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["data_type"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
         elif probe_conf["type"] == probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % probe_conf["id"])
-            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
+            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["data_type"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
         elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
 
