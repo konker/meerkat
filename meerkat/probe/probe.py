@@ -13,10 +13,6 @@ import logging
 from subprocess import Popen, PIPE
 import pyev
 
-"""
-TODO:
-    - pos. optimise creation of watchers using set() rather than re-creating them each time?
-"""
 
 # constants
 TYPE_DURATION = 1
@@ -228,7 +224,11 @@ class Probe(object):
     def init_interval(self):
         logging.debug("Adding interval timer for %s. (%s secs)" % (self.id, self.interval))
 
-        self.watchers["interval"] = self.loop.timer(self.interval, 0.0, self.interval_cb)
+        if not self.watchers["interval"]:
+            self.watchers["interval"] = pyev.Timer(self.interval, 0.0, self.loop, self.interval_cb)
+        else:
+            self.watchers["interval"].set(self.interval, 0.0)
+
         self.watchers["interval"].start()
 
 
@@ -241,11 +241,19 @@ class Probe(object):
         logging.debug("Adding I/O watchers for %s." % self.id)
 
         # set up watchers for stdout
-        self.watchers["io"]["stdout"] = self.loop.io(self.process.stdout, pyev.EV_READ, self.io_stdout_cb)
+        if not self.watchers["io"]["stdout"]:
+            self.watchers["io"]["stdout"] = pyev.Io(self.process.stdout, pyev.EV_READ, self.loop, self.io_stdout_cb)
+        else:
+            self.watchers["io"]["stdout"].set(self.process.stdout, pyev.EV_READ)
+
         self.watchers["io"]["stdout"].start()
 
         # set up watchers for stderr
-        self.watchers["io"]["stderr"] = self.loop.io(self.process.stderr, pyev.EV_READ, self.io_stderr_cb)
+        if not self.watchers["io"]["stderr"]:
+            self.watchers["io"]["stderr"] = pyev.Io(self.process.stderr, pyev.EV_READ, self.loop, self.io_stderr_cb)
+        else:
+            self.watchers["io"]["stderr"].set(self.process.stderr, pyev.EV_READ)
+
         self.watchers["io"]["stderr"].start()
 
 
@@ -259,7 +267,11 @@ class Probe(object):
     def init_duration(self):
         logging.debug("Adding duration timeout: %s secs." % self.duration)
 
-        self.watchers["duration"] = self.loop.timer(self.duration, 0.0, self.duration_cb)
+        if not self.watchers["duration"]:
+            self.watchers["duration"] = pyev.Timer(self.duration, 0.0, self.loop, self.duration_cb)
+        else:
+            self.watchers["duration"].set(self.duration, 0.0)
+
         self.watchers["duration"].start()
 
 
@@ -271,7 +283,11 @@ class Probe(object):
     def init_timeout(self):
         logging.debug("Adding timeout: %s secs." % self.timeout)
 
-        self.watchers["timeout"] = self.loop.timer(self.timeout, 0.0, self.timeout_cb)
+        if not self.watchers["timeout"]:
+            self.watchers["timeout"] = pyev.Timer(self.timeout, 0.0, self.loop, self.timeout_cb)
+        else:
+            self.watchers["timeout"].set(self.timeout, 0.0)
+
         self.watchers["timeout"].start()
 
 
