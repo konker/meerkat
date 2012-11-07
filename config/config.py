@@ -86,7 +86,7 @@ config = {
             "id": "meerkat.probe.dummy_data",
             "command": ["dummy_data.sh", "128"],
             "type": probe.TYPE_PERIODIC,
-            "interval": 10,
+            "interval": 5,
             "data_type": probe.DATA_TYPE_TEXT,
             "auto_start": False
         }

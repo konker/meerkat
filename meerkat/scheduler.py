@@ -12,27 +12,37 @@ import sys
 import logging
 import signal
 import pyev
+from Queue import Queue, Empty
 
 from meerkat.exception import MeerkatException
 import meerkat.probe.probe as probe
+
+
+COMMAND_EXEC = 1
 
 
 class Scheduler(object):
     def __init__(self, probepath, probe_confs, storage, signal_cb):
         self.active = False
         self.active_probes = 0
+        self.queue = Queue()
 
         self.probepath = probepath
         def extra_signal_cb():
             signal_cb()
 
         self.extra_signal_cb = extra_signal_cb
-        self.loop = pyev.default_loop()
+        self.loop = pyev.Loop()
+
+        # initialize and start a idle watcher
+        idle_watcher = pyev.Idle(self.loop, self.idle_cb)
+        idle_watcher.start()
 
         # initialize and start a signal watcher
-        sig = self.loop.signal(signal.SIGINT, self.sigint_cb)
-        sig.start()
-        self.loop.data = [sig]
+        signal_watcher = pyev.Signal(signal.SIGINT, self.loop, self.sigint_cb)
+        signal_watcher.start()
+
+        self.loop.data = [idle_watcher, signal_watcher]
 
         # read in probes from config 
         self.probes = []
@@ -47,7 +57,7 @@ class Scheduler(object):
             # load error filters
             self.load_error_filters(probe_conf)
         
-            p = self.get_probe(index, probe_conf, storage)
+            p = self.get_probe(index, storage, probe_conf, -1)
             p.register(self.loop)
             self.probes.append(p)
 
@@ -56,13 +66,35 @@ class Scheduler(object):
 
             index = index + 1
 
+
+    def idle_cb(self, watcher, revents):
+        if self.queue.empty():
+            return
+
+        try:
+            command = self.queue.get_nowait()
+        except Empty:
+            command = None
+
+        if command:
+            if command[0] == COMMAND_EXEC:
+                logging.debug("Idle: exec command: %s" % (command,))
+
+                # pass the rest of the command elements as args to method
+                getattr(self, command[1])(*command[2:])
+
+            else:
+                logging.debug("Idle: got unknown command: %s. Ignoring." % command)
+
+
+
     def sigint_cb(self, watcher, revents):
         logging.info("SIGINT caught. Exiting..")
         self.halt()
         self.extra_signal_cb()
 
 
-    def start(self, paused=False):
+    def start(self, paused=True):
         if not paused:
             self.start_probes()
 
@@ -166,7 +198,7 @@ class Scheduler(object):
         probe_conf["command"][0] = os.path.join(self.probepath, probe_conf["command"][0])
         
 
-    def get_probe(self, index, probe_conf, storage):
+    def get_probe(self, index, storage, probe_conf, timeout):
         # [FIXME: this is a bit dense]
         if not "type" in probe_conf:
             raise ValueError("Bad config: %s does not have a 'type' attribute" % probe_conf["id"])
@@ -175,11 +207,14 @@ class Scheduler(object):
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
                                   and a 'duration' attribute" % probe_conf["id"])
-            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["data_type"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"], probe_conf["duration"])
+            return probe.Probe(probe_conf["id"], index, storage, probe_conf, timeout)
+
         elif probe_conf["type"] == probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % probe_conf["id"])
-            return probe.Probe(probe_conf["id"], index, storage, probe_conf["command"], probe_conf["data_type"], probe_conf["filters"], probe_conf["error_filters"], probe_conf["interval"])
+            probe_conf["duration"] = -1
+            return probe.Probe(probe_conf["id"], index, storage, probe_conf, timeout)
+
         elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
 

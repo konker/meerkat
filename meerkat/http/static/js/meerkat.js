@@ -109,11 +109,6 @@ var meerkat = (function($) {
                 $('#master').render(meerkat.master.master, meerkat.master.directives.main);
 
                 /* event handlers */
-                $('#masterToggle')
-                    .unbind('click')
-                    .bind('click', meerkat.master.toggle)
-                    .show();
-
                 $('#masterRefresh')
                     .unbind('click')
                     .bind('click', meerkat.master.refresh);
@@ -196,6 +191,12 @@ var meerkat = (function($) {
                         for (var p in data.body.probes) {
                             meerkat.probes.renderProbe(p);
                         }
+
+                        /* master probe toggle event handler */
+                        $('#masterToggle')
+                            .unbind('click')
+                            .bind('click', meerkat.master.toggle)
+                            .show();
 
                         /* show it */
                         $('#probes .section-body').show();

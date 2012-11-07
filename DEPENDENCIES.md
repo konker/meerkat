@@ -2,6 +2,7 @@ Dependencies
 ==============================================================================
 
 apt:
+    - libev-dev
     - bluez
     - python-bluez
     - python-scapy

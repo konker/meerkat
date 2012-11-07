@@ -11,6 +11,7 @@ import os
 import fcntl
 import logging
 from subprocess import Popen, PIPE
+from threading import RLock
 import pyev
 
 
@@ -25,22 +26,24 @@ DATA_TYPE_DATA = 32
 
 
 class Probe(object):
-    def __init__(self, id, index, storage, command, data_type, filters, error_filters, interval, duration=-1, timeout=-1):
+    def __init__(self, id, index, storage, probe_conf, timeout=-1): #command, data_type, filters, error_filters, interval, duration=-1, timeout=-1):
         self.id = id
         self.index = index
         self.storage = storage
-        self.command = command
-        self.data_type = data_type
-        self.filters = filters
-        self.error_filters = error_filters
-        self.interval = interval
-        self.duration = duration
+        self.command = probe_conf["command"]
+        self.data_type = probe_conf["data_type"]
+        self.filters = probe_conf["filters"]
+        self.error_filters = probe_conf["error_filters"]
+        self.interval = probe_conf["interval"]
+        self.duration = probe_conf["duration"]
         self.timeout = timeout
         self.active = False
         self.running = False
         self.last_error = None
         self.loop = None
+        self.process = None
         self.buf = None
+        self.lock = RLock()
 
         self.watchers = {
             "interval": None,
@@ -55,12 +58,29 @@ class Probe(object):
 
     def register(self, loop):
         self.loop = loop
+        self.init_non_io()
         logging.info("Registered probe: %s" % self.id)
 
 
     def start(self):
-        self.init_interval()
+        self.set_interval()
         self.running = True
+
+
+    def stop(self, watchers=None):
+        if watchers == None:
+            watchers = self.watchers
+
+        for k,w in watchers.items():
+            if w:
+                if type(w) == type({}):
+                    # recurse
+                    self.stop(w)
+                else:
+                    w.stop()
+
+        self.active = False
+        self.running = False
 
 
     # execute the command
@@ -79,21 +99,21 @@ class Probe(object):
         self.buf = []
 
         # initialize I/O watchers
-        self.init_io()
+        self.set_io()
 
         # set up a watcher to kill the process after the duration
         if self.duration > 0:
-            self.init_duration()
+            self.set_duration()
 
         # set up a watcher to kill the process after a global timeout
         if self.timeout > 0:
-            self.init_timeout()
+            self.set_timeout()
 
 
     # read any data available from stdout pipe
     def io_stdout_cb(self, watcher, revents):
         logging.debug("Stdout ready: %s." % self.id)
-        self.set_nonoblocking(self.process.stdout)
+        self.make_nonoblocking(self.process.stdout)
 
         data = self.process.stdout.read()
 
@@ -107,7 +127,7 @@ class Probe(object):
             self.last_error = None
 
             self.active = False
-            self.init_interval()
+            self.set_interval()
         else:
             # EOF
             if data == '':
@@ -119,7 +139,7 @@ class Probe(object):
     # read any data available from stderr pipe
     def io_stderr_cb(self, watcher, revents):
         logging.debug("Stderr ready: %s." % self.id)
-        #self.set_nonoblocking(self.process.stderr)
+        #self.make_nonoblocking(self.process.stderr)
 
         # read in error data
         data = self.process.stderr.read()
@@ -138,7 +158,7 @@ class Probe(object):
 
             # start the interval again
             self.active = False
-            self.init_interval()
+            self.set_interval()
 
 
     def duration_cb(self, watcher, revents):
@@ -156,7 +176,7 @@ class Probe(object):
 
         # start the interval again
         self.active = False
-        self.init_interval()
+        self.set_interval()
 
 
     def timeout_cb(self, watcher, revents):
@@ -173,11 +193,11 @@ class Probe(object):
 
         # start the interval again
         self.active = False
-        self.init_interval()
+        self.set_interval()
 
 
     # set the given pipe to be in non-blocking mode
-    def set_nonoblocking(self, pipe):
+    def make_nonoblocking(self, pipe):
         fd = pipe.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
@@ -237,11 +257,29 @@ class Probe(object):
         self.cancel_interval()
 
 
+    def init_all(self):
+        self.init_interval()
+        self.init_io_stdout()
+        self.init_io_stderr()
+        self.init_duration()
+        self.init_timeout()
+
+
+    def init_non_io(self):
+        self.init_interval()
+        self.init_duration()
+        self.init_timeout()
+
+
     def init_interval(self):
+        self.watchers["interval"] = pyev.Timer(self.interval, 0.0, self.loop, self.interval_cb)
+
+
+    def set_interval(self):
         logging.debug("Adding interval timer for %s. (%s secs)" % (self.id, self.interval))
 
         if not self.watchers["interval"]:
-            self.watchers["interval"] = pyev.Timer(self.interval, 0.0, self.loop, self.interval_cb)
+            self.init_interval()
         else:
             self.watchers["interval"].set(self.interval, 0.0)
 
@@ -249,16 +287,26 @@ class Probe(object):
 
 
     def cancel_interval(self):
+        logging.debug("Cancel interval for %s." % self.id)
+
         if self.watchers["interval"]:
             self.watchers["interval"].stop()
 
 
-    def init_io(self):
+    def init_io_stdout(self):
+        self.watchers["io"]["stdout"] = pyev.Io(self.process.stdout, pyev.EV_READ, self.loop, self.io_stdout_cb)
+
+
+    def init_io_stderr(self):
+        self.watchers["io"]["stderr"] = pyev.Io(self.process.stderr, pyev.EV_READ, self.loop, self.io_stderr_cb)
+
+
+    def set_io(self):
         logging.debug("Adding I/O watchers for %s." % self.id)
 
         # set up watchers for stdout
         if not self.watchers["io"]["stdout"]:
-            self.watchers["io"]["stdout"] = pyev.Io(self.process.stdout, pyev.EV_READ, self.loop, self.io_stdout_cb)
+            self.init_io_stdout()
         else:
             self.watchers["io"]["stdout"].set(self.process.stdout, pyev.EV_READ)
 
@@ -266,7 +314,7 @@ class Probe(object):
 
         # set up watchers for stderr
         if not self.watchers["io"]["stderr"]:
-            self.watchers["io"]["stderr"] = pyev.Io(self.process.stderr, pyev.EV_READ, self.loop, self.io_stderr_cb)
+            self.init_io_stderr()
         else:
             self.watchers["io"]["stderr"].set(self.process.stderr, pyev.EV_READ)
 
@@ -274,6 +322,8 @@ class Probe(object):
 
 
     def cancel_io(self):
+        logging.debug("Cancel I/O watchers for %s." % self.id)
+
         if self.watchers["io"]["stdout"]:
             self.watchers["io"]["stdout"].stop()
         if self.watchers["io"]["stderr"]:
@@ -281,10 +331,14 @@ class Probe(object):
 
 
     def init_duration(self):
+        self.watchers["duration"] = pyev.Timer(self.duration, 0.0, self.loop, self.duration_cb)
+
+
+    def set_duration(self):
         logging.debug("Adding duration timeout: %s secs." % self.duration)
 
         if not self.watchers["duration"]:
-            self.watchers["duration"] = pyev.Timer(self.duration, 0.0, self.loop, self.duration_cb)
+            self.init_duration()
         else:
             self.watchers["duration"].set(self.duration, 0.0)
 
@@ -292,15 +346,21 @@ class Probe(object):
 
 
     def cancel_duration(self):
+        logging.debug("Cancel duration timeout for %s." % self.id)
+
         if self.watchers["duration"]:
             self.watchers["duration"].stop()
 
 
     def init_timeout(self):
+        self.watchers["timeout"] = pyev.Timer(self.timeout, 0.0, self.loop, self.timeout_cb)
+
+
+    def set_timeout(self):
         logging.debug("Adding timeout: %s secs." % self.timeout)
 
         if not self.watchers["timeout"]:
-            self.watchers["timeout"] = pyev.Timer(self.timeout, 0.0, self.loop, self.timeout_cb)
+            self.init_timeout()
         else:
             self.watchers["timeout"].set(self.timeout, 0.0)
 
@@ -308,25 +368,12 @@ class Probe(object):
 
 
     def cancel_timeout(self):
+        logging.debug("Cancel timeout for %s." % self.id)
+
         if self.watchers["timeout"]:
             self.watchers["timeout"].stop()
 
 
-    def stop(self, watchers=None):
-        if watchers == None:
-            watchers = self.watchers
-
-        for k,w in watchers.items():
-            if w:
-                if type(w) == type({}):
-                    # recurse
-                    self.stop(w)
-                else:
-                    w.stop()
-
-        self.active = False
-        self.running = False
-
-
     def __str__(self):
         return "<Probe: %s>" % self.id
+

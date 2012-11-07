@@ -8,6 +8,7 @@
 #
 
 import os
+import time
 import logging
 from datetime import timedelta
 from threading import Thread
@@ -17,6 +18,7 @@ import bottle
 from bottle import template, static_file, request, response
 from storage.sqlite import Storage
 from util.photo_capture import PhotoCapture
+from meerkat.scheduler import COMMAND_EXEC
 
 bottle.TEMPLATE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), 'views')),
 STATIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), 'static'))
@@ -45,17 +47,21 @@ class HttpServer(object):
 
 
     def start(self):
+        '''
+        bottle.run(host=self.config['http_host'], port=self.config['http_port'], debug=False, server='wsgiref')
+        '''
         self.http_thread = Thread(target=bottle.run,
-                                  kwargs=dict(host=self.config['http_host'], port=self.config['http_port']),
+                                  kwargs=dict(host=self.config['http_host'], port=self.config['http_port'], server='wsgiref', debug=False, quiet=True),
                                   name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()
+        logging.info("Http server started.")
 
 
     def index(self):
+        # [FIXME: homepage must be called before storage is used]
         if not self.storage:
-            self.storage = Storage(self.config['datafile'])
-
+            self.storage = Storage(self.config["datafile"])
         return template('index', scheduler=self.scheduler)
 
 
@@ -86,10 +92,13 @@ class HttpServer(object):
     def probe_control_json(self, p):
         command = request.forms.command
         if command == 'ON':
-            self.scheduler.start_probe(p)
+            #self.scheduler.start_probe(p)
+            self.scheduler.queue.put( (COMMAND_EXEC, 'start_probe', p) )
         elif command == 'OFF':
-            self.scheduler.stop_probe(p)
+            #self.scheduler.stop_probe(p)
+            self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probe', p) )
 
+        time.sleep(0.5)
         response.set_header('Cache-Control', 'No-store')
         return self.probe_json(p)
 
@@ -123,10 +132,13 @@ class HttpServer(object):
     def master_control_json(self):
         command = request.forms.command
         if command == 'ON':
-            self.scheduler.start_probes()
+            #self.scheduler.start_probes()
+            self.scheduler.queue.put( (COMMAND_EXEC, 'start_probes') )
         elif command == 'OFF':
-            self.scheduler.stop_probes()
+            #self.scheduler.stop_probes()
+            self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probes') )
 
+        time.sleep(1)
         response.set_header('Cache-Control', 'No-store')
         return self.master_json()
 
