@@ -39,7 +39,7 @@ def main():
         parser.error('incorrect number of arguments')
 
     # configure logging
-    if options.debug:
+    if options.debug or config.get('debug', False):
         if options.log_stderr:
             logging.basicConfig(level=logging.DEBUG,
                                 stream=sys.stderr,

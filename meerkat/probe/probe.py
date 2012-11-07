@@ -139,7 +139,10 @@ class Probe(object):
     # read any data available from stderr pipe
     def io_stderr_cb(self, watcher, revents):
         logging.debug("Stderr ready: %s." % self.id)
-        #self.make_nonoblocking(self.process.stderr)
+        # [XXX: if blocking, wifi_scan blocks the event loop,
+        # but others will only get the first line of stack trace?
+        # Pos. have err_buf like stdout buf and collect stderr before processing?]
+        self.make_nonoblocking(self.process.stderr)
 
         # read in error data
         data = self.process.stderr.read()
@@ -221,12 +224,12 @@ class Probe(object):
 
     def process_data(self, data):
         # deal with a buffer
-        '''
-        print "processing data:"
-        print self.id
-        print type(data)
-        print data
-        '''
+        if self.id == 'meerkat.probe.wifi_client_scan':
+            print "processing data:"
+            print self.id
+            print type(data)
+            print data
+
         if type(data) == list:
             if self.data_type == DATA_TYPE_JSON:
                 # XXX: bit of a hack

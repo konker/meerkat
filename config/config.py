@@ -14,6 +14,9 @@ config = {
     "probepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probe', 'bin')),
 
+    #[TODO]
+    "debug": False,
+
     "http_host": "0.0.0.0",
     "http_port": 80,
 
@@ -44,7 +47,8 @@ config = {
             "data_type": probe.DATA_TYPE_JSON,
             "auto_start": False,
             "filters": [
-                "meerkat.filters.cv_filters.CreateLatestLink"
+                "meerkat.filters.cv_filters.CreateLatestLink",
+                "meerkat.filters.cv_filters.DetectPedestrians"
             ],
             "error_filters": [
                 "meerkat.filters.cv_filters.RemoveErrors"
@@ -55,8 +59,8 @@ config = {
             "command": ["wifi_client_scan.py"],
             "type": probe.TYPE_DURATION,
             "interval": 10,
-            "duration": 30,
-            "data_type": probe.DATA_TYPE_TEXT,
+            "duration": 60,
+            "data_type": probe.DATA_TYPE_JSON,
             "auto_start": False,
             "filters": [
             ],

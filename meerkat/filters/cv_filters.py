@@ -10,6 +10,7 @@
 import os
 import logging
 import json
+import cv
 from meerkat.filters import BaseFilter
 
 
@@ -36,13 +37,30 @@ class CreateLatestLink(BaseFilter):
         return data
 
 
+class DetectPedestrians(BaseFilter):
+    def filter(self, data):
+        struct = json.loads(data)
+
+        storage = cv.CreateMemStorage(0)
+        img = cv.LoadImage(struct["image_path"])
+
+        detected = list(cv.HOGDetectMultiScale(img, storage, win_stride=(8,8),
+                        padding=(32,32), scale=1.05, group_threshold=2))
+
+        struct['detected'] = detected
+        return json.dumps(struct)
+
+
 def test():
     data1 = '{ "status":"OK", "id":"meerkat.probe.camera_photo", "image_path":"/home/pi/WORKING/isoveli/meerkat/meerkat/http/static/img/test.jpg", "image_wdith":1280, "image_height":720}'
 
-    filter = CreateLatestLink('meerkat.filters.cv_filters.CreateLatestLink')
+    filter1 = CreateLatestLink('meerkat.filters.cv_filters.CreateLatestLink')
+    filter2 = DetectPedestrians('meerkat.filters.cv_filters.DetectPedestrians')
 
-    print(filter.filter(data1))
-    assert filter.filter(data1) == data1
+    print(filter1.filter(data1))
+    assert filter1.filter(data1) == data1
+
+    print(filter2.filter(data1))
 
 
 if __name__ == '__main__':

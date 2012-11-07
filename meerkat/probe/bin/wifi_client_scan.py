@@ -28,7 +28,9 @@ def sniffCallback(p):
         if p.type == MANAGEMENT_FRAME_TYPE and \
                 p.subtype in MANAGEMENT_FRAME_SUBTYPES:
             if p.addr2 not in unique:
-                print(p.addr2)
+                unique.append(p.addr2)
+
+                sys.stdout.write(json.dumps({'MAC_Address': p.addr2}))
                 sys.stdout.flush()
 
 
