@@ -1,6 +1,26 @@
 TODO
 ==============================================================================
 
+- MUST: test opencv on images
+
+- Delay before probes start:
+    - something to do with http-thread -> MainThread?
+        - try with auto_start to see if the same effect
+        - if so, pos. implement queues?
+        - or: why can't http server be in main thread?
+    - didn't notice this happening before..?
+
+- Master toggle doesn't work at first load:
+    - click masterRefresh -> masterToggle works
+    - some artefact of moving masterToggle into probes?
+
+- wifi_client_scan blocks/fucks event loop
+    - why?
+    - can we build in a 'duration' parameter to probe?
+        - so it exits itself and thus frees up the event loop?
+    - 'nice'?
+    - some other approach?
+
 - Leave websockets for later
     - !!
 
