@@ -4,6 +4,8 @@ TODO
 - further tests of opencv on images
     - set up over night?
 
+- contextlib for storage?
+
 - have js UI  draw 'detected' rects on to images?
     - how? canvas?
     - raphael?

@@ -28,7 +28,6 @@ class HttpServer(object):
     def __init__(self, scheduler, config):
         self.scheduler = scheduler
         self.config = config
-        self.storage = None
         self.photo_capture = PhotoCapture(config["imagepath"])
 
         self.host = socket.gethostname()
@@ -48,7 +47,7 @@ class HttpServer(object):
 
     def start(self):
         self.http_thread = Thread(target=bottle.run,
-                                  kwargs=dict(host=self.config['http_host'], port=self.config['http_port'], server='wsgiref', debug=False, quiet=True),
+                                  kwargs=dict(host=self.config['http_host'], port=self.config['http_port'], server='cherrypy', debug=False, quiet=True),
                                   name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()
@@ -56,9 +55,6 @@ class HttpServer(object):
 
 
     def index(self):
-        # [FIXME: homepage must be called before storage is used]
-        if not self.storage:
-            self.storage = Storage(self.config["datafile"])
         return template('index', scheduler=self.scheduler)
 
 
@@ -182,7 +178,8 @@ class HttpServer(object):
     def helper_get_probe_data(self, probe):
         ret = []
         records = 1
-        for r in self.storage.get_records_by_probe_id(probe.id, records):
+        storage = Storage(self.config["datafile"])
+        for r in storage.get_records_by_probe_id(probe.id, records):
             record = {
                 "metadata": {
                     "probe_id": r[0],
@@ -201,6 +198,7 @@ class HttpServer(object):
 
             ret.append(record)
 
+        storage.close()
         return ret
 
 
