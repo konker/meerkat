@@ -9,5 +9,7 @@ apt:
     - python-opencv
     #- python-imaging
 
+    - python-cherrypy3
+
 easy_install:
     - pyev
