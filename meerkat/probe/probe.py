@@ -245,6 +245,14 @@ class Probe(object):
 
         # apply filters
         for filter in self.filters:
+            # 1) maintain a filter pointer
+            # 2) only write to storage if filter pointer is END
+            # 3) apply the current filter and increment pointer
+            # - separate above data pre-processing from  filter application?
+            # - storage also separate
+            # - proc filters:
+            #   - do we use the same loop?
+            #       - if so, extra watchers needed
             data = filter.filter(data)
 
         # store
