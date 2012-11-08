@@ -1,7 +1,24 @@
 TODO
 ==============================================================================
 
-- MUST: test opencv on images
+- further tests of opencv on images
+    - set up over night?
+
+- have js UI  draw 'detected' rects on to images?
+    - how? canvas?
+    - raphael?
+    - bonsaijs?
+    - d3?
+
+- data 'tab' in UI for inspecting the db
+- link to download database
+    - pos. zipped?
+
+- security:
+    - ssl?
+        - cherrypy
+    - auth
+    - encryption
 
 - --no-debug flag in command line?
     - overrides config['debug']

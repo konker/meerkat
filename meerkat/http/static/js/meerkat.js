@@ -314,6 +314,16 @@ var meerkat = (function($) {
                                     'table table-bordered', null));
 
                     if (typeof(data[r].data) == 'object') {
+                        /*[FIXME: this should be in some kind of plugin or something?]*/
+                        for (rr in data[r]) {
+                            if (data[r][rr][0] && data[r][rr][0].image_path) {
+                                data[r][rr][0].image_path = data[r][rr][0].image_path.substr(data[r][rr][0].image_path.lastIndexOf('/') + 1);
+                                data[r][rr][0].image_path += " " + '<img src="static/img/' + data[r][rr][0].image_path + '"/>';
+                            }
+                            if (data[r][rr][0] && data[r][rr][0].detected) {
+                                data[r][rr][0].detected = ConvertJsonToTable(data[r][rr][0].detected, null, 'table table-bordered', null);
+                            }
+                        }
                         probeHtml
                             .find('.dbody')
                             .append(ConvertJsonToTable(data[r].data, null,
@@ -322,7 +332,7 @@ var meerkat = (function($) {
                     else {
                         probeHtml
                             .find('.dbody')
-                            .append('<div class="scalar">' + data[r].data + '</div>');
+                            .append('<pre class="scalar">' + data[r].data + '</pre>');
                     }
                 }
 

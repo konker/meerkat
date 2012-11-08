@@ -40,15 +40,14 @@ config = {
             ]
         },
         {
-            "id": "meerkat.probe.camera_photo",
-            "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
+            "id": "meerkat.probe.camera_photo_detect_people",
+            "command": ["camera_photo_detect_people.py", "meerkat.probe.camera_photo_detect_people"],
             "type": probe.TYPE_PERIODIC,
             "interval": 20,
             "data_type": probe.DATA_TYPE_JSON,
             "auto_start": False,
             "filters": [
-                "meerkat.filters.cv_filters.CreateLatestLink",
-                "meerkat.filters.cv_filters.DetectPedestrians"
+                "meerkat.filters.cv_filters.CreateLatestLink"
             ],
             "error_filters": [
                 "meerkat.filters.cv_filters.RemoveErrors"
@@ -96,4 +95,22 @@ config = {
         }
     ]
 }
+
+'''
+{
+    "id": "meerkat.probe.camera_photo",
+    "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 20,
+    "data_type": probe.DATA_TYPE_JSON,
+    "auto_start": False,
+    "filters": [
+        "meerkat.filters.cv_filters.CreateLatestLink",
+        "meerkat.filters.cv_filters.DetectPedestrians"
+    ],
+    "error_filters": [
+        "meerkat.filters.cv_filters.RemoveErrors"
+    ]
+},
+'''
 
