@@ -3,15 +3,31 @@ TODO
 
 - MUST: test opencv on images
 
-- debug flag in config
-    - command line overrides
+- --no-debug flag in command line?
+    - overrides config['debug']
+
+- opencv pedestrian detect filter blocks event loop
+    - for ~20s
+    - what can we do?
+        - "threaded filter"?
+            - bit of a mess with getting the data back into the filter chain?
+        - add the detect code into the actual probe process?
+        - have some kind of file watcher process? 
+            -  watches for new files and runs detect?
+        - some kind of dependent probe?
+
 
 - wifi_client_scan blocks/fucks event loop
     - why?
-    - can we build in a 'duration' parameter to probe?
-        - so it exits itself and thus frees up the event loop?
-    - 'nice'?
-    - some other approach?
+        - because stderr was blocking. see next issue.
+
+- stderr_cb:
+    - if blocking, wifi_scan blocks the event loop,
+      but others will only get the first line of stack trace?
+      Pos. have err_buf like stdout buf and collect stderr before processing?]
+
+- change to cherrypy?
+    - bjoern did not work.
 
 - Leave websockets for later
     - !!

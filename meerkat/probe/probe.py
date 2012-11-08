@@ -43,6 +43,7 @@ class Probe(object):
         self.loop = None
         self.process = None
         self.buf = None
+        self.err_buf = None
         self.lock = RLock()
 
         self.watchers = {
@@ -97,6 +98,7 @@ class Probe(object):
         # create a sub-process for the probe command, listen to stdout and stderr
         self.process = Popen(self.command, bufsize=0, shell=True, stdout=PIPE, stderr=PIPE)
         self.buf = []
+        self.err_buf = []
 
         # initialize I/O watchers
         self.set_io()
@@ -129,8 +131,8 @@ class Probe(object):
             self.active = False
             self.set_interval()
         else:
-            # EOF
             if data == '':
+                # EOF
                 self.cancel_io()
             else:
                 self.buf.append(data)
@@ -145,23 +147,36 @@ class Probe(object):
         self.make_nonoblocking(self.process.stderr)
 
         # read in error data
-        data = self.process.stderr.read()
+        error = self.process.stderr.read()
 
-        # apply error filters
-        for filter in self.error_filters:
-            data = filter.filter(data)
+        if self.duration < 0:
+            error = self.process_error(error)
+            if self.is_error(error):
+                self.handle_error(error)
+        else:
+            if error == '':
+                # EOF
+                error = self.process_error(self.err_buf)
+                if self.is_error(error):
+                    self.handle_error(error)
+            else:
+                self.err_buf.append(error)
 
-        # check that it is an error after filters
-        if not data == '' and not data == None:
-            self.last_error = data
-            logging.error("Error in probe: %s: %s" % (self.id, self.last_error))
 
-            # cancel outstanding watchers
-            self.cancel_all()
+    def handle_error(self, error):
+        self.last_error = error
+        logging.error("Error in probe: %s: %s" % (self.id, self.last_error))
 
-            # start the interval again
-            self.active = False
-            self.set_interval()
+        # cancel outstanding watchers
+        self.cancel_all()
+
+        # start the interval again
+        self.active = False
+        self.set_interval()
+
+
+    def is_error(self, error):
+        return (error != '' and error != None)
 
 
     def duration_cb(self, watcher, revents):
@@ -173,13 +188,18 @@ class Probe(object):
         # terminate the current process
         self.terminate_process()
 
-        # deal with the collected data
-        self.process_data(self.buf)
-        self.last_error = None
+        # check for error
+        error = self.process_error(self.err_buf)
+        if self.is_error(error):
+            self.handle_error(error)
+        else:
+            # OK - deal with the collected data
+            self.last_error = None
+            self.process_data(self.buf)
 
-        # start the interval again
-        self.active = False
-        self.set_interval()
+            # start the interval again
+            self.active = False
+            self.set_interval()
 
 
     def timeout_cb(self, watcher, revents):
@@ -191,12 +211,18 @@ class Probe(object):
         # kill the current process
         self.kill_process()
 
-        # deal with the collected data
-        self.process_data(self.buf)
+        # check for error
+        error = self.process_error(self.err_buf)
+        if self.is_error(error):
+            self.handle_error(error)
+        else:
+            # OK - deal with the collected data
+            self.last_error = None
+            self.process_data(self.buf)
 
-        # start the interval again
-        self.active = False
-        self.set_interval()
+            # start the interval again
+            self.active = False
+            self.set_interval()
 
 
     # set the given pipe to be in non-blocking mode
@@ -222,14 +248,21 @@ class Probe(object):
             logging.error("Could not terminate process: %s: %s" % (self.id, self.process.pid))
 
 
+    def process_error(self, error):
+        # deal with a buffer
+        if type(error) == list:
+            error = ''.join(error)
+
+        # apply error filters
+        for filter in self.error_filters:
+            error = filter.filter(error)
+
+        self.last_error = error
+        return error
+
+
     def process_data(self, data):
         # deal with a buffer
-        if self.id == 'meerkat.probe.wifi_client_scan':
-            print "processing data:"
-            print self.id
-            print type(data)
-            print data
-
         if type(data) == list:
             if self.data_type == DATA_TYPE_JSON:
                 # XXX: bit of a hack
@@ -298,9 +331,8 @@ class Probe(object):
 
 
     def cancel_interval(self):
-        logging.debug("Cancel interval for %s." % self.id)
-
         if self.watchers["interval"]:
+            logging.debug("Cancel interval for %s." % self.id)
             self.watchers["interval"].stop()
 
 
@@ -333,11 +365,11 @@ class Probe(object):
 
 
     def cancel_io(self):
-        logging.debug("Cancel I/O watchers for %s." % self.id)
-
         if self.watchers["io"]["stdout"]:
+            logging.debug("Cancel stdout I/O watcher for %s." % self.id)
             self.watchers["io"]["stdout"].stop()
         if self.watchers["io"]["stderr"]:
+            logging.debug("Cancel stderr I/O watcher for %s." % self.id)
             self.watchers["io"]["stderr"].stop()
 
 
@@ -357,9 +389,8 @@ class Probe(object):
 
 
     def cancel_duration(self):
-        logging.debug("Cancel duration timeout for %s." % self.id)
-
         if self.watchers["duration"]:
+            logging.debug("Cancel duration timeout for %s." % self.id)
             self.watchers["duration"].stop()
 
 
@@ -379,9 +410,8 @@ class Probe(object):
 
 
     def cancel_timeout(self):
-        logging.debug("Cancel timeout for %s." % self.id)
-
         if self.watchers["timeout"]:
+            logging.debug("Cancel timeout for %s." % self.id)
             self.watchers["timeout"].stop()
 
 
