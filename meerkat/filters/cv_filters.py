@@ -10,8 +10,12 @@
 import os
 import logging
 import json
-import cv
 from meerkat.filters import BaseFilter
+
+try:
+    import cv
+except ImportError:
+    print "Could not import cv"
 
 
 class RemoveErrors(BaseFilter):

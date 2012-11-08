@@ -47,9 +47,6 @@ class HttpServer(object):
 
 
     def start(self):
-        '''
-        bottle.run(host=self.config['http_host'], port=self.config['http_port'], debug=False, server='wsgiref')
-        '''
         self.http_thread = Thread(target=bottle.run,
                                   kwargs=dict(host=self.config['http_host'], port=self.config['http_port'], server='wsgiref', debug=False, quiet=True),
                                   name='http-thread')
@@ -241,18 +238,30 @@ class HttpServer(object):
 
 
     def helper_get_uptime_secs(self):
-        with open('/proc/uptime', 'r') as f:
-            secs = f.readline()
+        uptime = '?'
+        try:
+            with open('/proc/uptime', 'r') as f:
+                secs = f.readline()
 
-        return float(secs.split()[0])
+            uptime = float(secs.split()[0])
+        except IOError:
+            pass
+
+        return uptime
 
 
     def helper_get_memory_info(self):
-        with open('/proc/meminfo', 'r') as f:
-            available_mem = f.readline()
-            free_mem = f.readline()
+        meminfo = ('?', '?')
+        try:
+            with open('/proc/meminfo', 'r') as f:
+                available_mem = f.readline()
+                free_mem = f.readline()
 
-        return (int(available_mem.split()[1]), int(free_mem.split()[1]))
+            meminfo = (int(available_mem.split()[1]), int(free_mem.split()[1]))
+        except IOError:
+            pass
+
+        return meminfo
 
 
     def helper_get_data_size_mb(self):

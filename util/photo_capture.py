@@ -12,7 +12,10 @@ import sys
 import logging
 from time import strftime
 import json
-import cv
+try:
+    import cv
+except ImportError:
+    print "Could not import cv"
 
 DEFAULT_IMAGE_WIDTH = 1280
 DEFAULT_IMAGE_HEIGHT = 720
