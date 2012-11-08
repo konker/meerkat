@@ -111,7 +111,7 @@ class HttpServer(object):
                     "host": self.host,
                     "uptime_secs": self.helper_get_uptime_secs(),
                     "data_size_mb": self.helper_get_data_size_mb(),
-                    "free_space_mb": self.helper_get_free_space(),
+                    "free_space_b": self.helper_get_free_space(),
                     "has_camera": self.config["has_camera"],
                     "available_memory_kb": 0,
                     "free_memory_kb": 0

@@ -148,6 +148,11 @@ section {
         background: #fff;
         padding: 1.0em;
         }
+    .probe .data small {
+        background: #ddd;
+        border-radius: 3px;
+        padding: 2px;
+        }
 
     .probe .probe-section ol li {
       background: #fff;

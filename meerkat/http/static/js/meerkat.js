@@ -98,8 +98,8 @@ var meerkat = (function($) {
                     meerkat.util.format_secs(meerkat.master.master.uptime_secs);
                 meerkat.master.master.data_size_mb =
                     meerkat.util.format_mb(meerkat.master.master.data_size_mb);
-                meerkat.master.master.free_space_mb =
-                    meerkat.util.format_mb(meerkat.master.master.free_space_mb);
+                meerkat.master.master.free_space_b =
+                    meerkat.util.format_b(meerkat.master.master.free_space_b);
                 meerkat.master.master.available_memory_kb =
                     meerkat.util.format_kb(meerkat.master.master.available_memory_kb);
                 meerkat.master.master.free_memory_kb =
@@ -159,7 +159,7 @@ var meerkat = (function($) {
                     'dd.host': 'host',
                     'dd.uptime': 'uptime_secs',
                     'dd.data_size': 'data_size_mb',
-                    'dd.free_space': 'free_space_mb',
+                    'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
                     'dd.free_memory': 'free_memory_kb'
                 }
@@ -501,19 +501,51 @@ var meerkat = (function($) {
                 }
             },
             format_timestamp: function(ts) {
-                /*[TODO]*/
-                return ts + " ms";
+                return meerkat.util.ReadableDateString(new Date(ts)) + "<br/><small>" + ts + "</small>";
+            },
+            ReadableDateString: function(d) {
+                function pad(n){return n<10 ? '0'+n : n}
+                    return d.getFullYear()+'-'
+                        + pad(d.getMonth()+1)+'-'
+                        + pad(d.getDate())+' '
+                        + pad(d.getHours())+':'
+                        + pad(d.getMinutes())+':'
+                        + pad(d.getSeconds())
+            },
+            ISODateString: function(d) {
+                function pad(n){return n<10 ? '0'+n : n}
+                    return d.getUTCFullYear()+'-'
+                        + pad(d.getUTCMonth()+1)+'-'
+                        + pad(d.getUTCDate())+'T'
+                        + pad(d.getUTCHours())+':'
+                        + pad(d.getUTCMinutes())+':'
+                        + pad(d.getUTCSeconds())+'Z'
             },
             format_secs: function(secs) {
-                /*[TODO]*/
+                if (secs > 60) {
+                    if (secs > 3600) {
+                        return Math.round(secs/3600) + " hrs";
+                    }
+                    return Math.round(secs/60) + " mins";
+                }
                 return secs + " secs";
             },
+            format_b: function(b) {
+                if (b > 1024) {
+                    return meerkat.util.format_kb(b/1024);
+                }
+                return kb + " KB";
+            },
             format_kb: function(kb) {
-                /*[TODO]*/
+                if (kb > 1024) {
+                    return meerkat.util.format_mb(kb/1024);
+                }
                 return kb + " KB";
             },
             format_mb: function(mb) {
-                /*[TODO]*/
+                if (mb > 1024) {
+                    return mb/1024 + " GB";
+                }
                 return mb + " MB";
             }
         }

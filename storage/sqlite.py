@@ -43,7 +43,7 @@ class Storage(BaseStorage):
 
 
     def write_str(self, probe_id, s):
-        timestamp = time.time()
+        timestamp = time.time() * 1000
         length    = len(s)
 
         self.buffer.append((probe_id, timestamp, length, sqlite3.Binary(s)))
