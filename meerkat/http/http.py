@@ -103,7 +103,7 @@ class HttpServer(object):
                     "ip_address": self.ip_address,
                     "host": self.host,
                     "uptime_secs": self.helper_get_uptime_secs(),
-                    "data_size_mb": self.helper_get_data_size_mb(),
+                    "data_size_kb": self.helper_get_data_size_kb(),
                     "free_space_b": self.helper_get_free_space(),
                     "has_camera": self.config["has_camera"],
                     "available_memory_kb": 0,
@@ -262,7 +262,7 @@ class HttpServer(object):
         return meminfo
 
 
-    def helper_get_data_size_mb(self):
+    def helper_get_data_size_kb(self):
         bytes = os.path.getsize(self.config['datafile'])
         return bytes / 1024
 

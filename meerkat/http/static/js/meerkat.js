@@ -96,8 +96,8 @@ var meerkat = (function($) {
                 /* extra formatting */
                 meerkat.master.master.uptime_secs =
                     meerkat.util.format_secs(meerkat.master.master.uptime_secs);
-                meerkat.master.master.data_size_mb =
-                    meerkat.util.format_mb(meerkat.master.master.data_size_mb);
+                meerkat.master.master.data_size_kb =
+                    meerkat.util.format_kb(meerkat.master.master.data_size_kb);
                 meerkat.master.master.free_space_b =
                     meerkat.util.format_b(meerkat.master.master.free_space_b);
                 meerkat.master.master.available_memory_kb =
@@ -158,7 +158,7 @@ var meerkat = (function($) {
                     'dd.ip_address': 'ip_address',
                     'dd.host': 'host',
                     'dd.uptime': 'uptime_secs',
-                    'dd.data_size': 'data_size_mb',
+                    'dd.data_size': 'data_size_kb',
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
                     'dd.free_memory': 'free_memory_kb'
