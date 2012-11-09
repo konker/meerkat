@@ -15,7 +15,7 @@ config = {
                                  '..', 'meerkat', 'probe', 'bin')),
 
     #[TODO]
-    "debug": False,
+    "debug": True,
 
     "http_host": "0.0.0.0",
     "http_port": 80,

@@ -42,6 +42,7 @@ class Probe(object):
         self.last_error = None
         self.loop = None
         self.process = None
+        self.pid = None
         self.buf = None
         self.err_buf = None
         self.lock = RLock()
@@ -60,15 +61,27 @@ class Probe(object):
     def register(self, loop):
         self.loop = loop
         self.init_non_io()
-        logging.info("Registered probe: %s" % self.id)
+        logging.info("Registered probe: %s" % (self.id))
 
 
     def start(self):
+        logging.info("[%s] Start" % (self.id))
+        if self.running:
+            logging.warning("[%s] Start when already running. Skipping" % (self.id))
+            return
+
         self.set_interval()
         self.running = True
 
 
-    def stop(self, watchers=None):
+    def stop(self):
+        logging.info("[%s] Stop" % (self.id))
+        self.running = False
+        self.kill_process()
+        self.stop_watchers()
+
+
+    def stop_watchers(self, watchers=None):
         if watchers == None:
             watchers = self.watchers
 
@@ -76,7 +89,7 @@ class Probe(object):
             if w:
                 if type(w) == type({}):
                     # recurse
-                    self.stop(w)
+                    self.stop_watchers(w)
                 else:
                     w.stop()
 
@@ -88,15 +101,23 @@ class Probe(object):
     def interval_cb(self, watcher, revents):
         logging.debug("[%s] Interval complete: %s secs." % (self.id, self.interval))
 
+        if not self.running:
+            logging.warning("[%s] Interval callback when not running. Skipping" % (self.id))
+            return
+
         if self.active:
-            logging.warning("[%s] Interval callback when still in active state. Skipping" % self.id)
+            logging.warning("[%s] Interval callback when still in active state. Skipping" % (self.id))
             return
 
         self.active = True
         self.cancel_interval()
 
         # create a sub-process for the probe command, listen to stdout and stderr
-        self.process = Popen(self.command, bufsize=0, shell=True, stdout=PIPE, stderr=PIPE)
+        # NOTE: shell must be False, otherwise duration_cb cannot terminate it properly
+        # (cannot terminate child processes of the shell process, e.g. #!/bin/python)
+        self.process = Popen(self.command, bufsize=0, shell=False, stdout=PIPE, stderr=PIPE)
+        self.pid = self.process.pid
+
         self.buf = []
         self.err_buf = []
 
@@ -114,7 +135,7 @@ class Probe(object):
 
     # read any data available from stdout pipe
     def io_stdout_cb(self, watcher, revents):
-        logging.debug("[%s] Stdout ready" % self.id)
+        logging.debug("[%s] Stdout ready" % (self.id))
         self.make_nonoblocking(self.process.stdout)
 
         data = self.process.stdout.read()
@@ -140,7 +161,7 @@ class Probe(object):
 
     # read any data available from stderr pipe
     def io_stderr_cb(self, watcher, revents):
-        logging.debug("[%s] Stderr ready" % self.id)
+        logging.debug("[%s] Stderr ready" % (self.id))
         # [XXX: if blocking, wifi_scan blocks the event loop,
         # but others will only get the first line of stack trace?
         # Pos. have err_buf like stdout buf and collect stderr before processing?]
@@ -234,18 +255,24 @@ class Probe(object):
 
     # terminate the process SIGTERM
     def terminate_process(self):
+        logging.debug("[%s] terminate process: SIGTERM %s" % (self.id, self.pid))
+
         try:
-            self.process.terminate()
+            if self.process:
+                self.process.terminate()
         except OSError as ex:
-            logging.error("Could not terminate process: %s: %s" % (self.id, self.process.pid))
+            logging.error("Could not terminate process: %s: %s" % (self.id, self.pid))
 
 
     # kill the process SIGKILL
     def kill_process(self):
+        logging.debug("[%s] kill process: SIGKILL %s" % (self.id, self.pid))
+
         try:
-            self.process.kill()
+            if self.process:
+                self.process.kill()
         except OSError as ex:
-            logging.error("Could not terminate process: %s: %s" % (self.id, self.process.pid))
+            logging.error("Could not kill process: %s: %s" % (self.id, self.pid))
 
 
     def process_error(self, error):
@@ -332,7 +359,7 @@ class Probe(object):
 
     def cancel_interval(self):
         if self.watchers["interval"] and self.watchers["interval"].active:
-            logging.debug("[%s] Cancel interval" % self.id)
+            logging.debug("[%s] Cancel interval" % (self.id))
             self.watchers["interval"].stop()
 
 
@@ -345,7 +372,7 @@ class Probe(object):
 
 
     def set_io(self):
-        logging.debug("[%s] Adding I/O watchers" % self.id)
+        logging.debug("[%s] Adding I/O watchers" % (self.id))
 
         # set up watchers for stdout
         if not self.watchers["io"]["stdout"]:
@@ -366,10 +393,10 @@ class Probe(object):
 
     def cancel_io(self):
         if self.watchers["io"]["stdout"]:
-            logging.debug("[%s] Cancel stdout I/O watcher" % self.id)
+            logging.debug("[%s] Cancel stdout I/O watcher" % (self.id))
             self.watchers["io"]["stdout"].stop()
         if self.watchers["io"]["stderr"]:
-            logging.debug("[%s] Cancel stderr I/O watcher" % self.id)
+            logging.debug("[%s] Cancel stderr I/O watcher" % (self.id))
             self.watchers["io"]["stderr"].stop()
 
 
@@ -391,7 +418,7 @@ class Probe(object):
 
     def cancel_duration(self):
         if self.watchers["duration"]:
-            logging.debug("[%s] Cancel duration timeout" % self.id)
+            logging.debug("[%s] Cancel duration timeout" % (self.id))
             self.watchers["duration"].stop()
 
 
@@ -413,7 +440,7 @@ class Probe(object):
 
     def cancel_timeout(self):
         if self.watchers["timeout"]:
-            logging.debug("[%s] Cancel timeout" % self.id)
+            logging.debug("[%s] Cancel timeout" % (self.id))
             self.watchers["timeout"].stop()
 
 
