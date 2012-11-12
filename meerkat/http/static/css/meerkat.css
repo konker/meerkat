@@ -9,6 +9,8 @@ cream: #efe7be
 
 
 header {
+  position: fixed;
+  width: 100%;
   background: #002635;
   box-shadow: 0 4px 3px #aaa;
   border-radius: 0 0 42px 0;
@@ -38,6 +40,10 @@ body {
     margin-top: 12px;
     display: none;
     }
+
+#container {
+  padding-top: 6em;
+  }
 
 section {
   margin: 1.5em 0;

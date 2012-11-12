@@ -28,7 +28,7 @@
 
 <body>
   <!-- Page Layout HTML here -->
-  <header class="navbar navbar-inverse navbar-fixed-top" id="header">
+  <header class="navbar navbar-fixed-top" id="header">
     <div class="navbar-inner">
       <h1>meerkat</h1>
     </div>
