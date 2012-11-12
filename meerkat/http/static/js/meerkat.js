@@ -320,9 +320,12 @@ var meerkat = (function($) {
                         for (var rr in data[r].data) {
                             if (data[r].data[rr] && data[r].data[rr].image_path) {
                                 data[r].data[rr].image_path = data[r].data[rr].image_path.substr(data[r].data[rr].image_path.lastIndexOf('/') + 1);
-                                data[r].data[rr].image_path += " " + '<canvas id="holder' + rr + '" width="'+ meerkat.probes.image_width +'" height="'+ meerkat.probes.image_height+'"></canvas><img id="dataimage' + rr + '" src="static/img/' + data[r].data[rr].image_path + '"/></div>';
+                                data[r].data[rr].image = '<canvas id="holder' + rr + '" width="'+ meerkat.probes.image_width +'" height="'+ meerkat.probes.image_height+'"></canvas>';
                             }
-                            if (data[r].data[rr] && data[r].data[rr].detected) {
+                            if (data[r].data[rr].id) {
+                                delete data[r].data[rr].id;
+                            }
+                            if (data[r].data[rr].detected) {
                                 data[r].data[rr].num_detected = data[r].data[rr].detected.length;
                             }
                         }
@@ -330,27 +333,30 @@ var meerkat = (function($) {
                             .find('.dbody')
                             .append(ConvertJsonToTable(data[r].data, null,
                                             'table table-bordered', null));
+
                         for (var rr in data[r].data) {
-                            if (data[r].data[rr].num_detected > 0) {
+                            if (data[r].data[rr].image_path) {
                                 var ctx = $('#holder' + rr).get(0).getContext('2d');
-                                var dataimage = $('#dataimage' + rr) 
+                                var dataimage = new Image();
+                                dataimage.onload = function() {
+                                    ctx.drawImage(dataimage, 0, 0, meerkat.probes.image_width, meerkat.probes.image_height);
+                                    if (data[r].data[rr].num_detected > 0) {
+                                        var x_fact = (meerkat.probes.image_width / data[r].data[rr].image_width);
+                                        var y_fact = (meerkat.probes.image_height / data[r].data[rr].image_height);
 
-                                ctx.drawImage(dataimage.get(0), 0, 0, meerkat.probes.image_width, meerkat.probes.image_height);
-                                //dataimage.hide();
-
-                                var x_fact = (meerkat.probes.image_width / data[r].data[rr].image_width);
-                                var y_fact = (meerkat.probes.image_height / data[r].data[rr].image_height);
-
-                                for (var d in data[r].data[rr].detected) {
-                                    console.log(data[r].data[rr].detected[d]);
-                                    ctx.strokeStyle = 'rgb(255, 0, 0)';
-                                    ctx.strokeRect(
-                                        data[r].data[rr].detected[d][0][0] * x_fact,
-                                        data[r].data[rr].detected[d][0][1] * y_fact,
-                                        data[r].data[rr].detected[d][1][0] * x_fact,
-                                        data[r].data[rr].detected[d][1][1] * y_fact
-                                    );
+                                        for (var d in data[r].data[rr].detected) {
+                                            console.log(data[r].data[rr].detected[d]);
+                                            ctx.strokeStyle = 'rgb(255, 0, 0)';
+                                            ctx.strokeRect(
+                                                data[r].data[rr].detected[d][0][0] * x_fact,
+                                                data[r].data[rr].detected[d][0][1] * y_fact,
+                                                data[r].data[rr].detected[d][1][0] * x_fact,
+                                                data[r].data[rr].detected[d][1][1] * y_fact
+                                            );
+                                        }
+                                    }
                                 }
+                                dataimage.src = 'static/img/' + data[r].data[rr].image_path;
                             }
                         }
                     }
@@ -372,12 +378,6 @@ var meerkat = (function($) {
                     .find('.error-filters ol')
                     .html('<li></li>')
                     .render(meerkat.probes.probes[p], meerkat.probes.directives.error_filters);
-
-                /* render post processes */
-                probeHtml
-                    .find('.post-processes ol')
-                    .html('<li></li>')
-                    .render(meerkat.probes.probes[p], meerkat.probes.directives.post_processes);
 
                 /* event handlers */
                 probeHtml
@@ -456,13 +456,6 @@ var meerkat = (function($) {
                     'li': {
                         'filter<-error_filters': {
                             '.': 'filter'
-                        }
-                    }
-                },
-                post_processes: {
-                    'li': {
-                        'process<-post_processes': {
-                            '.': 'process'
                         }
                     }
                 }

@@ -209,13 +209,6 @@ class HttpServer(object):
         return ret
 
 
-    def helper_get_probe_processes(self, processes):
-        ret = []
-        for p in processes:
-            ret.append(' '.join(p.command))
-        return ret
-
-
     def helper_get_probe_struct(self, probe):
         ret = {
             "id": "probe%s" % probe.index,
@@ -226,7 +219,6 @@ class HttpServer(object):
             "data": self.helper_get_probe_data(probe),
             "filters": self.helper_get_probe_filters(probe.filters),
             "error_filters": self.helper_get_probe_filters(probe.error_filters),
-            "post_processes": self.helper_get_probe_processes(probe.post_processes),
             "interval": probe.interval,
             "duration": probe.duration,
             "last_error": probe.last_error

@@ -12,7 +12,6 @@ import fcntl
 import logging
 from subprocess import Popen, PIPE
 import pyev
-from meerkat.processes.process import ProcessException
 
 
 # constants
@@ -34,7 +33,6 @@ class Probe(object):
         self.data_type = probe_conf["data_type"]
         self.filters = probe_conf["filters"]
         self.error_filters = probe_conf["error_filters"]
-        self.post_processes = probe_conf["post_processes"]
         self.interval = probe_conf["interval"]
         self.duration = probe_conf["duration"]
         self.timeout = timeout
@@ -78,7 +76,6 @@ class Probe(object):
         logging.info("[%s] Stop" % (self.id))
         self.running = False
         self.kill_command()
-        self.stop_post_processes()
         self.stop_watchers()
 
 
@@ -207,7 +204,7 @@ class Probe(object):
         # cancel outstanding watchers
         self.cancel_all()
 
-        # terminate the current process
+        # terminate the command process
         self.terminate_command()
 
         # check for error
@@ -230,7 +227,7 @@ class Probe(object):
         # cancel outstanding watchers
         self.cancel_all()
 
-        # kill the current process
+        # kill the command process
         self.kill_command()
 
         # check for error
@@ -276,14 +273,6 @@ class Probe(object):
             logging.error("Could not kill command: %s: %s" % (self.id, self.pid))
 
 
-    # stop post processes
-    def stop_post_processes(self):
-        logging.debug("[%s] stop processes: SIGKILL %s" % (self.id, self.pid))
-
-        for process in self.post_processes:
-            process.stop()
-
-
     def process_error(self, error):
         # deal with a buffer
         if type(error) == list:
@@ -315,15 +304,6 @@ class Probe(object):
         # apply filters
         for filter in self.filters:
             data = filter.filter(data)
-
-        # apply post-processes
-        for process in self.post_processes:
-            try:
-                logging.debug("[%s] run post process: %s" % (self.id, process))
-                data = process.run(data)
-            except ProcessException as ex:
-                self.handle_error(str(ex))
-                return
 
         # store
         if self.storage:

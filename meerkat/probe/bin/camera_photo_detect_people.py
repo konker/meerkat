@@ -42,9 +42,9 @@ def main():
                         padding=(32,32), scale=1.05, group_threshold=2))
 
         detected = filter_detected(detected)
-        draw_detected(img, detected)
-
+        #draw_detected(img, detected)
         cv.SaveImage(filename, img)
+
         ret = {
             "status": "OK",
             "id": id,

@@ -16,20 +16,18 @@ from Queue import Queue, Empty
 
 from meerkat.exception import MeerkatException
 import meerkat.probe.probe as probe
-from meerkat.processes.process import Process
 
 
 COMMAND_EXEC = 1
 
 
 class Scheduler(object):
-    def __init__(self, probepath, processpath, probe_confs, storage, signal_cb):
+    def __init__(self, probepath, probe_confs, storage, signal_cb):
         self.active = False
         self.active_probes = 0
         self.queue = Queue()
 
         self.probepath = probepath
-        self.processpath = processpath
         def extra_signal_cb():
             signal_cb()
 
@@ -58,9 +56,6 @@ class Scheduler(object):
 
             # load error filters
             self.load_error_filters(probe_conf)
-
-            # load post processes
-            self.check_post_processes(probe_conf)
         
             p = self.get_probe(index, storage, probe_conf, -1)
             p.register(self.loop)
@@ -147,19 +142,6 @@ class Scheduler(object):
             self.stop_probes()
 
         self.loop.stop(pyev.EVBREAK_ALL)
-
-
-    def check_post_processes(self, probe_conf):
-        if not "post_processes" in probe_conf:
-            probe_conf["post_processes"] = []
-            return
-
-        for i in xrange(len(probe_conf["post_processes"])):
-            # expand the command
-            probe_conf["post_processes"][i][0] = os.path.join(self.processpath, probe_conf["post_processes"][i][0])
-
-            # instantite Process object
-            probe_conf["post_processes"][i] = Process(probe_conf["post_processes"][i])
 
 
     def load_filters(self, probe_conf):
