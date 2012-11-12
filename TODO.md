@@ -1,26 +1,31 @@
 TODO
 ==============================================================================
 
+- opencv HOG detector doesn't really work well
+    - keep original images for first trial?
+        - check this will Olli
+    - can then post-process them with some other analyses?
+        - maybe re-train a HOG detector?
+
+- security:
+    - ssl?
+        - cherrypy
+            - this is too heavy it seems
+    - auth
+        - bottle-cork?
+    - encryption
+
 - further tests of opencv on images
     - set up over night?
 
 - contextlib for storage?
 
 - have js UI  draw 'detected' rects on to images?
-    - how? canvas?
-    - raphael?
-    - bonsaijs?
-    - d3?
+    - canvas
 
 - data 'tab' in UI for inspecting the db
 - link to download database
     - pos. zipped?
-
-- security:
-    - ssl?
-        - cherrypy
-    - auth
-    - encryption
 
 - --no-debug flag in command line?
     - overrides config['debug']
