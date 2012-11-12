@@ -122,6 +122,13 @@
                 <li></li>
               </ol>
             </div>
+            <div class="row post-processes probe-section">
+              <h4><i class="icon-wrench"></i> post processes</h4>
+              <!-- post processes here -->
+              <ol>
+                <li></li>
+              </ol>
+            </div>
           </div>
         </div>
         <!--END:PROBE -->
@@ -150,6 +157,7 @@
   <script src="static/js/jquery.js"></script>
   <script src="static/js/pure_min.js"></script>
   <script src="static/js/json-to-table.js"></script>
+  <script src="static/js/raphael-min.js"></script>
   <script src="static/js/meerkat.js"></script>
 </body>
 </html>

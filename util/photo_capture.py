@@ -44,7 +44,7 @@ class PhotoCapture(object):
         ret = {
             "status": "OK",
             "image_path": filename,
-            "image_wdith": width,
+            "image_width": width,
             "image_height": height
         }
         return ret

@@ -13,6 +13,8 @@ config = {
                                  '..', 'meerkat', 'http', 'static','img')),
     "probepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probe', 'bin')),
+    "processpath": os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                 '..', 'meerkat', 'processes', 'bin')),
 
     #[TODO]
     "debug": True,
@@ -40,8 +42,8 @@ config = {
             ]
         },
         {
-            "id": "meerkat.probe.camera_photo_detect_people",
-            "command": ["camera_photo_detect_people.py", "meerkat.probe.camera_photo_detect_people"],
+            "id": "meerkat.probe.camera_photo",
+            "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
             "type": probe.TYPE_PERIODIC,
             "interval": 20,
             "data_type": probe.DATA_TYPE_JSON,
@@ -51,6 +53,9 @@ config = {
             ],
             "error_filters": [
                 "meerkat.filters.cv_filters.RemoveErrors"
+            ],
+            "post_processes": [
+                ["detect_people.py"]
             ]
         },
         {

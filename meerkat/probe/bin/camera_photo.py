@@ -42,7 +42,7 @@ def main():
             "status": "OK",
             "id": id,
             "image_path": filename,
-            "image_wdith": width,
+            "image_width": width,
             "image_height": height
         }
         sys.stdout.write(json.dumps(ret))

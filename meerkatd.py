@@ -69,7 +69,7 @@ def main():
         storage.close()
 
     # initialize the scheduler
-    scheduler = Scheduler(config["probepath"], config["probes"], storage, signal_cb)
+    scheduler = Scheduler(config["probepath"], config["processpath"], config["probes"], storage, signal_cb)
 
     # start http server
     http_server = HttpServer(scheduler, config)

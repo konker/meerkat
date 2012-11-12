@@ -167,6 +167,8 @@ var meerkat = (function($) {
         },
         probes: {
             probes: null,
+            image_width: 400,
+            image_height: 225,
 
             init: function() {
                 meerkat.probes.loadProbes();
@@ -315,19 +317,42 @@ var meerkat = (function($) {
 
                     if (typeof(data[r].data) == 'object') {
                         /*[FIXME: this should be in some kind of plugin or something?]*/
-                        for (rr in data[r]) {
-                            if (data[r][rr][0] && data[r][rr][0].image_path) {
-                                data[r][rr][0].image_path = data[r][rr][0].image_path.substr(data[r][rr][0].image_path.lastIndexOf('/') + 1);
-                                data[r][rr][0].image_path += " " + '<img src="static/img/' + data[r][rr][0].image_path + '"/>';
+                        for (var rr in data[r].data) {
+                            if (data[r].data[rr] && data[r].data[rr].image_path) {
+                                data[r].data[rr].image_path = data[r].data[rr].image_path.substr(data[r].data[rr].image_path.lastIndexOf('/') + 1);
+                                data[r].data[rr].image_path += " " + '<canvas id="holder' + rr + '" width="'+ meerkat.probes.image_width +'" height="'+ meerkat.probes.image_height+'"></canvas><img id="dataimage' + rr + '" src="static/img/' + data[r].data[rr].image_path + '"/></div>';
                             }
-                            if (data[r][rr][0] && data[r][rr][0].detected) {
-                                data[r][rr][0].detected = ConvertJsonToTable(data[r][rr][0].detected, null, 'table table-bordered', null);
+                            if (data[r].data[rr] && data[r].data[rr].detected) {
+                                data[r].data[rr].num_detected = data[r].data[rr].detected.length;
                             }
                         }
                         probeHtml
                             .find('.dbody')
                             .append(ConvertJsonToTable(data[r].data, null,
                                             'table table-bordered', null));
+                        for (var rr in data[r].data) {
+                            if (data[r].data[rr].num_detected > 0) {
+                                var ctx = $('#holder' + rr).get(0).getContext('2d');
+                                var dataimage = $('#dataimage' + rr) 
+
+                                ctx.drawImage(dataimage.get(0), 0, 0, meerkat.probes.image_width, meerkat.probes.image_height);
+                                //dataimage.hide();
+
+                                var x_fact = (meerkat.probes.image_width / data[r].data[rr].image_width);
+                                var y_fact = (meerkat.probes.image_height / data[r].data[rr].image_height);
+
+                                for (var d in data[r].data[rr].detected) {
+                                    console.log(data[r].data[rr].detected[d]);
+                                    ctx.strokeStyle = 'rgb(255, 0, 0)';
+                                    ctx.strokeRect(
+                                        data[r].data[rr].detected[d][0][0] * x_fact,
+                                        data[r].data[rr].detected[d][0][1] * y_fact,
+                                        data[r].data[rr].detected[d][1][0] * x_fact,
+                                        data[r].data[rr].detected[d][1][1] * y_fact
+                                    );
+                                }
+                            }
+                        }
                     }
                     else {
                         probeHtml
@@ -347,6 +372,12 @@ var meerkat = (function($) {
                     .find('.error-filters ol')
                     .html('<li></li>')
                     .render(meerkat.probes.probes[p], meerkat.probes.directives.error_filters);
+
+                /* render post processes */
+                probeHtml
+                    .find('.post-processes ol')
+                    .html('<li></li>')
+                    .render(meerkat.probes.probes[p], meerkat.probes.directives.post_processes);
 
                 /* event handlers */
                 probeHtml
@@ -425,6 +456,13 @@ var meerkat = (function($) {
                     'li': {
                         'filter<-error_filters': {
                             '.': 'filter'
+                        }
+                    }
+                },
+                post_processes: {
+                    'li': {
+                        'process<-post_processes': {
+                            '.': 'process'
                         }
                     }
                 }
