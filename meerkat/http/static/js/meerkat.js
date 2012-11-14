@@ -1,9 +1,9 @@
 
 var meerkat = (function($) {
-    var PROBES_JSON_URL  = '/probes.json',
-        MASTER_JSON_URL  = '/master.json',
-        CAPTURE_JSON_URL = '/capture.json',
-        LOG_JSON_URL     = '/log.json';
+    var PROBES_JSON_URL  = '/meerkat/probes.json',
+        MASTER_JSON_URL  = '/meerkat/master.json',
+        CAPTURE_JSON_URL = '/meerkat/capture.json',
+        LOG_JSON_URL     = '/meerkat/log.json';
 
     return {
         init: function() {

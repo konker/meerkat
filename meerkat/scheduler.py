@@ -14,6 +14,7 @@ import signal
 import pyev
 from Queue import Queue, Empty
 
+from storage.sqlite import Storage
 from meerkat.exception import MeerkatException
 import meerkat.probe.probe as probe
 
@@ -22,27 +23,28 @@ COMMAND_EXEC = 1
 
 
 class Scheduler(object):
-    def __init__(self, probepath, probe_confs, storage, signal_cb):
+    def __init__(self, datafile, probepath, probe_confs):
         self.active = False
         self.active_probes = 0
-        self.queue = Queue()
-
         self.probepath = probepath
-        def extra_signal_cb():
-            signal_cb()
-
-        self.extra_signal_cb = extra_signal_cb
+        self.queue = Queue()
         self.loop = pyev.Loop()
 
         # initialize and start a idle watcher
         idle_watcher = pyev.Idle(self.loop, self.idle_cb)
         idle_watcher.start()
 
-        # initialize and start a signal watcher
-        signal_watcher = pyev.Signal(signal.SIGINT, self.loop, self.sigint_cb)
-        signal_watcher.start()
+        # initialize and start a signal watchers
+        sigterm_watcher = pyev.Signal(signal.SIGTERM, self.loop, self.sigterm_cb)
+        sigterm_watcher.start()
+        sigint_watcher = pyev.Signal(signal.SIGINT, self.loop, self.sigint_cb)
+        sigint_watcher.start()
 
-        self.loop.data = [idle_watcher, signal_watcher]
+        self.loop.data = [idle_watcher, sigterm_watcher, sigint_watcher]
+
+        # initialize storage
+        logging.info("Init storage...")
+        self.storage = Storage(datafile)
 
         # read in probes from config 
         self.probes = []
@@ -57,7 +59,7 @@ class Scheduler(object):
             # load error filters
             self.load_error_filters(probe_conf)
         
-            p = self.get_probe(index, storage, probe_conf, -1)
+            p = self.get_probe(index, self.storage, probe_conf, -1)
             p.register(self.loop)
             self.probes.append(p)
 
@@ -88,10 +90,14 @@ class Scheduler(object):
 
 
 
+    def sigterm_cb(self, watcher, revents):
+        logging.info("SIGTERM caught. Exiting..")
+        self.halt()
+
+
     def sigint_cb(self, watcher, revents):
         logging.info("SIGINT caught. Exiting..")
         self.halt()
-        self.extra_signal_cb()
 
 
     def start(self, paused=True):
@@ -140,6 +146,9 @@ class Scheduler(object):
 
         if self.probes:
             self.stop_probes()
+
+        logging.info("Closing storage...")
+        self.storage.close()
 
         self.loop.stop(pyev.EVBREAK_ALL)
 

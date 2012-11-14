@@ -17,12 +17,12 @@
   <title>Meerkat</title>
 
   <!-- Included CSS Files -->
-  <link rel="stylesheet" href="static/css/bootstrap.min.css">
-  <link rel="stylesheet" href="static/css/meerkat.css">
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/meerkat.css">
 
   <!-- Custom Modernizr for Foundation -->
   <!--
-  <script src="static/javascripts/foundation/modernizr.foundation.js"></script>
+  <script src="/static/javascripts/foundation/modernizr.foundation.js"></script>
   -->
 </head>
 
@@ -67,7 +67,7 @@
         <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera icon-white"></i> Capture photo</button>
 
         <div id="latest-img">
-          <a href="static/img/latest.jpg"><img src="static/img/latest.jpg"/></a>
+          <a href="/static/img/latest.jpg"><img src="/static/img/latest.jpg"/></a>
         </div>
       </div>
     </section>
@@ -146,10 +146,10 @@
   </footer>
 
   <!-- Included JS Files -->
-  <script src="static/js/bootstrap.min.js"></script>
-  <script src="static/js/jquery.js"></script>
-  <script src="static/js/pure_min.js"></script>
-  <script src="static/js/json-to-table.js"></script>
-  <script src="static/js/meerkat.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <script src="/static/js/jquery.js"></script>
+  <script src="/static/js/pure_min.js"></script>
+  <script src="/static/js/json-to-table.js"></script>
+  <script src="/static/js/meerkat.js"></script>
 </body>
 </html>

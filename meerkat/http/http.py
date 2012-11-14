@@ -15,7 +15,7 @@ from threading import Thread
 import json
 import socket
 import bottle
-from bottle import template, static_file, request, response
+from bottle import template, static_file, request, response, redirect
 from storage.sqlite import Storage
 from util.photo_capture import PhotoCapture
 from meerkat.scheduler import COMMAND_EXEC
@@ -36,13 +36,14 @@ class HttpServer(object):
         # set up the routes manually
         bottle.route('/static/<filepath:path>', method='GET')(self.static)
         bottle.route('/', method='GET')(self.index)
-        bottle.route('/master.json', method='GET')(self.master_json)
-        bottle.route('/master.json', method='POST')(self.master_control_json)
-        bottle.route('/capture.json', method='POST')(self.capture_control_json)
-        bottle.route('/probes.json', method='GET')(self.probes_json)
-        bottle.route('/probe<p:int>.json', method='GET')(self.probe_json)
-        bottle.route('/probe<p:int>.json', method='POST')(self.probe_control_json)
-        bottle.route('/log.json', method='GET')(self.log_json)
+        bottle.route('/meerkat/', method='GET')(self.meerkat)
+        bottle.route('/meerkat/master.json', method='GET')(self.master_json)
+        bottle.route('/meerkat/master.json', method='POST')(self.master_control_json)
+        bottle.route('/meerkat/capture.json', method='POST')(self.capture_control_json)
+        bottle.route('/meerkat/probes.json', method='GET')(self.probes_json)
+        bottle.route('/meerkat/probe<p:int>.json', method='GET')(self.probe_json)
+        bottle.route('/meerkat/probe<p:int>.json', method='POST')(self.probe_control_json)
+        bottle.route('/meerkat/log.json', method='GET')(self.log_json)
 
 
     def start(self):
@@ -51,10 +52,14 @@ class HttpServer(object):
                                   name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()
-        logging.info("Http server started.")
+        logging.info("Http server started on port %s." % self.config["http_port"])
 
 
     def index(self):
+        redirect('/meerkat/')
+
+
+    def meerkat(self):
         return template('index', scheduler=self.scheduler)
 
 

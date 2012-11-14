@@ -1,6 +1,11 @@
 TODO
 ==============================================================================
 
+- sniff wifi network traffic
+
+- can we join an open wifi that requires clicking of web link?
+    - try with battery?
+
 - opencv HOG detector doesn't really work well
     - keep original images for first trial?
         - check this will Olli
@@ -14,6 +19,7 @@ TODO
     - auth
         - bottle-cork?
     - encryption
+        - would need to encrypt images as well as database!
 
 - further tests of opencv on images
     - set up over night?
@@ -80,6 +86,7 @@ TODO
     - class based route handlers
     - better ajax support?
     - better auth support
+    - ssl
     - websockets?
         - later
 
