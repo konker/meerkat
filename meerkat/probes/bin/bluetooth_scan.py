@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# meerkat.probe.bluetooth_scan
+# meerkat.probes.bluetooth_scan
 #
 # Copyright 2012 Konrad Markus
 #

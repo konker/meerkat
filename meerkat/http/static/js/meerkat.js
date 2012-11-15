@@ -1,9 +1,10 @@
 
 var meerkat = (function($) {
-    var PROBES_JSON_URL  = '/meerkat/probes.json',
-        MASTER_JSON_URL  = '/meerkat/master.json',
-        CAPTURE_JSON_URL = '/meerkat/capture.json',
-        LOG_JSON_URL     = '/meerkat/log.json';
+    var URL_PREFX        = '/meerkat',
+        PROBES_JSON_URL  = URL_PREFX + '/probes.json',
+        MASTER_JSON_URL  = URL_PREFX + '/master.json',
+        CAPTURE_JSON_URL = URL_PREFX + '/capture.json',
+        LOG_JSON_URL     = URL_PREFX + '/log.json';
 
     return {
         init: function() {
@@ -217,7 +218,7 @@ var meerkat = (function($) {
                 }
 
                 $.ajax({
-                    url: '/' + probe.id + '.json',
+                    url: URL_PREFX + '/' + probe.id + '.json',
                     type: 'POST',
                     data: {'command': command},
                     dataType: 'json',
@@ -256,7 +257,7 @@ var meerkat = (function($) {
                 meerkat.util.loading.on();
 
                 $.ajax({
-                    url: '/' + meerkat.probes.probes[p].id + '.json',
+                    url: URL_PREFX + '/' + meerkat.probes.probes[p].id + '.json',
                     dataType: 'json',
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
@@ -296,6 +297,12 @@ var meerkat = (function($) {
             },
             renderProbe: function(p) {
                 var probeHtml = $('#' + meerkat.probes.probes[p].id);
+
+                /* render dummy */
+                if (meerkat.probes.probes[p].dummy) {
+                    probeHtml.
+                        addClass('dummy');
+                }
 
                 /* render status */
                 probeHtml

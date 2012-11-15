@@ -16,17 +16,17 @@ from Queue import Queue, Empty
 
 from storage.sqlite import Storage
 from meerkat.exception import MeerkatException
-import meerkat.probe.probe as probe
+import meerkat.probes.probe as probe
 
 
 COMMAND_EXEC = 1
 
 
 class Scheduler(object):
-    def __init__(self, datafile, probepath, probe_confs):
+    def __init__(self, datafile, probespath, probe_confs):
         self.active = False
         self.active_probes = 0
-        self.probepath = probepath
+        self.probespath = probespath
         self.queue = Queue()
         self.loop = pyev.Loop()
 
@@ -52,6 +52,7 @@ class Scheduler(object):
         for probe_conf in probe_confs:
             self.check_command(probe_conf)
             self.check_data_type(probe_conf)
+            self.check_dummy(probe_conf)
 
             # load filters
             self.load_filters(probe_conf)
@@ -188,6 +189,12 @@ class Scheduler(object):
                 raise MeerkatException("Could not load filter module: %s" % module)
 
 
+    def check_dummy(self, probe_conf):
+        # ensure dummy param exists (default False)
+        if not "dummy" in probe_conf:
+            probe_conf["dummy"] = False
+
+
     def check_data_type(self, probe_conf):
         # sanity check the probe data type
         if not "data_type" in probe_conf \
@@ -204,7 +211,7 @@ class Scheduler(object):
             raise ValueError("Bad config: %s: 'command' should be an array of strings" % probe_conf["id"])
 
         # expand the command, saves doing this each time
-        probe_conf["command"][0] = os.path.join(self.probepath, probe_conf["command"][0])
+        probe_conf["command"][0] = os.path.join(self.probespath, probe_conf["command"][0])
         
 
     def get_probe(self, index, storage, probe_conf, timeout):

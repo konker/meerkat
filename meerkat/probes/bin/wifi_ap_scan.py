@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# meerkat.probe.wifi_ap_scan
+# meerkat.probes.wifi_ap_scan
 #
 # Copyright 2012 Konrad Markus
 #

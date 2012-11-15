@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# meerkat.probe.probe
+# meerkat.probes.probe
 #
 # Copyright 2012 Konrad Markus
 #
@@ -35,6 +35,7 @@ class Probe(object):
         self.error_filters = probe_conf["error_filters"]
         self.interval = probe_conf["interval"]
         self.duration = probe_conf["duration"]
+        self.dummy = probe_conf["dummy"]
         self.timeout = timeout
         self.active = False
         self.running = False

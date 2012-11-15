@@ -1,5 +1,5 @@
 import os
-import meerkat.probe.probe as probe
+import meerkat.probes.probe as probe
 
 config = {
     # paths relative from this config file
@@ -11,8 +11,8 @@ config = {
                                  '..', 'data', 'meerkat.db')),
     "imagepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'http', 'static','img')),
-    "probepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', 'meerkat', 'probe', 'bin')),
+    "probespath": os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                 '..', 'meerkat', 'probes', 'bin')),
 
     #[TODO]
     "debug": True,
@@ -74,6 +74,7 @@ config = {
             "duration": 8,
             "interval": 4,
             "data_type": probe.DATA_TYPE_JSON,
+            "dummy": True,
             "auto_start": False
         },
         {
@@ -83,6 +84,7 @@ config = {
             "duration": 8,
             "interval": 5,
             "data_type": probe.DATA_TYPE_TEXT,
+            "dummy": True,
             "auto_start": False
         },
         {
@@ -91,6 +93,7 @@ config = {
             "type": probe.TYPE_PERIODIC,
             "interval": 5,
             "data_type": probe.DATA_TYPE_TEXT,
+            "dummy": True,
             "auto_start": False
         }
     ]

@@ -22,7 +22,8 @@ header {
   header h1 {
     color: #fff;
     margin: 0;
-    font-weight: normal;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
     font-size: 300%;
     background: url(../img/logo.png) 0 0 no-repeat;
     padding: 0 0 8px 94px;
@@ -57,6 +58,8 @@ section {
     color: #555;
     border-bottom: 1px dotted #002635;
     margin: 0;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     font-size: 160%;
     line-height: 1.5;
     padding: 0 0.5em;
@@ -94,11 +97,16 @@ section {
     background: #efe7be;
     border: 1px solid #ccc;
     margin: 0;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
     font-size: 130%;
-    font-weight: normal;
     padding: 0 0.5em;
     border-radius: 6px;
     cursor: pointer;
+    }
+  .probe.dummy h3 {
+    background: #eee;
+    color: #666;
     }
     .probe h3 i {
       vertical-align: baseline;
@@ -125,6 +133,9 @@ section {
   .probe .probeToggle {
     margin-top: 0.35em;
     }
+  section dl dd {
+    font-family: 'Courier new', monospace;
+    }
   section dl.dl-horizontal dt {
     width: 8em !important;
     }
@@ -142,8 +153,9 @@ section {
     color: #003540;
     border-bottom: 1px dotted #003540;
     margin: 0 0 0.5em 0;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
     font-size: 100%;
-    font-weight: bold;
     padding: 0.25em 0.5em;
     }
 

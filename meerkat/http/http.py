@@ -226,6 +226,7 @@ class HttpServer(object):
             "error_filters": self.helper_get_probe_filters(probe.error_filters),
             "interval": probe.interval,
             "duration": probe.duration,
+            "dummy": probe.dummy,
             "last_error": probe.last_error
         }
         if probe.running:

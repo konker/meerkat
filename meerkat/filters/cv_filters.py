@@ -56,7 +56,7 @@ class DetectPedestrians(BaseFilter):
 
 
 def test():
-    data1 = '{ "status":"OK", "id":"meerkat.probe.camera_photo", "image_path":"/home/pi/WORKING/isoveli/meerkat/meerkat/http/static/img/test.jpg", "image_width":1280, "image_height":720}'
+    data1 = '{ "status":"OK", "id":"meerkat.probes.camera_photo", "image_path":"/home/pi/WORKING/isoveli/meerkat/meerkat/http/static/img/test.jpg", "image_width":1280, "image_height":720}'
 
     filter1 = CreateLatestLink('meerkat.filters.cv_filters.CreateLatestLink')
     filter2 = DetectPedestrians('meerkat.filters.cv_filters.DetectPedestrians')

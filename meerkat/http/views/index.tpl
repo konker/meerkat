@@ -19,6 +19,7 @@
   <!-- Included CSS Files -->
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/css/meerkat.css">
+  <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
 
   <!-- Custom Modernizr for Foundation -->
   <!--
