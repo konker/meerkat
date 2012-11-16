@@ -25,13 +25,13 @@ class HttpServer(object):
     def __init__(self):
         self.host = socket.gethostname()
         self.ip_address = socket.gethostbyname(self.host)
-        self.nodes = {}
+        self.nodes = []
 
         # set up the routes manually
         bottle.route('/static/<filepath:path>', method='GET')(self.static)
         bottle.route('/', method='GET')(self.index)
         bottle.route('/nodes.json', method='GET')(self.nodes_json)
-        bottle.route('/register/', method='POST')(self.register_control)
+        bottle.route('/register', method='POST')(self.register_control)
         bottle.route('/log.json', method='GET')(self.log_json)
 
 
@@ -43,7 +43,7 @@ class HttpServer(object):
         self.http_thread.setDaemon(True)
         self.http_thread.start()
         '''
-        bottle.run(host='0.0.0.0', port=8080, server='cherrypy', debug=False, quiet=True)
+        bottle.run(host='0.0.0.0', port=9300, server='cherrypy', debug=False, quiet=True)
         logging.info("Http control server started.")
 
 
@@ -61,13 +61,19 @@ class HttpServer(object):
 
 
     def register_control(self):
-        node = request.body
+        node = request.body.read()
         try:
             node = json.loads(node)
         except ValueError as ex:
-            pass
+            ret = {"status": "ERROR", "body": str(ex)}
+            logging.error(str(ex))
+            return json.dumps(ret)
 
-        self.nodes[node["id"]] = node
+        if node.get("status", False):
+            node = node["body"]
+
+        print node
+        self.nodes.append(node)
 
         ret = {"status": "OK"}
         return json.dumps(ret)

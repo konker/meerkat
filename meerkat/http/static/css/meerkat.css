@@ -39,6 +39,8 @@ body {
     display: none;
     }
 
+#templates { display: none; }
+
 section {
   margin: 1.5em 0;
   border-radius: 6px;
@@ -78,13 +80,13 @@ section {
 
 #masterToggle { display: none; }
 
-.probe {
+.node {
   background: #ddd;
   margin: 1.5em 0;
   border-radius: 6px;
-  display: none;
+  display: block;
   }
-  .probe h3 {
+  .node h3 {
     background: #efe7be;
     border: 1px solid #ccc;
     margin: 0;
@@ -94,29 +96,29 @@ section {
     border-radius: 6px;
     cursor: pointer;
     }
-    .probe h3 i {
+    .node h3 i {
       vertical-align: baseline;
       }
-    .probe h3 .btn-small {
+    .node h3 .btn-small {
        margin-top: 7px !important;
        }
 
-    .probe.closed, .probe.open {
+    .node.closed, .node.open {
       display: block;
       }
-    .probe.closed .probe-body {
+    .node.closed .node-body {
       display: none;
     }
-  .probe dd.last_error pre {
+  .node dd.last_error pre {
     color: #a00;
     }
-  .probe .probe-body {
+  .node .node-body {
     padding: 0 1.0em;
     }
-    .probe .probe-section {
+    .node .node-section {
       margin: 0.5em 0 1.0em 0;
       }
-  .probe .probeToggle {
+  .node .nodeToggle {
     margin-top: 0.35em;
     }
   section dl.dl-horizontal dt {
@@ -132,7 +134,7 @@ section {
     margin-left: 2.5em;
     }
 
-  .probe h4 {
+  .node h4 {
     color: #003540;
     border-bottom: 1px dotted #003540;
     margin: 0 0 0.5em 0;
@@ -141,20 +143,20 @@ section {
     padding: 0.25em 0.5em;
     }
 
-    .probe .data .table {
+    .node .data .table {
       background: #fff;
       }
-      .probe .scalar {
+      .node .scalar {
         background: #fff;
         padding: 1.0em;
         }
-    .probe .data small {
+    .node .data small {
         background: #ddd;
         border-radius: 3px;
         padding: 2px;
         }
 
-    .probe .probe-section ol li {
+    .node .node-section ol li {
       background: #fff;
       padding: 0.25em;
       border-radius: 3px;

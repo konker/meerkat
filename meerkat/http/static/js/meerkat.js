@@ -109,14 +109,18 @@ var meerkat = (function($) {
                 return false;
             },
             renderNode: function(p) {
-                var nodeHtml = $('#' + meerkat.nodes.nodes[p].id);
+                var nodeHtml = $('#' + meerkat.nodes.nodes[p].info.ip_address);
 
                 /* render status */
+                console.log(meerkat.nodes.nodes[p])
+                console.log(nodeHtml)
+                /*
                 nodeHtml
                     .find('.node-body')
                     .render(meerkat.nodes.nodes[p], meerkat.nodes.directives.single);
-
+                */
                 /* render data */
+                /*
                 var data = meerkat.nodes.nodes[p].data;
                 for (var r in data) {
                     if (data[r].metadata.timestamp) {
@@ -130,7 +134,6 @@ var meerkat = (function($) {
                                     'table table-bordered', null));
 
                     if (typeof(data[r].data) == 'object') {
-                        /*[FIXME: this should be in some kind of plugin or something?]*/
                         for (var rr in data[r].data) {
                             if (data[r].data[rr] && data[r].data[rr].image_path) {
                                 data[r].data[rr].image_path = data[r].data[rr].image_path.substr(data[r].data[rr].image_path.lastIndexOf('/') + 1);
@@ -180,6 +183,7 @@ var meerkat = (function($) {
                             .append('<pre class="scalar">' + data[r].data + '</pre>');
                     }
                 }
+                */
 
                 /* event handlers */
                 nodeHtml
@@ -223,6 +227,7 @@ var meerkat = (function($) {
                 if (!nodeHtml.hasClass('open') && !nodeHtml.hasClass('closed')) {
                     nodeHtml.addClass('closed');
                 }
+
                 /* show it */
                 $('#nodes .section-body').show();
             },
@@ -230,17 +235,14 @@ var meerkat = (function($) {
                 main: {
                     '.node': {
                         'node<-nodes': {
-                            '@id': 'node.id',
-                            'h3 span.node-label': 'node.label',
+                            '@id': 'node.info.ip_address',
+                            'h3 span.node-label': 'node.info.host',
                         }
                     }
                 },
                 single: {
-                    'dd.status': 'status',
-                    'dd.interval': 'interval',
-                    'dd.duration': 'duration',
-                    'dd.command': 'command',
-                    'dd.last_error pre': 'last_error'
+                    'dd.status': 'info.status',
+                    'dd.ip_address': 'info.ip_address'
                 }
             }
         },
