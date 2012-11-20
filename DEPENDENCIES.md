@@ -12,3 +12,4 @@ apt:
 easy_install:
     - pyev
     - python-daemon
+    - requests

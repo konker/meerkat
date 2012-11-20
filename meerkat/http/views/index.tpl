@@ -29,7 +29,7 @@
 
 <body>
   <!-- Page Layout HTML here -->
-  <header class="navbar navbar-fixed-top" id="header">
+  <header class="navbar" id="header">
     <div class="navbar-inner">
       <h1>meerkat</h1>
     </div>
@@ -44,6 +44,7 @@
       <h2>
         <i class="icon-info-sign"></i>
         info
+        <button class="btn btn-small pull-right" id="missionControlRegister">Register with mission control</button>
       </h2>
       <div class="section-body">
         <dl class="dl-horizontal">
@@ -63,6 +64,8 @@
           <dd class="available_memory"><!-- [xKB] --></dd>
           <dt class="free_memory">free RAM</dt>
           <dd class="free_memory"><!-- [yKB] --></dd>
+          <dt class="mission_control">mission control</dt>
+          <dd class="mission_control"><a href=""><!--[mission control url]--></a></dd>
         </dl>
         <button type="button" class="btn btn-warning refresh" id="masterRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
         <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera icon-white"></i> Capture photo</button>
