@@ -13,13 +13,16 @@ import sys
 import pathhack
 import logging
 from optparse import OptionParser
+import daemon
 
+# NOTE: edit config.rb as appropriate
+from config.config import config
 from meerkat.http.http import HttpServer
+from util.pidfile import PidFile
 
 
 def main():
     parser = OptionParser()
-
     parser.add_option('--debug', action='store_true', default=False,
                       help='log debugging messages too')
 
@@ -27,12 +30,25 @@ def main():
                       action='store_true', default=False,
                       help='force log messages to stderr')
 
+    parser.add_option('--foreground', '-f', dest='foreground',
+                      action='store_true', default=False,
+                      help='do not run as daemon')
+
     options, args = parser.parse_args()
     if args:
         parser.error('incorrect number of arguments')
 
+    if options.foreground:
+        meerkat_ctrld(options)
+    else:
+        # NOTE: the pidfile path must be the same as $PIDFILE in the init.d script
+        with daemon.DaemonContext(pidfile=PidFile('/var/run/meerkat-ctrld.pid')):
+            meerkat_ctrld(options)
+
+
+def meerkat_ctrld(options):
     # configure logging
-    if options.debug:
+    if options.debug or config.get('debug', False):
         if options.log_stderr:
             logging.basicConfig(level=logging.DEBUG,
                                 stream=sys.stderr,
@@ -40,7 +56,7 @@ def main():
                                 datefmt='%Y-%m-%d %H:%M:%S')
         else:
             logging.basicConfig(level=logging.DEBUG,
-                                filename='meerkat-ctrld.log',
+                                filename=config['logfile'],
                                 format='%(asctime)s [%(threadName)s] %(message)s',
                                 datefmt='%Y-%m-%d %H:%M:%S')
     else:
@@ -51,12 +67,12 @@ def main():
                                 datefmt='%Y-%m-%d %H:%M:%S')
         else:
             logging.basicConfig(level=logging.INFO,
-                                filename='meerkat-ctrld.log',
+                                filename=config['logfile'],
                                 format='%(asctime)s %(message)s',
                                 datefmt='%Y-%m-%d %H:%M:%S')
 
     # start http server
-    http_server = HttpServer()
+    http_server = HttpServer(config)
     http_server.start()
 
 
