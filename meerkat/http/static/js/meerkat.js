@@ -181,8 +181,10 @@ var meerkat = (function($) {
                 main: {
                     'dd.status': 'status',
                     'dd.ip_address': 'ip_address',
+                    'dd.net_interfaces': 'net_interfaces',
                     'dd.host': 'host',
                     'dd.uptime': 'uptime_secs',
+                    'dd.load_average': 'load_average',
                     'dd.data_size': 'data_size_kb',
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',

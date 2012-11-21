@@ -52,10 +52,14 @@
           <dd class="status"><!-- [on/off] --></dd>
           <dt class="ip_address">ip address</dt>
           <dd class="ip_address"><!-- [ip.address] --></dd>
+          <dt class="net_interfaces">net interfaces</dt>
+          <dd class="net_interfaces"><!-- [net_interfaces] --></dd>
           <dt class="host">host</dt>
           <dd class="host"><!-- [host] --></dd>
           <dt class="uptime">uptime</dt>
           <dd class="uptime"><!-- [1:23] --></dd>
+          <dt class="load_average">load average</dt>
+          <dd class="load_average"><!-- [1.23] --></dd>
           <dt class="data_size">data size</dt>
           <dd class="data_size"><!-- [xMB] --></dd>
           <dt class="free_space">free space</dt>

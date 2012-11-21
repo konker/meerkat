@@ -59,6 +59,7 @@ config["probes"].append({
         "meerkat.filters.cv_filters.RemoveErrors"
     ]
 })
+'''
 config["probes"].append({
     "id": "meerkat.probe.camera_photo_detect_people",
     "command": ["camera_photo_detect_people.py", "meerkat.probe.camera_photo_detect_people"],
@@ -73,6 +74,7 @@ config["probes"].append({
         "meerkat.filters.cv_filters.RemoveErrors"
     ]
 })
+'''
 config["probes"].append({
     "id": "meerkat.probe.wifi_client_scan",
     "command": ["wifi_client_scan.py"],
