@@ -12,7 +12,7 @@ import sys
 import logging
 import signal
 import pyev
-from Queue import Queue, Empty
+#from Queue import Queue, Empty
 
 from storage.sqlite import Storage
 from meerkat.exception import MeerkatException
@@ -27,12 +27,12 @@ class Scheduler(object):
         self.active = False
         self.active_probes = 0
         self.probespath = probespath
-        self.queue = Queue()
         self.loop = pyev.Loop()
+        #self.queue = Queue()
 
         # initialize and start a idle watcher
-        idle_watcher = pyev.Idle(self.loop, self.idle_cb)
-        idle_watcher.start()
+        #self.idle_watcher = pyev.Idle(self.loop, self.idle_cb)
+        #self.idle_watcher.start()
 
         # initialize and start a signal watchers
         sigterm_watcher = pyev.Signal(signal.SIGTERM, self.loop, self.sigterm_cb)
@@ -40,7 +40,8 @@ class Scheduler(object):
         sigint_watcher = pyev.Signal(signal.SIGINT, self.loop, self.sigint_cb)
         sigint_watcher.start()
 
-        self.loop.data = [idle_watcher, sigterm_watcher, sigint_watcher]
+        self.loop.data = [sigterm_watcher, sigint_watcher]
+        #self.loop.data.append(self.idle_watcher)
 
         # initialize storage
         logging.info("Init storage...")
@@ -70,12 +71,12 @@ class Scheduler(object):
             index = index + 1
 
 
+    '''
     def idle_cb(self, watcher, revents):
-        if self.queue.empty():
-            return
+        #self.idle_watcher.stop()
 
         try:
-            command = self.queue.get_nowait()
+            command = self.queue.get()
         except Empty:
             command = None
 
@@ -89,6 +90,8 @@ class Scheduler(object):
             else:
                 logging.debug("Idle: got unknown command: %s. Ignoring." % command)
 
+        #self.idle_watcher.start()
+    '''
 
 
     def sigterm_cb(self, watcher, revents):

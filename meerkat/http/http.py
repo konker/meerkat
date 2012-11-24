@@ -10,15 +10,16 @@
 import os
 import time
 import logging
-from datetime import timedelta
 from threading import Thread
+from subprocess import check_output
 import json
 import socket
+import requests
 import bottle
 from bottle import template, static_file, request, response, redirect
 from storage.sqlite import Storage
 from util.photo_capture import PhotoCapture
-from meerkat.scheduler import COMMAND_EXEC
+#from meerkat.scheduler import COMMAND_EXEC
 
 bottle.TEMPLATE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), 'views')),
 STATIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), 'static'))
@@ -37,8 +38,11 @@ class HttpServer(object):
         bottle.route('/static/<filepath:path>', method='GET')(self.static)
         bottle.route('/', method='GET')(self.index)
         bottle.route('/meerkat/', method='GET')(self.meerkat)
+        bottle.route('/meerkat/heartbeat.json', method='GET')(self.register_control_json)
+        bottle.route('/meerkat/info.json', method='GET')(self.info_json)
         bottle.route('/meerkat/master.json', method='GET')(self.master_json)
         bottle.route('/meerkat/master.json', method='POST')(self.master_control_json)
+        bottle.route('/meerkat/register.json', method='POST')(self.register_control_json)
         bottle.route('/meerkat/capture.json', method='POST')(self.capture_control_json)
         bottle.route('/meerkat/probes.json', method='GET')(self.probes_json)
         bottle.route('/meerkat/probe<p:int>.json', method='GET')(self.probe_json)
@@ -90,38 +94,41 @@ class HttpServer(object):
     def probe_control_json(self, p):
         command = request.forms.command
         if command == 'ON':
-            #self.scheduler.start_probe(p)
-            self.scheduler.queue.put( (COMMAND_EXEC, 'start_probe', p) )
+            self.scheduler.start_probe(p)
+            #self.scheduler.queue.put( (COMMAND_EXEC, 'start_probe', p) )
         elif command == 'OFF':
-            #self.scheduler.stop_probe(p)
-            self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probe', p) )
+            self.scheduler.stop_probe(p)
+            #self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probe', p) )
 
         time.sleep(0.5)
         response.set_header('Cache-Control', 'No-store')
         return self.probe_json(p)
 
 
-    def master_json(self):
+    def info_json(self):
+        probes = []
+        i = 0
+        for p in self.scheduler.probes:
+            probes.append(self.helper_get_probe_struct(p))
+            i = i + 1
+
         ret = {"status": "OK",
                 "body": {
-                    "status": "OFF",
-                    "ip_address": self.ip_address,
-                    "host": self.host,
-                    "uptime_secs": self.helper_get_uptime_secs(),
-                    "data_size_kb": self.helper_get_data_size_kb(),
-                    "free_space_b": self.helper_get_free_space(),
-                    "has_camera": self.config["has_camera"],
-                    "available_memory_kb": 0,
-                    "free_memory_kb": 0
+                    "id": None,
+                    "info": self.helper_get_master_struct(),
+                    "probes": probes
                 }
+              }
+        ret["body"]["id"] = ret["body"]["info"]["host"]
+
+        response.set_header('Cache-Control', 'No-store')
+        return json.dumps(ret)
+
+
+    def master_json(self):
+        ret = {"status": "OK",
+                "body": self.helper_get_master_struct()
         }
-
-        if self.scheduler.active:
-            ret["body"]["status"] = "ON"
-
-        available_mem, free_mem = self.helper_get_memory_info()
-        ret["body"]["available_memory_kb"] = available_mem
-        ret["body"]["free_memory_kb"] = free_mem
 
         response.set_header('Cache-Control', 'No-store')
         return json.dumps(ret)
@@ -130,15 +137,30 @@ class HttpServer(object):
     def master_control_json(self):
         command = request.forms.command
         if command == 'ON':
-            #self.scheduler.start_probes()
-            self.scheduler.queue.put( (COMMAND_EXEC, 'start_probes') )
+            self.scheduler.start_probes()
+            #self.scheduler.queue.put( (COMMAND_EXEC, 'start_probes') )
         elif command == 'OFF':
-            #self.scheduler.stop_probes()
-            self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probes') )
+            self.scheduler.stop_probes()
+            #self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probes') )
 
         time.sleep(1)
         response.set_header('Cache-Control', 'No-store')
         return self.master_json()
+
+    
+    def register_control_json(self):
+        ret = {"status": "OK",
+                "body": ""
+              }
+        try:
+            r = requests.post(self.config["mission_control"]["register_url"], data=self.info_json())
+            ret = r.text
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header('Cache-Control', 'No-store')
+        return json.dumps(ret)
 
     
     def capture_control_json(self):
@@ -235,10 +257,54 @@ class HttpServer(object):
         return ret
 
 
+    def helper_get_master_struct(self):
+        ret = {
+            "timestamp": time.time() * 1000,
+            "status": "OFF",
+            "ip_address": self.ip_address,
+            "net_interfaces": self.helper_get_net_interfaces(),
+            "host": self.host,
+            "heartbeat_url": "https://%s/meerkat/heartbeat.json" % (self.host),
+            "info_url": "https://%s/meerkat/info.json" % (self.host),
+            "dashboard_url": "https://%s/meerkat/" % (self.host),
+            "latest_img_url": "https://%s/static/img/latest.jpg?%s" % (self.host, time.time()),
+            "uptime_secs": self.helper_get_uptime_secs(),
+            "load_average": self.helper_get_load_average(),
+            "data_size_kb": self.helper_get_data_size_kb(),
+            "free_space_b": self.helper_get_free_space(),
+            "has_camera": self.config["has_camera"],
+            "available_memory_kb": 0,
+            "free_memory_kb": 0,
+            "mission_control_url": self.config['mission_control']['url'],
+            "mission_control_register_url": self.config['mission_control']['register_url']
+        }
+
+        if self.scheduler.active:
+            ret["status"] = "ON"
+
+        available_mem, free_mem = self.helper_get_memory_info()
+        ret["available_memory_kb"] = available_mem
+        ret["free_memory_kb"] = free_mem
+
+        return ret
+
     def helper_get_free_space(self):
         # TODO: should this be the where the data file is, not just '/'?
         stat = os.statvfs('/')
         return stat.f_bsize * stat.f_bavail
+
+
+    def helper_get_net_interfaces(self):
+        net_interfaces = '?'
+        cmd = 'ifconfig -s -a | sed 1d | cut -d " " -f1 | tr "\\\\n" ,'
+        try:
+            net_interfaces = check_output(cmd, shell=True).split(',')
+            net_interfaces.pop()
+            net_interfaces.pop()
+        except IOError:
+            pass
+
+        return net_interfaces
 
 
     def helper_get_uptime_secs(self):
@@ -252,6 +318,20 @@ class HttpServer(object):
             pass
 
         return uptime
+
+
+    def helper_get_load_average(self):
+        load_average = '?'
+        try:
+            with open('/proc/loadavg', 'r') as f:
+                loadavg = f.readline()
+
+            loadavg = loadavg.split(' ')
+            loadavg = loadavg[:-2]
+        except IOError:
+            pass
+
+        return loadavg
 
 
     def helper_get_memory_info(self):

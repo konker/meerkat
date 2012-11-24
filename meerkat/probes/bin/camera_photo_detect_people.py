@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# meerkat.probes.camera_photo
+# meerkat.probes.camera_photo_detect_people
 #
 # Copyright 2012 Konrad Markus
 #

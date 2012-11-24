@@ -1,10 +1,11 @@
 
 var meerkat = (function($) {
-    var URL_PREFX        = '/meerkat',
-        PROBES_JSON_URL  = URL_PREFX + '/probes.json',
-        MASTER_JSON_URL  = URL_PREFX + '/master.json',
-        CAPTURE_JSON_URL = URL_PREFX + '/capture.json',
-        LOG_JSON_URL     = URL_PREFX + '/log.json';
+    var URL_PREFX         = '/meerkat',
+        PROBES_JSON_URL   = URL_PREFX + '/probes.json',
+        MASTER_JSON_URL   = URL_PREFX + '/master.json',
+        REGISTER_JSON_URL = URL_PREFX + '/register.json',
+        CAPTURE_JSON_URL  = URL_PREFX + '/capture.json',
+        LOG_JSON_URL      = URL_PREFX + '/log.json';
 
     return {
         init: function() {
@@ -73,6 +74,25 @@ var meerkat = (function($) {
                 });
                 return false;
             },
+            missionControlRegister: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: REGISTER_JSON_URL,
+                    type: 'POST',
+                    dataType: 'json',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
             refresh: function() {
                 meerkat.util.loading.on();
 
@@ -110,6 +130,10 @@ var meerkat = (function($) {
                 $('#master').render(meerkat.master.master, meerkat.master.directives.main);
 
                 /* event handlers */
+                $('#missionControlRegister')
+                    .unbind('click')
+                    .bind('click', meerkat.master.missionControlRegister);
+
                 $('#masterRefresh')
                     .unbind('click')
                     .bind('click', meerkat.master.refresh);
@@ -157,12 +181,16 @@ var meerkat = (function($) {
                 main: {
                     'dd.status': 'status',
                     'dd.ip_address': 'ip_address',
+                    'dd.net_interfaces': 'net_interfaces',
                     'dd.host': 'host',
                     'dd.uptime': 'uptime_secs',
+                    'dd.load_average': 'load_average',
                     'dd.data_size': 'data_size_kb',
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
-                    'dd.free_memory': 'free_memory_kb'
+                    'dd.free_memory': 'free_memory_kb',
+                    'dd.mission_control a': 'mission_control_url',
+                    'dd.mission_control a@href': 'mission_control_url'
                 }
             }
         },
@@ -363,7 +391,7 @@ var meerkat = (function($) {
                                         }
                                     }
                                 }
-                                dataimage.src = 'static/img/' + data[r].data[rr].image_path;
+                                dataimage.src = '/static/img/' + data[r].data[rr].image_path;
                             }
                         }
                     }
