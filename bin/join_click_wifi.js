@@ -5,32 +5,13 @@ Author: Konrad Markus <konker@gmail.com>
 
 var INIT_URL = 'http://ipv4.0-9.fi/';
 
-//console.log('Loading init url');
-//00:26:b0:f9:40:6b
-
-var JAVSCRIPT_RE = /^javascript:/;
-
 var page = require('webpage').create();
-page.onLoadFinished = function(status) {
-    console.log('onLoadFinished: ' + status);
-}
-page.onError = function(msg, trace) {
-    var msgStack = ['ERROR: ' + msg];
-    /*
-    if (trace) {
-        msgStack.push('TRACE: ');
-    }
-    */
-    console.error('onError: ' + msgStack.join("\n"));
-}
 page.open(INIT_URL, function(status) {
-    //console.log('open: ' + status);
     if (status !== 'success') {
         console.log('Unable to load: ' + INIT_URL);
         return -1;
     }
 
-    //page.injectJs('meerkat/http/static/js/jquery.js');
     var h = page.evaluate(function() {
         var JAVSCRIPT_RE = /^javascript:/;
         var ARG_RE = /open\('([^']*)'\)/;
@@ -42,7 +23,7 @@ page.open(INIT_URL, function(status) {
         h = h.replace(JAVSCRIPT_RE, '');
         h = h.replace(ARG_RE, '$1');
 
-        function kopen(e) {
+        function myOpen(e) {
             e = "http://nextmesh.net/extranet/r/" + billing + "?nasid=" + nasid + "&url=" + encodeURIComponent(e) + "&" + (new Date).getTime();
             var t = document.getElementById("container");
             var n = document.getElementById("loading");
@@ -77,47 +58,9 @@ page.open(INIT_URL, function(status) {
             return o;
         }
 
-        return kopen(h);
-        //open(h);
-        //eval(h);
-        //return h;
-        //var h =  $('#display a').attr('href');
-        //return h;
-        //$('#display a').click();
-        //return document.body.innerHTML;
-        //return  $('#display a').attr('href');
-        //return document.getElementById('display').innerHTML;
-        //return document.getElementById('display').innerText;
+        return myOpen(h);
     });
     console.log(h);
-
-    /*
-    var foo = page.evaluate(function() {
-        window.location = 'http://www.google.co.uk/';
-        return document.body.innerHTML;
-    });
-    console.log(foo);
-    */
-    /*
-    page.open(h, function(status) {
-        if (status !== 'success') {
-            console.log('Unable to load: ' + INIT_URL);
-            return -1;
-        }
-        console.log(page.content);
-    }); 
-    */
-    //console.log(page.content);
-    //console.log('Clicked');
-    /*
-    page.open(INIT_URL, function(status) {
-        if (status !== 'success') {
-            console.log('Unable to load: ' + INIT_URL);
-            return -1;
-        }
-        console.log(page.content);
-    }); 
-    */
 
     phantom.exit();
 });
