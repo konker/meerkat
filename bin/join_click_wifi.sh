@@ -8,8 +8,10 @@ else
     PHANTOMJS="phantomjs"
 fi
 
+HERE=`dirname "$0"`
+echo $HERE
 #OUT=`DISPLAY=:0 pyphantomjs bin/join_click_wifi.js`
-OUT=`$PHANTOMJS bin/join_click_wifi.js`
+OUT=`$PHANTOMJS $HERE/join_click_wifi.js`
 if [[ $OUT == http:* ]]; then
     echo $OUT
     wget -q -O - $OUT
