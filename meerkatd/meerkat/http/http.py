@@ -203,7 +203,7 @@ class HttpServer(object):
 
     def data_tgz(self):
         cmd = "tar -czf - -C %s . -C %s ." % (os.path.dirname(self.config["datafile"]), self.config["imagepath"])
-        filename = "data-%s.tgz" % (datetime.today().isoformat())
+        filename = "%s-data-%s.tgz" % (self.host, datetime.today().isoformat())
 
         try:
             proc = Popen(cmd.split(' '), bufsize=0, shell=False, stdout=PIPE)
