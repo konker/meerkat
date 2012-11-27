@@ -4,7 +4,7 @@ Author: Konrad Markus <konker@gmail.com>
 */
 
 var INIT_URL = 'http://ipv4.0-9.fi/';
-var IP_ADDRESS_RE = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
+var IP_ADDRESS_RE = />(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})</
 var page = require('webpage').create();
 page.open(INIT_URL, function(status) {
     if (status !== 'success') {
@@ -12,9 +12,9 @@ page.open(INIT_URL, function(status) {
         return -1;
     }
     
-    var h = null;
-    if (page.plainText.match(IP_ADDRESS_RE)) {
-        h = page.plainText;
+    var h = page.content.match(IP_ADDRESS_RE);
+    if (h) {
+        h = h[1];
     }
     else {
         var h = page.evaluate(function() {
@@ -26,7 +26,7 @@ page.open(INIT_URL, function(status) {
             var a = as[0];
             var h = a.href;
             h = h.replace(JAVSCRIPT_RE, '');
-            h = h.replace(ARG_RE, '$1');
+            h = h.replace(ARG_RE, "$1");
 
             function myOpen(e) {
                 e = "http://nextmesh.net/extranet/r/" + billing + "?nasid=" + nasid + "&url=" + encodeURIComponent(e) + "&" + (new Date).getTime();

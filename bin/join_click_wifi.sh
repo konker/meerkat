@@ -4,6 +4,7 @@ PHANTOMJS=`which phantomjs`
 if [ -z "$PHANTOMJS" ]; then
     export DISPLAY=:0
     PHANTOMJS="pyphantomjs"
+    /etc/init.d/Xvfb start
 else
     PHANTOMJS="phantomjs"
 fi
@@ -16,5 +17,6 @@ if [[ $OUT == http:* ]]; then
     wget -q -O - $OUT
     exec $0
 else
+    killall Xvfb
     echo "OK"
 fi
