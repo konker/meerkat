@@ -35,6 +35,7 @@ class Probe(object):
         self.error_filters = probe_conf["error_filters"]
         self.interval = probe_conf["interval"]
         self.duration = probe_conf["duration"]
+        self.no_store = probe_conf["no_store"]
         self.dummy = probe_conf["dummy"]
         self.timeout = timeout
         self.active = False
@@ -308,8 +309,9 @@ class Probe(object):
 
         # store
         if self.storage:
-            logging.debug("[%s] -> %s" % (self.id, data))
-            self.storage.write_str(self.id, data)
+            if not self.no_store:
+                logging.debug("[%s] -> %s" % (self.id, data))
+                self.storage.write_str(self.id, data)
 
 
     def cancel_all(self):

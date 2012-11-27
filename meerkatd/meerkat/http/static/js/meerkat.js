@@ -630,8 +630,13 @@ var meerkat = (function($) {
             }
         },
         util: {
+            NL_RE: /\n/,
+
             init: function() {
                 meerkat.util.alert.init();
+            },
+            nl2br: function(s) {
+                return s.replace(meerkat.util.NL_RE, '<br/>');
             },
             alert: {
                 init: function() {
@@ -663,9 +668,9 @@ var meerkat = (function($) {
                         .removeClass('alert-success')
                         .removeClass('alert-info')
                     $('#alert')
-                        .find('.body').html(title);
+                        .find('.body').text(title);
                     $('#alert')
-                        .find('.title').html(body);
+                        .find('.title').text(body);
                 },
                 _show: function() {
                     $('#alert').show();

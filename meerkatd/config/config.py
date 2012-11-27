@@ -93,13 +93,23 @@ config["probes"].append({
     ]
 })
 config["probes"].append({
+    "id": "meerkat.probe.gps_info",
+    "command": ["gps_info.py"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 60,
+    "duration": -1,
+    "data_type": probe.DATA_TYPE_JSON,
+    "auto_start": True
+})
+config["probes"].append({
     "id": "meerkat.probe.heartbeat",
     "command": ["heartbeat.py", config["heartbeat"]["url"]],
     "type": probe.TYPE_PERIODIC,
     "interval": config["heartbeat"]["interval"],
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True
+    "auto_start": True,
+    "no_store": True
 })
 config["probes"].append({
     "id": "meerkat.probe.json_tick_sleeper",

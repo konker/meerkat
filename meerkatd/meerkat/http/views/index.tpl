@@ -39,7 +39,7 @@
     <div id="alert" class="alert alert-error">
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong class="title"></strong>
-        <span class="body"></span>
+        <pre class="body"></pre>
     </div>
     <section class="row" id="master">
       <h2>

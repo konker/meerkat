@@ -53,6 +53,7 @@ class Scheduler(object):
             self.check_command(probe_conf)
             self.check_data_type(probe_conf)
             self.check_dummy(probe_conf)
+            self.check_no_store(probe_conf)
 
             # load filters
             self.load_filters(probe_conf)
@@ -176,6 +177,12 @@ class Scheduler(object):
                     raise MeerkatException("Module %s has no class %s" % (module, cls))
             else:
                 raise MeerkatException("Could not load filter module: %s" % module)
+
+
+    def check_no_store(self, probe_conf):
+        # ensure no_store param exists (default False)
+        if not "no_store" in probe_conf:
+            probe_conf["no_store"] = False
 
 
     def check_dummy(self, probe_conf):
