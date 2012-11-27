@@ -14,7 +14,7 @@
 
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/home/pi/WORKING/isoveli/meerkat/meerkatd.py
+DAEMON=/home/pi/WORKING/meerkat/meerkatd/meerkatd.py
 NAME=meerkatd
 DESC="meerkat server"
 # NOTE: the $PIDFILE path must be the same as the pidfile

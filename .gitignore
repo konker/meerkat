@@ -1,0 +1,31 @@
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse project files
+.classpath
+.project
+
+_scrap
+
+*.pyc
+
+usb/python/data/*.dat
+usb/python/data/*.db
+usb/python/log/*.log
+meerkatd/log/*.log
+meerkatd/data/*.db
+meerkatd/meerkat/http/static/img/meerkat.probe.camera_photo*
+meerkatd/meerkat/http/static/img/camera_photo*
+meerkatd/meerkat/http/static/img/latest.jpg
