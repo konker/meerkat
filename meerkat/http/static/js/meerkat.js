@@ -117,6 +117,10 @@ var meerkat = (function($) {
                 /* extra formatting */
                 meerkat.master.master.uptime_secs =
                     meerkat.util.format_secs(meerkat.master.master.uptime_secs);
+                meerkat.master.master.sys_temperature =
+                    meerkat.util.format_temp(meerkat.master.master.sys_temperature);
+                meerkat.master.master.gpu_temperature =
+                    meerkat.util.format_temp(meerkat.master.master.gpu_temperature);
                 meerkat.master.master.data_size_kb =
                     meerkat.util.format_kb(meerkat.master.master.data_size_kb);
                 meerkat.master.master.free_space_b =
@@ -185,6 +189,8 @@ var meerkat = (function($) {
                     'dd.host': 'host',
                     'dd.uptime': 'uptime_secs',
                     'dd.load_average': 'load_average',
+                    'dd.sys_temperature': 'sys_temperature',
+                    'dd.gpu_temperature': 'gpu_temperature',
                     'dd.data_size': 'data_size_kb',
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
@@ -610,19 +616,22 @@ var meerkat = (function($) {
                 if (b > 1024) {
                     return meerkat.util.format_kb(b/1024);
                 }
-                return kb + " KB";
+                return b.toFixed(2) + " B";
             },
             format_kb: function(kb) {
                 if (kb > 1024) {
                     return meerkat.util.format_mb(kb/1024);
                 }
-                return kb + " KB";
+                return kb.toFixed(2) + " KB";
             },
             format_mb: function(mb) {
                 if (mb > 1024) {
-                    return mb/1024 + " GB";
+                    return (mb/1024).toFixed(2) + " GB";
                 }
-                return mb + " MB";
+                return mb.toFixed(2) + " MB";
+            },
+            format_temp: function(temp) {
+                return temp + "&deg;C";
             }
         }
     }

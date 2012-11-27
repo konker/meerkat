@@ -270,6 +270,8 @@ class HttpServer(object):
             "latest_img_url": "https://%s/static/img/latest.jpg?%s" % (self.host, time.time()),
             "uptime_secs": self.helper_get_uptime_secs(),
             "load_average": self.helper_get_load_average(),
+            "sys_temperature": self.helper_get_sys_temperature(),
+            "gpu_temperature": self.helper_get_gpu_temperature(),
             "data_size_kb": self.helper_get_data_size_kb(),
             "free_space_b": self.helper_get_free_space(),
             "has_camera": self.config["has_camera"],
@@ -318,6 +320,30 @@ class HttpServer(object):
             pass
 
         return uptime
+
+
+    def helper_get_gpu_temperature(self):
+        gpu_temperature = '?'
+        cmd = '/opt/vc/bin/vcgencmd measure_temp | egrep "[0-9.]{4,}" -o'
+        try:
+            gpu_temperature = check_output(cmd, shell=True)
+        except IOError:
+            pass
+
+        return float(gpu_temperature)
+
+
+    def helper_get_sys_temperature(self):
+        sys_temperature = '?'
+        try:
+            with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
+                sys_temperature = f.readline()
+
+            sys_temperature = float(sys_temperature) / 1000
+        except IOError:
+            pass
+
+        return sys_temperature
 
 
     def helper_get_load_average(self):

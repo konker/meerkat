@@ -60,6 +60,10 @@
           <dd class="uptime"><!-- [1:23] --></dd>
           <dt class="load_average">load average</dt>
           <dd class="load_average"><!-- [1.23] --></dd>
+          <dt class="sys_temperature">system temp.</dt>
+          <dd class="sys_temperature"><!-- [12.34] --></dd>
+          <dt class="gpu_temperature">gpu temp.</dt>
+          <dd class="gpu_temperature"><!-- [12.34] --></dd>
           <dt class="data_size">data size</dt>
           <dd class="data_size"><!-- [xMB] --></dd>
           <dt class="free_space">free space</dt>

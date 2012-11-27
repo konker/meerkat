@@ -24,7 +24,7 @@ config = {
         "register_url": "http://meerkat.0-9.fi/meerkat/register.json"
     },
     "heartbeat": {
-        "interval": 20,
+        "interval": 30,
         "url": "https://localhost/meerkat/heartbeat.json"
     },
 
@@ -36,7 +36,7 @@ config["probes"].append({
     "id": "meerkat.probe.bluetooth",
     "command": ["bluetooth_scan.py"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 10,
+    "interval": 30,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
@@ -49,7 +49,7 @@ config["probes"].append({
     "id": "meerkat.probe.camera_photo",
     "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 20,
+    "interval": 30,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
@@ -79,7 +79,7 @@ config["probes"].append({
     "id": "meerkat.probe.wifi_client_scan",
     "command": ["wifi_client_scan.py"],
     "type": probe.TYPE_DURATION,
-    "interval": 10,
+    "interval": 20,
     "duration": 60,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
