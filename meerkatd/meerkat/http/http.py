@@ -52,6 +52,8 @@ class HttpServer(object):
         bottle.route('/meerkat/log.json', method='GET')(self.log_json)
         bottle.route('/meerkat/data', method='GET')(self.data_tgz)
         bottle.route('/meerkat/kickstart_gps.json', method='POST')(self.kickstart_gps_control_json)
+        bottle.route('/meerkat/gps_procs.json', method='GET')(self.gps_procs_json)
+        bottle.route('/meerkat/cleanup_gps.json', method='POST')(self.cleanup_gps_control_json)
 
 
     def start(self):
@@ -213,6 +215,36 @@ class HttpServer(object):
 
         except Exception as ex:
             yield str(ex)
+
+
+    def gps_procs_json(self):
+        ret = {"status": "OK",
+               "body": "GPS procs: ?"}
+
+        cmd = os.path.join(self.config["binpath"], 'gps_procs.sh')
+        try:
+            ret["body"] = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
+
+
+    def cleanup_gps_control_json(self):
+        ret = {"status": "OK",
+               "body": "GPS processes cleaned up"}
+
+        cmd = os.path.join(self.config["binpath"], 'cleanup_gps.sh')
+        try:
+            ret["body"] = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
 
 
     def kickstart_gps_control_json(self):

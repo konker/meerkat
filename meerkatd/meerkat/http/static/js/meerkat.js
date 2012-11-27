@@ -5,6 +5,8 @@ var meerkat = (function($) {
         MASTER_JSON_URL    = URL_PREFX + '/master.json',
         REGISTER_JSON_URL  = URL_PREFX + '/register.json',
         KICKSTART_JSON_URL = URL_PREFX + '/kickstart_gps.json',
+        CLEANUP_JSON_URL   = URL_PREFX + '/cleanup_gps.json',
+        GPS_PROCS_JSON_URL = URL_PREFX + '/gps_procs.json',
         CAPTURE_JSON_URL   = URL_PREFX + '/capture.json',
         LOG_JSON_URL       = URL_PREFX + '/log.json';
 
@@ -77,6 +79,48 @@ var meerkat = (function($) {
                     }
                 });
                 return false;
+            },
+            cleanupGPS: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: CLEANUP_JSON_URL,
+                    type: 'POST',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            getGPSProcs: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: GPS_PROCS_JSON_URL,
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
             },
             kickstartGPS: function() {
                 meerkat.util.loading.on();
@@ -172,6 +216,14 @@ var meerkat = (function($) {
                 $('#kickstartGPS')
                     .unbind('click')
                     .bind('click', meerkat.master.kickstartGPS);
+
+                $('#getGPSProcs')
+                    .unbind('click')
+                    .bind('click', meerkat.master.getGPSProcs);
+
+                $('#cleanupGPS')
+                    .unbind('click')
+                    .bind('click', meerkat.master.cleanupGPS);
 
                 $('#masterRefresh')
                     .unbind('click')
