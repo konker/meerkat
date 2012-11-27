@@ -84,7 +84,6 @@ def meerkatd(options):
     http_server.start()
 
     # register with mission control
-    #r = requests.post(config["mission_control"]["register_url"], data=http_server.info_json())
     r = http_server.register_control_json()
     logging.info("Registered with mission control: %s" % r)
 
