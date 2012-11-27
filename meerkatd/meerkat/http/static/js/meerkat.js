@@ -50,7 +50,7 @@ var meerkat = (function($) {
                 meerkat.util.loading.on();
 
                 var command = 'ON';
-                if (meerkat.master.master.status == 'ON') {
+                if (meerkat.master.master.all_on) {
                     command = 'OFF';
                 }
 
@@ -123,6 +123,8 @@ var meerkat = (function($) {
                     meerkat.util.format_temp(meerkat.master.master.gpu_temperature);
                 meerkat.master.master.data_size_kb =
                     meerkat.util.format_kb(meerkat.master.master.data_size_kb);
+                meerkat.master.master.image_data_size_kb =
+                    meerkat.util.format_kb(meerkat.master.master.image_data_size_kb);
                 meerkat.master.master.free_space_b =
                     meerkat.util.format_b(meerkat.master.master.free_space_b);
                 meerkat.master.master.available_memory_kb =
@@ -155,18 +157,7 @@ var meerkat = (function($) {
                 }
 
                 /* visual aids */
-                if (meerkat.master.master.status == 'ON') {
-                    $('#masterToggle')
-                        .removeClass('btn-danger')
-                        .addClass('btn-success')
-                        .find('.lbl')
-                        .text('Master ON');
-                    $('#master dl')
-                        .find('dd.status')
-                        .removeClass('text-error')
-                        .addClass('text-success');
-                }
-                else {
+                if (meerkat.master.master.all_on) {
                     $('#masterToggle')
                         .removeClass('btn-success')
                         .addClass('btn-danger')
@@ -176,6 +167,17 @@ var meerkat = (function($) {
                         .find('dd.status')
                         .removeClass('text-success')
                         .addClass('text-error');
+                }
+                else {
+                    $('#masterToggle')
+                        .removeClass('btn-danger')
+                        .addClass('btn-success')
+                        .find('.lbl')
+                        .text('Master ON');
+                    $('#master dl')
+                        .find('dd.status')
+                        .removeClass('text-error')
+                        .addClass('text-success');
                 }
 
                 /* show it */
@@ -192,6 +194,7 @@ var meerkat = (function($) {
                     'dd.sys_temperature': 'sys_temperature',
                     'dd.gpu_temperature': 'gpu_temperature',
                     'dd.data_size': 'data_size_kb',
+                    'dd.image_data_size': 'image_data_size_kb',
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
                     'dd.free_memory': 'free_memory_kb',
@@ -574,10 +577,12 @@ var meerkat = (function($) {
                 },
                 _setLoading: function(on) {
                     if (on) {
-                        $('h1').addClass('loading');
+                        //$('h1').addClass('loading');
+                        $('#loading').show();
                     }
                     else {
-                        $('h1').removeClass('loading');
+                        //$('h1').removeClass('loading');
+                        $('#loading').hide();
                         meerkat.util.loading._stack = 0;
                     }
                 }

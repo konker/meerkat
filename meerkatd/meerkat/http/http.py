@@ -9,9 +9,11 @@
 
 import os
 import time
+from datetime import datetime
 import logging
+import re
 from threading import Thread
-from subprocess import check_output
+from subprocess import check_output, Popen, PIPE
 import json
 import socket
 import requests
@@ -48,12 +50,17 @@ class HttpServer(object):
         bottle.route('/meerkat/probe<p:int>.json', method='GET')(self.probe_json)
         bottle.route('/meerkat/probe<p:int>.json', method='POST')(self.probe_control_json)
         bottle.route('/meerkat/log.json', method='GET')(self.log_json)
+        bottle.route('/meerkat/data.tgz', method='GET')(self.data_tgz)
 
 
     def start(self):
-        self.http_thread = Thread(target=bottle.run,
-                                  kwargs=dict(host=self.config['http_host'], port=self.config['http_port'], server='wsgiref', debug=False, quiet=True),
-                                  name='http-thread')
+        def run():
+            try:
+                bottle.run(host=self.config['http_host'], port=self.config['http_port'], server='wsgiref', debug=False, quiet=True)
+            except Exception as ex:
+                logging.error("Error in HTTP thread: %s" % ex)
+
+        self.http_thread = Thread(target=run, name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()
         logging.info("Http server started on port %s." % self.config["http_port"])
@@ -194,6 +201,23 @@ class HttpServer(object):
         return json.dumps(ret)  
 
 
+    def data_tgz(self):
+        cmd = "tar -czf - -C %s . -C %s ." % (os.path.dirname(self.config["datafile"]), self.config["imagepath"])
+        filename = "data-%s.tgz" % (datetime.today().isoformat())
+
+        try:
+            proc = Popen(cmd.split(' '), bufsize=0, shell=False, stdout=PIPE)
+
+            response.set_header('Content-Type', 'application/octet-stream')
+            response.set_header('Content-Disposition',
+                                "Attachment;filename=%s" % filename)
+            for l in proc.stdout:
+                yield l
+
+        except Exception as ex:
+            yield str(ex)
+
+
     def static(self, filepath):
         if 'latest' in filepath:
             response.set_header('Cache-Control', 'No-store')
@@ -261,6 +285,8 @@ class HttpServer(object):
         ret = {
             "timestamp": time.time() * 1000,
             "status": "OFF",
+            "all_on": self.scheduler.all_probes_on(),
+            "all_off": self.scheduler.all_probes_off(),
             "ip_address": self.ip_address,
             "net_interfaces": self.helper_get_net_interfaces(),
             "host": self.host,
@@ -273,6 +299,7 @@ class HttpServer(object):
             "sys_temperature": self.helper_get_sys_temperature(),
             "gpu_temperature": self.helper_get_gpu_temperature(),
             "data_size_kb": self.helper_get_data_size_kb(),
+            "image_data_size_kb": self.helper_get_image_data_size_kb(),
             "free_space_b": self.helper_get_free_space(),
             "has_camera": self.config["has_camera"],
             "available_memory_kb": 0,
@@ -376,6 +403,13 @@ class HttpServer(object):
 
     def helper_get_data_size_kb(self):
         bytes = os.path.getsize(self.config['datafile'])
+        return bytes / 1024
+
+
+    def helper_get_image_data_size_kb(self):
+        bytes = 0
+        for root, dirs, files in os.walk(self.config['imagepath']):
+            bytes = sum(os.path.getsize(os.path.join(root, image)) for image in files)
         return bytes / 1024
 
 

@@ -77,7 +77,7 @@ def meerkatd(options):
                                 datefmt='%Y-%m-%d %H:%M:%S')
 
     # initialize the scheduler
-    scheduler = Scheduler(config["datafile"], config["probespath"], config["probes"])
+    scheduler = Scheduler(config["datafile"], config["probespath"], config["probes"], config["hide_dummy_probes"])
 
     # start http server
     http_server = HttpServer(scheduler, config)

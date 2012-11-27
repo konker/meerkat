@@ -10,11 +10,12 @@ config = {
     "datafile": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'data', 'meerkat.db')),
     "imagepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', 'meerkat', 'http', 'static','img')),
+                                 '..', 'meerkat', 'http', 'static','img', 'capture')),
     "probespath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probes', 'bin')),
 
     "debug": True,
+    "hide_dummy_probes": True,
 
     "http_host": "0.0.0.0",
     "http_port": 8080,

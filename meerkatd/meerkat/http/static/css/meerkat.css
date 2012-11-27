@@ -9,7 +9,7 @@ cream: #efe7be
 
 
 header {
-  position: fixed;
+  kposition: fixed;
   width: 100%;
   background: #002635;
   box-shadow: 0 4px 3px #aaa;
@@ -33,17 +33,24 @@ header {
       }
 
 body {
-  min-width: 800px;
   background: #eee;
   }
-
+#loading {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    padding: 6px;
+    border-radius: 3px;
+    background: #002635;
+    display: none;
+    }
 .alert {
     margin-top: 12px;
     display: none;
     }
 
 #container {
-  padding-top: 6em;
+  kpadding-top: 6em;
   }
 
 section {
@@ -67,6 +74,15 @@ section {
     section h2 i {
       vertical-align: baseline !important;
       }
+  section #system-tools {
+      margin-top: 1.0em;
+      }
+      #system-tools .inner {
+        float: right;
+        }
+      #tools .inner {
+        margin-left: 3.5em;
+        }
 
     #master dd.status {
       font-weight: bold;
@@ -76,14 +92,6 @@ section {
         }
 
 #masterCapture { display: none; }
-#latest-img {
-  position: absolute;
-  top: 6px;
-  left: 24em;
-  width: 33%;
-  border: 6px solid #aaa;
-  display: none;
-}
 
 #masterToggle { display: none; }
 
@@ -133,20 +141,31 @@ section {
   .probe .probeToggle {
     margin-top: 0.35em;
     }
-  section dl dd {
-    font-family: 'Courier new', monospace;
+#latest-img {
+  position: absolute;
+  left: 40%;
+  width: 35%;
+  border: 6px solid #aaa;
+  display: none;
+  }
+  .section-body {
+      position: relative;
+  }
+  section dl {
     }
-  section dl.dl-horizontal dt {
-    width: 8em !important;
-    }
-  section dl.dl-horizontal dd {
-    margin-left: 9em !important;
-    }
+    section dl dd {
+      font-family: 'Courier new', monospace;
+      }
+    section dl.dl-horizontal dt {
+      kwidth: 8em !important;
+      }
+    section dl.dl-horizontal dd {
+      kmargin-left: 9em !important;
+      }
   section .btn {
     min-width: 8em;
     }
   section .refresh {
-    margin-left: 2.5em;
     }
 
   .probe h4 {

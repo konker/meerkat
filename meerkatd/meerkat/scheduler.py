@@ -12,7 +12,6 @@ import sys
 import logging
 import signal
 import pyev
-#from Queue import Queue, Empty
 
 from storage.sqlite import Storage
 from meerkat.exception import MeerkatException
@@ -23,16 +22,12 @@ COMMAND_EXEC = 1
 
 
 class Scheduler(object):
-    def __init__(self, datafile, probespath, probe_confs):
+    def __init__(self, datafile, probespath, probe_confs, hide_dummy_probes=True):
         self.active = False
+        self.num_probes = 0
         self.active_probes = 0
         self.probespath = probespath
         self.loop = pyev.Loop()
-        #self.queue = Queue()
-
-        # initialize and start a idle watcher
-        #self.idle_watcher = pyev.Idle(self.loop, self.idle_cb)
-        #self.idle_watcher.start()
 
         # initialize and start a signal watchers
         sigterm_watcher = pyev.Signal(signal.SIGTERM, self.loop, self.sigterm_cb)
@@ -41,7 +36,6 @@ class Scheduler(object):
         sigint_watcher.start()
 
         self.loop.data = [sigterm_watcher, sigint_watcher]
-        #self.loop.data.append(self.idle_watcher)
 
         # initialize storage
         logging.info("Init storage...")
@@ -51,6 +45,11 @@ class Scheduler(object):
         self.probes = []
         index = 0
         for probe_conf in probe_confs:
+            if hide_dummy_probes and probe_conf.get("dummy", False):
+                # skip dummy probe
+                logging.info("Skipping dummy probe: %s" % probe_conf["id"])
+                continue
+
             self.check_command(probe_conf)
             self.check_data_type(probe_conf)
             self.check_dummy(probe_conf)
@@ -70,28 +69,7 @@ class Scheduler(object):
 
             index = index + 1
 
-
-    '''
-    def idle_cb(self, watcher, revents):
-        #self.idle_watcher.stop()
-
-        try:
-            command = self.queue.get()
-        except Empty:
-            command = None
-
-        if command:
-            if command[0] == COMMAND_EXEC:
-                logging.debug("Idle: exec command: %s" % (command,))
-
-                # pass the rest of the command elements as args to method
-                getattr(self, command[1])(*command[2:])
-
-            else:
-                logging.debug("Idle: got unknown command: %s. Ignoring." % command)
-
-        #self.idle_watcher.start()
-    '''
+        self.num_probes = len(self.probes)
 
 
     def sigterm_cb(self, watcher, revents):
@@ -155,6 +133,14 @@ class Scheduler(object):
         self.storage.close()
 
         self.loop.stop(pyev.EVBREAK_ALL)
+
+
+    def all_probes_on(self):
+        return (self.num_probes - self.active_probes == 0)
+
+
+    def all_probes_off(self):
+        return (self.active_probes == 0)
 
 
     def load_filters(self, probe_conf):
