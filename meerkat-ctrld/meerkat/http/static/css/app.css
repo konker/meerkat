@@ -1,0 +1,190 @@
+
+/*
+dkblue: #002635
+midblue: #003540
+red: #ab1a25
+orange: #d97925
+cream: #efe7be
+*/
+
+
+header {
+  position: fixed;
+  width: 100%;
+  background: #002635;
+  box-shadow: 0 4px 3px #aaa;
+  border-radius: 0 0 42px 0;
+  }
+  .navbar-inner {
+    padding: 6px 12px;
+    }
+
+  header h1 {
+    color: #ff0;
+    margin: 0;
+    font-family: Lato, Verdana, sans-serif;
+    font-weight: 300;
+    font-size: 300%;
+    background: url(../img/logo.png) 0 0 no-repeat;
+    padding: 0 0 8px 94px;
+    }
+    header h1.loading {
+      background: url(../img/loading.gif) 28px 8px no-repeat;
+      }
+
+body {
+  min-width: 800px;
+  background: #eee;
+  }
+
+.alert {
+    margin-top: 12px;
+    display: none;
+    }
+#container {
+   padding-top: 6em;
+   }
+#templates { display: none; }
+
+section {
+  margin: 1.5em 0;
+  border-radius: 6px;
+  }
+  section .section-body {
+    margin: 1.5em;
+    display: block;
+    }
+  section h2 {
+    color: #555;
+    border-bottom: 1px dotted #002635;
+    margin: 0;
+    font-family: 'Lato', sans-serif;                                                                                                                          
+    font-weight: 400;
+    font-size: 160%;
+    line-height: 1.5;
+    padding: 0 0.5em;
+    }
+    section h2 i {
+      vertical-align: baseline !important;
+      }
+
+    #master dd.status {
+      font-weight: bold;
+      }
+      #master .section-body {
+        position: relative;
+        }
+
+#masterCapture { display: none; }
+#latest-img {
+  position: absolute;
+  top: 5em;
+  left: 27em;
+  width: 33%;
+  border: 6px solid #aaa;
+  display: none;
+}
+
+#masterToggle { display: none; }
+
+.node {
+  background: #ddd;
+  margin: 1.5em 0;
+  border-radius: 6px;
+  display: block;
+  }
+  .node h3 {
+    background: #efe7be;
+    border: 1px solid #ccc;
+    margin: 0;
+    font-size: 130%;
+    font-family: 'Lato', sans-serif;                                                                                                                          
+    font-weight: 300;
+    padding: 0 0.5em;
+    border-radius: 6px;
+    cursor: pointer;
+    }
+    .node h3 i {
+      vertical-align: baseline;
+      }
+    .node h3 .btn-small {
+       margin-top: 7px !important;
+       }
+
+    .node.closed, .node.open {
+      display: block;
+      }
+    .node.closed .node-body {
+      display: none;
+    }
+  .node dd.last_error pre {
+    color: #a00;
+    }
+  .node .node-body {
+    position: relative;
+    padding: 0 1.0em;
+    }
+    .node .node-section {
+      margin: 0.5em 0 1.0em 0;
+      }
+  .node .nodeToggle {
+    margin-top: 0.35em;
+    }
+  section dl dd {
+    font-family: 'Courier new', monospace;
+    }
+  section dl.dl-horizontal dt {
+    width: 8em !important;
+    }
+  section dl.dl-horizontal dd {
+    margin-left: 9em !important;
+    }
+  section .btn {
+    min-width: 8em;
+    }
+  section .refresh {
+    margin-left: 2.5em;
+    }
+
+  .node h4 {
+    color: #003540;
+    border-bottom: 1px dotted #003540;
+    margin: 0 0 0.5em 0;
+    font-family: 'Lato', sans-serif;                                                                                                                          
+    font-weight: 400;
+    font-size: 100%;
+    padding: 0.25em 0.5em;
+    }
+
+    .node .data .table {
+      background: #fff;
+      }
+      .node .scalar {
+        background: #fff;
+        padding: 1.0em;
+        }
+    .node .data small {
+        background: #ddd;
+        border-radius: 3px;
+        padding: 2px;
+        }
+
+    .node .node-section ol li {
+      background: #fff;
+      padding: 0.25em;
+      border-radius: 3px;
+      margin: 0.2em 0;
+      }
+
+#log pre {
+  background: #fff;
+  }
+#logRefresh { display: block; }
+
+footer {
+  background: #ddd;
+  padding: 1.0em;
+  border-top: 1px solid #aaa;
+  font-size: 90%;
+  }
+  

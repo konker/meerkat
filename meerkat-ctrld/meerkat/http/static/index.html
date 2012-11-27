@@ -1,0 +1,131 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]--> <!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]--> <!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]--> <!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Meerkat Mission Control</title>
+  <meta name="description" content="">
+  <meta name="author" content="Konrad Markus, HIIT">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <!--
+  -->
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2">
+  <link rel="stylesheet" href="css/app.css?v=2">
+  <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <header class="navbar" id="header">
+    <div class="navbar-inner">
+      <h1>meerkat mission control</h1>
+    </div>
+  </header>
+  <div class="container" id="container">
+      <!-- main goes here -->
+  </div>
+  <footer>
+    <p>
+    <i class="icon-hand-right"></i> Konrad Markus/HIIT &lt;<a href="mailto:konrad.markus@hiit.fi">konrad.markus@hiit.fi</a>&gt;
+    </p>
+  </footer>
+
+
+  <script type="text/x-handlebars" data-template-name="main">
+      {{view App.NodeListView}}
+      {{view App.LogView}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="node-list">
+    <section class="row" id="nodes">
+      <h2>
+        <i class="icon-eye-open"></i>
+        nodes
+        <button {{action refresh}} type="button" class="btn btn-warning refresh pull-right" id="nodesRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
+      </h2>
+      <div class="section-body">
+        {{#each node in App.nodeListController}}
+            {{view App.NodeView}}
+        {{/each}}
+      </div>
+    </section>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="node">
+      <!--START:NODE -->
+      <div class="node row" {{bindAttr id="node.id"}}>
+        <h3 {{action toggleOpen}}>
+          <i class="icon-chevron-right"></i>
+          <span class="node-label">{{node.id}}</span>
+          
+        </h3>
+        <div class="node-body">
+          <div class="row status node-section">
+            <h4><i class="icon-info-sign"></i> info</h4>
+            <dl class="dl-horizontal">
+              <dt class="status">status</dt>
+              <dd class="status">{{node.info.status}}</dd>
+              <dt class="timestamp">timestamp</dt>
+              <dd class="timestamp">{{format_timestamp node.info.timestamp}}</dd>
+              <dt class="ip_address">ip address</dt>
+              <dd class="ip_address">{{node.info.ip_address}}</dd>
+              <dt class="net_interfaces">net interfaces</dt>
+              <dd class="net_interfaces">{{node.info.net_interfaces}}</dd>
+              <dt class="host">host</dt>
+              <dd class="host">{{node.info.host}}</dd>
+              <dt class="uptime">uptime</dt>
+              <dd class="uptime">{{format_secs node.info.uptime_secs}}</dd>
+              <dt class="load_average">load average</dt>
+              <dd class="load_average">{{node.info.load_average}}</dd>
+              <dt class="data_size">data size</dt>
+              <dd class="data_size">{{format_kb node.info.data_size_kb}}</dd>
+              <dt class="free_space">free space</dt>
+              <dd class="free_space">{{format_b node.info.free_space_b}}</dd>
+              <dt class="available_memory">available RAM</dt>
+              <dd class="available_memory">{{format_kb node.info.available_memory_kb}}</dd>
+              <dt class="free_memory">free RAM</dt>
+              <dd class="free_memory">{{format_kb node.info.free_memory_kb}}</dd>
+              <dt class="dashboard">dashboard</dt>
+              <dd class="dashboard"><a {{bindAttr href="node.info.dashboard_url"}}>{{node.info.dashboard_url}}</a></dd>
+            </dl>
+            <div id="latest-img">
+                <a {{bindAttr href="node.info.latest_img_url"}}><img {{bindAttr src="node.info.latest_img_url"}} /></a>
+            </div>
+            <!--[Need to disable this if host is not publically visible]
+            <button {{action refresh}} type="button" class="nodeRefresh btn btn-small btn-warning refresh"><i class="icon-refresh icon-white"></i> refresh</button>
+            -->
+          </div>
+        </div>
+      </div>
+      <!--END:NODE -->
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="log">
+    <section class="row" id="log">
+      <h2>
+        <i class="icon-list"></i> log
+        <button {{action refresh}} type="button" id="logRefresh" class="btn btn-warning refresh pull-right"><i class="icon-refresh icon-white"></i> refresh</button>
+      </h2>
+      <div class="section-body">
+        <pre>
+        {{#each item in App.logController}} {{item}} {{/each}}
+        </pre>
+      </div>
+    </section>
+  </script>
+
+  <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="js/libs/jquery.min.js"><\/script>')</script>
+  <script src="js/libs/handlebars-1.0.0.js"></script>
+  <script src="js/libs/ember-1.0.0-pre.2.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
