@@ -50,6 +50,7 @@
         <div class="inner">
           <a href="data.tgz" class="btn" id="masterDownload"><i class="icon-list-alt"></i> Download data</a>
           <button class="btn" id="missionControlRegister"><i class="icon-bullhorn"></i> Ping mission control</button>
+          <button class="btn btn-warning" id="kickstartGPS"><i class="icon-globe icon-white"></i> Kickstart GPS</button>
         </div>
       </div>
       <div class="section-body row">
@@ -89,7 +90,7 @@
         </dl>
         <div id="tools" class="row">
           <div class="inner">
-            <button type="button" class="btn btn-warning refresh" id="masterRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
+            <button type="button" class="btn btn-info refresh" id="masterRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
             <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera icon-white"></i> Capture photo</button>
           </div>
         </div>
@@ -125,7 +126,7 @@
                 <dt class="last_error">last error</dt>
                 <dd class="last_error"><pre><!-- [error] --></pre></dd>
               </dl>
-              <button type="button" class="probeRefresh btn btn-warning refresh"><i class="icon-refresh icon-white"></i> refresh</button>
+              <button type="button" class="probeRefresh btn btn-info refresh"><i class="icon-refresh icon-white"></i> refresh</button>
             </div>
             <div class="row data probe-section">
               <h4><i class="icon-th-list"></i> last data</h4>
@@ -155,7 +156,7 @@
     <section class="row" id="log">
       <h2>
         <i class="icon-list"></i> log
-        <button type="button" id="logRefresh" class="btn btn-warning refresh pull-right"><i class="icon-refresh icon-white"></i> refresh</button>
+        <button type="button" id="logRefresh" class="btn btn-info refresh pull-right"><i class="icon-refresh icon-white"></i> refresh</button>
       </h2>
       <div class="section-body">
         <!-- log here -->

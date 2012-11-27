@@ -7,5 +7,5 @@ fi
 
 NETWORK=`wpa_cli list_networks | grep CURRENT | cut -c 1`
 
-airmon-ng start $INTERFACE 
-wpa_cli select_network $NETWORK
+sudo airmon-ng start $INTERFACE 
+sudo wpa_cli select_network $NETWORK

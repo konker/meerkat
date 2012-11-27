@@ -1,11 +1,12 @@
 
 var meerkat = (function($) {
-    var URL_PREFX         = '/meerkat',
-        PROBES_JSON_URL   = URL_PREFX + '/probes.json',
-        MASTER_JSON_URL   = URL_PREFX + '/master.json',
-        REGISTER_JSON_URL = URL_PREFX + '/register.json',
-        CAPTURE_JSON_URL  = URL_PREFX + '/capture.json',
-        LOG_JSON_URL      = URL_PREFX + '/log.json';
+    var URL_PREFX          = '/meerkat',
+        PROBES_JSON_URL    = URL_PREFX + '/probes.json',
+        MASTER_JSON_URL    = URL_PREFX + '/master.json',
+        REGISTER_JSON_URL  = URL_PREFX + '/register.json',
+        KICKSTART_JSON_URL = URL_PREFX + '/kickstart_gps.json',
+        CAPTURE_JSON_URL   = URL_PREFX + '/capture.json',
+        LOG_JSON_URL       = URL_PREFX + '/log.json';
 
     return {
         init: function() {
@@ -14,6 +15,7 @@ var meerkat = (function($) {
             meerkat.probes.init();
             meerkat.log.init();
         },
+
         master: {
             master: null,
             capture_counter: 0,
@@ -28,6 +30,7 @@ var meerkat = (function($) {
                     url: CAPTURE_JSON_URL,
                     type: 'POST',
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -59,6 +62,7 @@ var meerkat = (function($) {
                     type: 'POST',
                     data: {'command': command},
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -74,12 +78,13 @@ var meerkat = (function($) {
                 });
                 return false;
             },
-            missionControlRegister: function() {
+            kickstartGPS: function() {
                 meerkat.util.loading.on();
                 $.ajax({
-                    url: REGISTER_JSON_URL,
+                    url: KICKSTART_JSON_URL,
                     type: 'POST',
                     dataType: 'json',
+                    timeout: 40000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -89,6 +94,29 @@ var meerkat = (function($) {
                         if (data.status == "ERROR") {
                             meerkat.util.alert.show("Could not execute operation.", data.body);
                         }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            missionControlRegister: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: REGISTER_JSON_URL,
+                    type: 'POST',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        console.log(data);
+                        meerkat.util.alert.showSuccess(data.status, data.body);
                         meerkat.util.loading.off();
                     }
                 });
@@ -100,6 +128,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: MASTER_JSON_URL,
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load master information.", errorThrown);
@@ -139,6 +168,10 @@ var meerkat = (function($) {
                 $('#missionControlRegister')
                     .unbind('click')
                     .bind('click', meerkat.master.missionControlRegister);
+
+                $('#kickstartGPS')
+                    .unbind('click')
+                    .bind('click', meerkat.master.kickstartGPS);
 
                 $('#masterRefresh')
                     .unbind('click')
@@ -217,6 +250,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: PROBES_JSON_URL,
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load probes data.", errorThrown);
@@ -259,6 +293,7 @@ var meerkat = (function($) {
                     type: 'POST',
                     data: {'command': command},
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -296,6 +331,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: URL_PREFX + '/' + meerkat.probes.probes[p].id + '.json',
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load probe data.", errorThrown);
@@ -514,6 +550,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: LOG_JSON_URL,
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load log data.", errorThrown);
@@ -551,11 +588,34 @@ var meerkat = (function($) {
                     $('#alert').hide();
                 },
                 show: function(body, title) {
+                    meerkat.util.alert._set(body, title);
                     $('#alert')
-                        .find('.body').html(body);
+                        .addClass('alert-error');
+                    meerkat.util.alert._show();
+                },
+                showSuccess: function(body, title) {
+                    meerkat.util.alert._set(body, title);
                     $('#alert')
-                        .find('.title').html(title);
-
+                        .addClass('alert-success');
+                    meerkat.util.alert._show();
+                },
+                showInfo: function(body, title) {
+                    meerkat.util.alert._set(body, title);
+                    $('#alert')
+                        .addClass('alert-info');
+                    meerkat.util.alert._show();
+                },
+                _set: function(body, title) {
+                    $('#alert')
+                        .removeClass('alert-error')
+                        .removeClass('alert-success')
+                        .removeClass('alert-info')
+                    $('#alert')
+                        .find('.body').html(title);
+                    $('#alert')
+                        .find('.title').html(body);
+                },
+                _show: function() {
                     $('#alert').show();
                 },
                 hide: function() {
@@ -568,6 +628,7 @@ var meerkat = (function($) {
                 on: function() {
                     meerkat.util.loading._stack++;
                     meerkat.util.loading._setLoading(true);
+                    meerkat.util.alert.hide();
                 },
                 off: function() {
                     meerkat.util.loading._stack--;

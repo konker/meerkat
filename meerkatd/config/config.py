@@ -13,6 +13,8 @@ config = {
                                  '..', 'meerkat', 'http', 'static','img', 'capture')),
     "probespath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probes', 'bin')),
+    "binpath": os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                 '..', 'bin')),
 
     "debug": True,
     "hide_dummy_probes": True,

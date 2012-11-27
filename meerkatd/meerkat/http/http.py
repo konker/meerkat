@@ -50,12 +50,17 @@ class HttpServer(object):
         bottle.route('/meerkat/probe<p:int>.json', method='GET')(self.probe_json)
         bottle.route('/meerkat/probe<p:int>.json', method='POST')(self.probe_control_json)
         bottle.route('/meerkat/log.json', method='GET')(self.log_json)
-        bottle.route('/meerkat/data.tgz', method='GET')(self.data_tgz)
+        bottle.route('/meerkat/data', method='GET')(self.data_tgz)
+        bottle.route('/meerkat/kickstart_gps.json', method='POST')(self.kickstart_gps_control_json)
 
 
     def start(self):
         self.http_thread = Thread(target=bottle.run,
-                                  kwargs=dict(host=self.config['http_host'], 
+                                  kwargs=dict(host=self.config['http_host'],
+                                              port=self.config['http_port'],
+                                              server='wsgiref',
+                                              debug=False,
+                                              quiet=True),
                                   name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()
@@ -82,7 +87,7 @@ class HttpServer(object):
                     "probes": probes
                 }
               }
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -90,7 +95,7 @@ class HttpServer(object):
         ret = {"status": "OK",
                 "body": self.helper_get_probe_struct(self.scheduler.probes[p])
               }
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -104,7 +109,7 @@ class HttpServer(object):
             #self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probe', p) )
 
         time.sleep(0.5)
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return self.probe_json(p)
 
 
@@ -124,7 +129,7 @@ class HttpServer(object):
               }
         ret["body"]["id"] = ret["body"]["info"]["host"]
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -133,7 +138,7 @@ class HttpServer(object):
                 "body": self.helper_get_master_struct()
         }
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
     
@@ -147,28 +152,24 @@ class HttpServer(object):
             #self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probes') )
 
         time.sleep(1)
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return self.master_json()
 
     
     def register_control_json(self):
-        ret = {"status": "OK",
-                "body": ""
-              }
         try:
             r = requests.post(self.config["mission_control"]["register_url"], data=self.info_json())
             ret = r.text
         except Exception as ex:
-            ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret = json.dumps({"status": "ERROR", "body": str(ex) })
 
-        response.set_header('Cache-Control', 'No-store')
-        return json.dumps(ret)
+        response.set_header("Cache-Control", "No-store")
+        return ret
 
     
     def capture_control_json(self):
         ret = {"status": "OK",
-                "body": None
+                "body": "Camera image captured"
               }
         try:
             ret["body"] = self.photo_capture.capture()
@@ -176,7 +177,7 @@ class HttpServer(object):
             ret["status"] = "ERROR"
             ret["body"] = str(ex)
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -193,7 +194,7 @@ class HttpServer(object):
                 }
               }
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)  
 
 
@@ -214,9 +215,24 @@ class HttpServer(object):
             yield str(ex)
 
 
+    def kickstart_gps_control_json(self):
+        ret = {"status": "OK",
+               "body": "GPS Kickstarted"}
+
+        cmd = os.path.join(self.config["binpath"], 'kickstart_gps.sh')
+        try:
+            output = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
+
+
     def static(self, filepath):
         if 'latest' in filepath:
-            response.set_header('Cache-Control', 'No-store')
+            response.set_header("Cache-Control", "No-store")
 
         return static_file(filepath, root=STATIC_ROOT)
 
