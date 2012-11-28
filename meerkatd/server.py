@@ -20,7 +20,7 @@ import daemon
 
 # NOTE: edit config.rb as appropriate
 from config.config import config
-from meerkat.scheduler import Scheduler
+from meerkat.scheduler.scheduler import Scheduler
 from meerkat.http.http import HttpServer
 from util.pidfile import PidFile
 

@@ -346,6 +346,7 @@ class HttpServer(object):
             "image_data_size_kb": self.helper_get_image_data_size_kb(),
             "free_space_b": self.helper_get_free_space(),
             "has_camera": self.config["has_camera"],
+            "location": self.helper_get_location(),
             "available_memory_kb": 0,
             "free_memory_kb": 0,
             "mission_control_url": self.config['mission_control']['url'],
@@ -360,6 +361,19 @@ class HttpServer(object):
         ret["free_memory_kb"] = free_mem
 
         return ret
+
+
+    def helper_get_location(self):
+        location = {"latitude": '?', "longitude": '?'}
+
+        AGE_MS = 1000 * 60 * 3
+        cached_location = self.scheduler.cache.get_fresh("meerkat.probe.gps_info", AGE_MS)
+        if cached_location:
+            location["latitude"] = cached_location['latitude']
+            location["longitude"] = cached_location['longitude']
+
+        return location
+
 
     def helper_get_free_space(self):
         # TODO: should this be the where the data file is, not just '/'?

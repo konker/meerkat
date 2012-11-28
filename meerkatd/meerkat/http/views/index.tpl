@@ -87,6 +87,8 @@
           <dd class="available_memory"><!-- [xKB] --></dd>
           <dt class="free_memory">free RAM</dt>
           <dd class="free_memory"><!-- [yKB] --></dd>
+          <dt class="lodation">location</dt>
+          <dd class="location"><span class="lat"></span>, <span class="lon"></span></dd>
           <dt class="mission_control">mission control</dt>
           <dd class="mission_control"><a href=""><!--[mission control url]--></a></dd>
         </dl>

@@ -96,10 +96,11 @@ config["probes"].append({
     "id": "meerkat.probe.gps_info",
     "command": ["gps_info.py"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 60,
+    "interval": 10,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True
+    "auto_start": True,
+    "cache_last": True
 })
 config["probes"].append({
     "id": "meerkat.probe.heartbeat",

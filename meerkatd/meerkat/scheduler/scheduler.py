@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# meerkat.scheduler
+# meerkat.scheduler.scheduler
 #
 # Copyright 2012 Konrad Markus
 #
@@ -15,6 +15,7 @@ import pyev
 
 from storage.sqlite import Storage
 from meerkat.exception import MeerkatException
+from meerkat.scheduler.data_cache import DataCache
 import meerkat.probes.probe as probe
 
 
@@ -28,6 +29,7 @@ class Scheduler(object):
         self.active_probes = 0
         self.probespath = probespath
         self.loop = pyev.Loop()
+        self.cache = DataCache()
 
         # initialize and start a signal watchers
         sigterm_watcher = pyev.Signal(signal.SIGTERM, self.loop, self.sigterm_cb)
@@ -54,6 +56,7 @@ class Scheduler(object):
             self.check_data_type(probe_conf)
             self.check_dummy(probe_conf)
             self.check_no_store(probe_conf)
+            self.check_cache_last(probe_conf)
 
             # load filters
             self.load_filters(probe_conf)
@@ -179,6 +182,12 @@ class Scheduler(object):
                 raise MeerkatException("Could not load filter module: %s" % module)
 
 
+    def check_cache_last(self, probe_conf):
+        # ensure cache_last param exists (default False)
+        if not "cache_last" in probe_conf:
+            probe_conf["cache_last"] = False
+
+
     def check_no_store(self, probe_conf):
         # ensure no_store param exists (default False)
         if not "no_store" in probe_conf:
@@ -219,13 +228,13 @@ class Scheduler(object):
             if not "interval" in probe_conf or not "duration" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute \
                                   and a 'duration' attribute" % probe_conf["id"])
-            return probe.Probe(probe_conf["id"], index, storage, probe_conf, timeout)
+            return probe.Probe(probe_conf["id"], index, storage, self.cache, probe_conf, timeout)
 
         elif probe_conf["type"] == probe.TYPE_PERIODIC:
             if not "interval" in probe_conf:
                 raise ValueError("Bad config: %s: probes of this type must have a 'interval' attribute" % probe_conf["id"])
             probe_conf["duration"] = -1
-            return probe.Probe(probe_conf["id"], index, storage, probe_conf, timeout)
+            return probe.Probe(probe_conf["id"], index, storage, self.cache, probe_conf, timeout)
 
         elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
             raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])

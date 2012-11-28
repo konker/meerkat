@@ -204,6 +204,8 @@ var meerkat = (function($) {
                     meerkat.util.format_kb(meerkat.master.master.available_memory_kb);
                 meerkat.master.master.free_memory_kb =
                     meerkat.util.format_kb(meerkat.master.master.free_memory_kb);
+                meerkat.master.master.location =
+                    meerkat.util.format_location(meerkat.master.master.location);
 
                 /* render the data */
                 $('#master').render(meerkat.master.master, meerkat.master.directives.main);
@@ -283,6 +285,7 @@ var meerkat = (function($) {
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
                     'dd.free_memory': 'free_memory_kb',
+                    'dd.location': 'location',
                     'dd.mission_control a': 'mission_control_url',
                     'dd.mission_control a@href': 'mission_control_url'
                 }
@@ -707,6 +710,13 @@ var meerkat = (function($) {
             },
             format_timestamp: function(ts) {
                 return meerkat.util.ReadableDateString(new Date(ts)) + "<br/><small>" + ts + "</small>";
+            },
+            format_location: function(location) {
+                console.log(location);
+                if (location.latitude == '?' || location.longitude == '?') {
+                    return '?, ?';
+                }
+                return '<a href="http://www.openstreetmap.org/index.html?mlat=' + location.latitude + '&mlon=' + location.longitude + '&zoom=17">' + location.latitude + ', ' + location.longitude + '</a>';
             },
             ReadableDateString: function(d) {
                 function pad(n){return n<10 ? '0'+n : n}

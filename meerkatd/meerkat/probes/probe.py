@@ -12,6 +12,7 @@ import fcntl
 import logging
 from subprocess import Popen, PIPE
 import pyev
+import json
 
 
 # constants
@@ -25,10 +26,11 @@ DATA_TYPE_DATA = 32
 
 
 class Probe(object):
-    def __init__(self, id, index, storage, probe_conf, timeout=-1):
+    def __init__(self, id, index, storage, cache, probe_conf, timeout=-1):
         self.id = id
         self.index = index
         self.storage = storage
+        self.cache = cache
         self.command = probe_conf["command"]
         self.data_type = probe_conf["data_type"]
         self.filters = probe_conf["filters"]
@@ -36,6 +38,7 @@ class Probe(object):
         self.interval = probe_conf["interval"]
         self.duration = probe_conf["duration"]
         self.no_store = probe_conf["no_store"]
+        self.cache_last = probe_conf["cache_last"]
         self.dummy = probe_conf["dummy"]
         self.timeout = timeout
         self.active = False
@@ -312,6 +315,13 @@ class Probe(object):
             if not self.no_store:
                 logging.debug("[%s] -> %s" % (self.id, data))
                 self.storage.write_str(self.id, data)
+
+        # cache
+        if self.cache_last:
+            if self.data_type == DATA_TYPE_JSON:
+                self.cache.put(self.id, json.loads(data))
+            else:
+                self.cache.put(self.id, data)
 
 
     def cancel_all(self):

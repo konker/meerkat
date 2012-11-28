@@ -24,9 +24,10 @@ def main():
     height = sys.argv[3] if len(sys.argv) > 2 else DEFAULT_IMAGE_HEIGHT
     format = sys.argv[4] if len(sys.argv) > 3 else DEFAULT_FORMAT
 
+    # FIXME: this should use config["imagepath"]
     filename = "%s-%s.%s" % (id, strftime("%Y-%m-%d_%H:%M:%S"), format)
     filename = os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', '..', 'http', 'static', 'img', filename))
+                                 '..', '..', 'http', 'static', 'img', 'capture', filename))
 
     try:
         capture = cv.CaptureFromCAM(-1)
