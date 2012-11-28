@@ -48,7 +48,7 @@ class Storage(BaseStorage):
 
         self.buffer.append((probe_id, timestamp, length, sqlite3.Binary(s)))
         if (len(self.buffer) >= self.buffer_size):
-            self.cursor.executemany('''INSERT into accessory_data (probe_id, timestamp, length, data)
+            self.cursor.executemany('''INSERT into probe_data (probe_id, timestamp, length, data)
                                        VALUES (?, ?, ?, ?)''',
                                        self.buffer)
             self.buffer = []
@@ -58,12 +58,12 @@ class Storage(BaseStorage):
 
 
     def get_records_by_probe_id(self, probe_id, n=1):
-        for row in self.cursor.execute('SELECT * FROM accessory_data where probe_id = ? ORDER BY timestamp DESC LIMIT ?', (probe_id, n)):
+        for row in self.cursor.execute('SELECT * FROM probe_data where probe_id = ? ORDER BY timestamp DESC LIMIT ?', (probe_id, n)):
             yield row
 
 
     def reader(self):
-        for row in self.cursor.execute('SELECT * FROM accessory_data'):
+        for row in self.cursor.execute('SELECT * FROM probe_data'):
             yield row
 
 
@@ -74,7 +74,7 @@ class Storage(BaseStorage):
 
 
     def _ddl(self):
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS accessory_data
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS probe_data
                             (
                                probe_id,    VARCHAR,
                                timestamp    REAL,
