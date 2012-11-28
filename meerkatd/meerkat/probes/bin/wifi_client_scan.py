@@ -20,7 +20,6 @@ iface  = 'mon0'
 
 def main():
     sniff(iface=iface, prn=sniffCallback)
-    #sys.stdout.write(json.dumps(unique))
 
 
 def sniffCallback(p): 
@@ -31,6 +30,7 @@ def sniffCallback(p):
                 unique.append(p.addr2)
 
                 sys.stdout.write(json.dumps({'MAC_Address': p.addr2}))
+                sys.stdout.write("\n")
                 sys.stdout.flush()
 
 

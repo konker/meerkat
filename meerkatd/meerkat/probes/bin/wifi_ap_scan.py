@@ -10,29 +10,78 @@
 
 import sys
 import json
-from scapy.all import *
+from subprocess import check_output
 
-unique = []
 
 def main():
-    sniff(iface="mon0", prn=sniffBeacon)
-    #sniff(iface="wlan0", filter="tcp port 80", prn=sniffBeacon)
-    #sniff(iface="wlan0", prn=lambda x:x.sprintf("{Dot11Beacon:%Dot11.addr3%\t%Dot11Beacon.info%\t%PrismHeader.channel%\tDot11Beacon.cap%}"))
+    cmd = ['sudo', 'iwlist', 'wlan0', 'scan']
+    raw = check_output(cmd, shell=False)
 
-    print json.dumps(unique)
+    info = parse_raw(raw)
+    sys.stdout.write(json.dumps(info))
 
 
-def sniffBeacon(p): 
-    #print dir(p)
-    #print p.summary
-    #print p.haslayer(Dot11Beacon)
-    #sys.exit()
-    #if ( (p.haslayer(Dot11Beacon) or p.haslayer(Dot11ProbeResp)) 
-    #             and not aps.has_key(p[Dot11].addr3)):
-    if p.haslayer(Dot11Beacon):
-        if unique.count(p.addr2) == 0:
-            unique.append(p.addr2)
-            print p.sprintf("%Dot11.addr2%[%Dot11Elt.info%|%Dot11Beacon.cap%]")
+def parse_raw(raw):
+    ret = []
+    cur_cell = None
+    for l in raw.split("\n"):
+        l = l.strip()
+        if l.startswith('Cell '):
+            if cur_cell:
+                ret.append(cur_cell)
+
+            cur_cell = {}
+            handle_cell_start(l, cur_cell)
+        elif cur_cell:
+            handle_cell_item(l, cur_cell)
+
+    if cur_cell:
+        ret.append(cur_cell)
+
+    return ret
+
+
+def handle_cell_start(l, cur_cell):
+    x,l = l.split(' - ')
+    handle_cell_item(l, cur_cell)
+
+
+def handle_cell_item(l, cur_cell):
+    if l is not None and l != '':
+        if not ':' in l:
+            for part in  l.split('  '):
+                k,v = part.split('=')
+                cur_cell[k] = v.translate(None, '"')
+        else:
+            k,v = l.split(':', 1)
+            cur_cell[k] = v.translate(None, '"')
+
+
+'''
+Example raw output:
+
+          Cell 01 - Address: A4:56:30:E8:07:E0
+                    ESSID:"aalto open"
+                    Protocol:IEEE 802.11bg
+                    Mode:Master
+                    Frequency:2.412 GHz (Channel 1)
+                    Encryption key:off
+                    Bit Rates:54 Mb/s
+                    Quality=87/100  Signal level=60/100  
+          Cell 02 - Address: A4:56:30:E8:07:E1
+                    ESSID:"eduroam"
+                    Protocol:IEEE 802.11bg
+                    Mode:Master
+                    Frequency:2.412 GHz (Channel 1)
+                    Encryption key:on
+                    Bit Rates:54 Mb/s
+                    Extra:rsn_ie=30140100000fac040100000fac040100000fac012800
+                    IE: IEEE 802.11i/WPA2 Version 1
+                        Group Cipher : CCMP
+                        Pairwise Ciphers (1) : CCMP
+                        Authentication Suites (1) : 802.1x
+                    Quality=90/100  Signal level=50/100  
+'''
 
 
 if __name__ == '__main__':

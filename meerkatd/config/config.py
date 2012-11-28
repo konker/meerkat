@@ -44,7 +44,6 @@ config["probes"].append({
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
-        "meerkat.filters.dummy.Uppercase"
     ]
 })
 
@@ -84,6 +83,20 @@ config["probes"].append({
     "type": probe.TYPE_DURATION,
     "interval": 20,
     "duration": 60,
+    "data_type": probe.DATA_TYPE_JSON,
+    "auto_start": False,
+    "filters": [
+    ],
+    "error_filters": [
+        "meerkat.filters.wifi_filters.RemoveWarnings"
+    ]
+})
+config["probes"].append({
+    "id": "meerkat.probe.wifi_ap_scan",
+    "command": ["wifi_ap_scan.py"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 5,
+    "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
