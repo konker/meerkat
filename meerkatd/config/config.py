@@ -122,7 +122,7 @@ config["probes"].append({
     "interval": config["heartbeat"]["interval"],
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": False,
+    "auto_start": True,
     "no_store": True
 })
 config["probes"].append({

@@ -299,6 +299,8 @@ class Probe(object):
             if not self.no_store:
                 logging.debug("[%s] -> %s" % (self.id, data))
                 self.storage.write_str(self.id, data)
+            else:
+                logging.debug("[%s] ->| %s" % (self.id, data))
 
         # cache
         if self.cache_last:
