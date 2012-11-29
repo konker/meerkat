@@ -12,6 +12,7 @@ import sys
 import json
 from subprocess import check_output
 
+ignore_list = ['Bit Rates']
 
 def main():
     cmd = ['sudo', 'iwlist', 'wlan0', 'scan']
@@ -50,10 +51,14 @@ def handle_cell_item(l, cur_cell):
     if l is not None and l != '':
         if not ':' in l:
             for part in  l.split('  '):
-                k,v = part.split('=')
-                cur_cell[k] = v.translate(None, '"')
+                if '=' in part:
+                    k,v = part.split('=', 1)
+                    cur_cell[k] = v.translate(None, '"')
         else:
             k,v = l.split(':', 1)
+            if k in ignore_list:
+                return
+
             cur_cell[k] = v.translate(None, '"')
 
 
