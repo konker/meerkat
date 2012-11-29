@@ -57,8 +57,15 @@ class Storage(BaseStorage):
             self.conn.commit()
 
 
-    def get_records_by_probe_id(self, probe_id, n=1):
-        for row in self.cursor.execute('SELECT * FROM accessory_data where probe_id = ? ORDER BY timestamp DESC LIMIT ?', (probe_id, n)):
+    def get_records_by_probe_id(self, probe_id, n=-1):
+        if n > 0:
+            sql = 'SELECT * FROM accessory_data where probe_id = ? ORDER BY timestamp DESC LIMIT ?'
+            args = (probe_id, n)
+        else:
+            sql = 'SELECT * FROM accessory_data where probe_id = ? ORDER BY timestamp DESC'
+            args = (probe_id,)
+
+        for row in self.cursor.execute(sql, args):
             yield row
 
 
