@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo wpa_cli select_network 4
+
 PHANTOMJS=`which phantomjs`
 if [ -z "$PHANTOMJS" ]; then
     export DISPLAY=:0

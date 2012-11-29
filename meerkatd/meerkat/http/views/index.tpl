@@ -50,6 +50,8 @@
         <div class="inner">
           <a href="data.tgz" class="btn" id="masterDownload"><i class="icon-list-alt"></i> Download data</a>
           <button class="btn" id="missionControlRegister"><i class="icon-bullhorn"></i> Ping mission control</button>
+          <button class="btn" id="joinClickWifi"><i class="icon-globe"></i> Join click wifi</button>
+          <button class="btn" id="joinCityWifi"><i class="icon-globe"></i> Join city wifi</button>
           <button class="btn" id="getGPSProcs"><i class="icon-globe"></i> Get GPS procs</button>
           <button class="btn btn-warning" id="kickstartGPS"><i class="icon-globe icon-white"></i> Kickstart GPS</button>
           <button class="btn btn-warning" id="cleanupGPS"><i class="icon-globe icon-white"></i> Clean up GPS</button>

@@ -1,14 +1,16 @@
 
 var meerkat = (function($) {
-    var URL_PREFX          = '/meerkat',
-        PROBES_JSON_URL    = URL_PREFX + '/probes.json',
-        MASTER_JSON_URL    = URL_PREFX + '/master.json',
-        REGISTER_JSON_URL  = URL_PREFX + '/register.json',
-        KICKSTART_JSON_URL = URL_PREFX + '/kickstart_gps.json',
-        CLEANUP_JSON_URL   = URL_PREFX + '/cleanup_gps.json',
-        GPS_PROCS_JSON_URL = URL_PREFX + '/gps_procs.json',
-        CAPTURE_JSON_URL   = URL_PREFX + '/capture.json',
-        LOG_JSON_URL       = URL_PREFX + '/log.json';
+    var URL_PREFX                = '/meerkat',
+        PROBES_JSON_URL          = URL_PREFX + '/probes.json',
+        MASTER_JSON_URL          = URL_PREFX + '/master.json',
+        REGISTER_JSON_URL        = URL_PREFX + '/register.json',
+        KICKSTART_JSON_URL       = URL_PREFX + '/kickstart_gps.json',
+        CLEANUP_JSON_URL         = URL_PREFX + '/cleanup_gps.json',
+        GPS_PROCS_JSON_URL       = URL_PREFX + '/gps_procs.json',
+        JOIN_CLICK_WIFI_JSON_URL = URL_PREFX + '/join_click_wifi.json',
+        JOIN_CITY_WIFI_JSON_URL  = URL_PREFX + '/join_city_wifi.json',
+        CAPTURE_JSON_URL         = URL_PREFX + '/capture.json',
+        LOG_JSON_URL             = URL_PREFX + '/log.json';
 
     return {
         init: function() {
@@ -105,6 +107,48 @@ var meerkat = (function($) {
                 meerkat.util.loading.on();
                 $.ajax({
                     url: GPS_PROCS_JSON_URL,
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            joinClickWifi: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: JOIN_CLICK_WIFI_JSON_URL,
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            joinCityWifi: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: JOIN_CITY_WIFI_JSON_URL,
                     type: 'GET',
                     dataType: 'json',
                     timeout: 20000,
@@ -222,6 +266,14 @@ var meerkat = (function($) {
                 $('#getGPSProcs')
                     .unbind('click')
                     .bind('click', meerkat.master.getGPSProcs);
+
+                $('#joinClickWifi')
+                    .unbind('click')
+                    .bind('click', meerkat.master.joinClickWifi);
+
+                $('#joinCityWifi')
+                    .unbind('click')
+                    .bind('click', meerkat.master.joinCityWifi);
 
                 $('#cleanupGPS')
                     .unbind('click')
