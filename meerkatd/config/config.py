@@ -17,7 +17,7 @@ config = {
                                  '..', 'bin')),
 
     "debug": True,
-    "hide_dummy_probes": True,
+    "hide_dummy_probes": False,
 
     "http_host": "0.0.0.0",
     "http_port": 8080,
@@ -51,7 +51,7 @@ config["probes"].append({
     "id": "meerkat.probe.camera_photo",
     "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 30,
+    "interval": 10,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
@@ -81,8 +81,8 @@ config["probes"].append({
     "id": "meerkat.probe.wifi_client_scan",
     "command": ["wifi_client_scan.py"],
     "type": probe.TYPE_DURATION,
-    "interval": 20,
-    "duration": 60,
+    "interval": 5,
+    "duration": 20,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
@@ -112,7 +112,7 @@ config["probes"].append({
     "interval": 10,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True,
+    "auto_start": False,
     "cache_last": True
 })
 config["probes"].append({
@@ -122,7 +122,7 @@ config["probes"].append({
     "interval": config["heartbeat"]["interval"],
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True,
+    "auto_start": False,
     "no_store": True
 })
 config["probes"].append({
@@ -152,6 +152,19 @@ config["probes"].append({
     "interval": 5,
     "data_type": probe.DATA_TYPE_TEXT,
     "dummy": True,
+    "auto_start": False,
+    "error_filters": [
+        "meerkat.filters.util.Null"
+    ]
+})
+config["probes"].append({
+    "id": "meerkat.probe.dummy_error",
+    "command": ["dummy_error.py"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 15,
+    "data_type": probe.DATA_TYPE_JSON,
+    "dummy": True,
+    "no_store": True,
     "auto_start": False
 })
 

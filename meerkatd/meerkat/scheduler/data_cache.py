@@ -29,8 +29,6 @@ class DataCache(object):
 
     def get_fresh(self, id, max_age_ms, default=None):
         age = (time.time() * 1000) - self.timestamps.get(id, 0)
-        print age
-        print max_age_ms
         if age > 0 and age < max_age_ms:
             return self.cache.get(id, default)
 

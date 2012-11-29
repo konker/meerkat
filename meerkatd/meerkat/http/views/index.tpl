@@ -57,7 +57,7 @@
       </div>
       <div class="section-body row">
         <div id="latest-img">
-          <a href="/static/img/capture/latest.jpg"><img src="/static/img/capture/latest.jpg"/></a>
+          <a href="/static/img/capture/manual_capture.jpg"><img src="/static/img/capture/manual_capture.jpg"/></a>
         </div>
 
         <dl class="dl-horizontal">

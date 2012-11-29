@@ -15,10 +15,8 @@ from meerkat.filters import BaseFilter
 
 class RemoveWarnings(BaseFilter):
     def filter(self, data):
-        for l in data.split("\n"):
-            if l.startswith('WARNING'):
-                continue
-            else:
-                return l
+        if data.startswith('WARNING'):
+            return ''
 
+        return data
 

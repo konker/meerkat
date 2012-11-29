@@ -39,6 +39,9 @@ def main():
             session.close()
             print json.dumps(ret)
             return
+        #else:
+        #    print "rejected:"
+        #    print packet
 
         # Bail out after NUM_PACKET_THRESHOLD loops
         # although it will block anyway if there is no fix
@@ -48,7 +51,6 @@ def main():
             session.close()
             print json.dumps(ret)
             return
-
 
 if __name__ == '__main__':
     main()
