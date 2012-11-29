@@ -58,8 +58,13 @@
         </div>
       </div>
       <div class="section-body row">
-        <div id="latest-img">
-          <a href="/static/img/capture/manual_capture.jpg"><img src="/static/img/capture/manual_capture.jpg"/></a>
+        <div id="img-holder">
+            <div id="capture-img">
+              <a href="/static/img/capture/manual_capture.jpg"><img src="/static/img/capture/manual_capture.jpg"/></a>
+            </div>
+            <div id="latest-img">
+              <a href="/static/img/capture/manual_capture.jpg"><img src="/static/img/capture/latest.jpg"/></a>
+            </div>
         </div>
 
         <dl class="dl-horizontal">

@@ -288,11 +288,11 @@ var meerkat = (function($) {
                         .unbind('click')
                         .bind('click', meerkat.master.capture)
                         .show();
-                    $('#latest-img').show();
+                    $('#img-holder').show();
                 }
                 else {
                     $('#masterCapture').hide();
-                    $('#latest-img').hide();
+                    $('#img-holder').hide();
                 }
 
                 /* visual aids */

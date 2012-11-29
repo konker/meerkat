@@ -62,7 +62,7 @@ class HttpServer(object):
         self.http_thread = Thread(target=bottle.run,
                                   kwargs=dict(host=self.config['http_host'],
                                               port=self.config['http_port'],
-                                              server='wsgiref',
+                                              server='cherrypy',
                                               debug=False,
                                               quiet=True),
                                   name='http-thread')
