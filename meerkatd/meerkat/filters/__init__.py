@@ -8,7 +8,9 @@
 #
 
 class BaseFilter(object):
-    def __init__(self, id):
+    def __init__(self, id=None):
+        if not id:
+            id = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
         self.id = id
 
 
