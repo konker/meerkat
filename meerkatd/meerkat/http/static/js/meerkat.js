@@ -1,11 +1,14 @@
 
 var meerkat = (function($) {
-    var URL_PREFX         = '/meerkat',
-        PROBES_JSON_URL   = URL_PREFX + '/probes.json',
-        MASTER_JSON_URL   = URL_PREFX + '/master.json',
-        REGISTER_JSON_URL = URL_PREFX + '/register.json',
-        CAPTURE_JSON_URL  = URL_PREFX + '/capture.json',
-        LOG_JSON_URL      = URL_PREFX + '/log.json';
+    var URL_PREFX          = '/meerkat',
+        PROBES_JSON_URL    = URL_PREFX + '/probes.json',
+        MASTER_JSON_URL    = URL_PREFX + '/master.json',
+        REGISTER_JSON_URL  = URL_PREFX + '/register.json',
+        KICKSTART_JSON_URL = URL_PREFX + '/kickstart_gps.json',
+        CLEANUP_JSON_URL   = URL_PREFX + '/cleanup_gps.json',
+        GPS_PROCS_JSON_URL = URL_PREFX + '/gps_procs.json',
+        CAPTURE_JSON_URL   = URL_PREFX + '/capture.json',
+        LOG_JSON_URL       = URL_PREFX + '/log.json';
 
     return {
         init: function() {
@@ -14,6 +17,7 @@ var meerkat = (function($) {
             meerkat.probes.init();
             meerkat.log.init();
         },
+
         master: {
             master: null,
             capture_counter: 0,
@@ -28,6 +32,7 @@ var meerkat = (function($) {
                     url: CAPTURE_JSON_URL,
                     type: 'POST',
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -50,7 +55,7 @@ var meerkat = (function($) {
                 meerkat.util.loading.on();
 
                 var command = 'ON';
-                if (meerkat.master.master.status == 'ON') {
+                if (meerkat.master.master.all_on) {
                     command = 'OFF';
                 }
 
@@ -59,6 +64,7 @@ var meerkat = (function($) {
                     type: 'POST',
                     data: {'command': command},
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -74,12 +80,13 @@ var meerkat = (function($) {
                 });
                 return false;
             },
-            missionControlRegister: function() {
+            cleanupGPS: function() {
                 meerkat.util.loading.on();
                 $.ajax({
-                    url: REGISTER_JSON_URL,
+                    url: CLEANUP_JSON_URL,
                     type: 'POST',
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -89,6 +96,71 @@ var meerkat = (function($) {
                         if (data.status == "ERROR") {
                             meerkat.util.alert.show("Could not execute operation.", data.body);
                         }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            getGPSProcs: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: GPS_PROCS_JSON_URL,
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            kickstartGPS: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: KICKSTART_JSON_URL,
+                    type: 'POST',
+                    dataType: 'json',
+                    timeout: 40000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        meerkat.util.alert.showSuccess(data.status, data.body);
+                        meerkat.util.loading.off();
+                    }
+                });
+            },
+            missionControlRegister: function() {
+                meerkat.util.loading.on();
+                $.ajax({
+                    url: REGISTER_JSON_URL,
+                    type: 'POST',
+                    dataType: 'json',
+                    timeout: 20000,
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        /*[TODO: error handling ]*/
+                        meerkat.util.alert.show("Could not execute operation.", errorThrown);
+                        meerkat.util.loading.off();
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.status == "ERROR") {
+                            meerkat.util.alert.show("Could not execute operation.", data.body);
+                        }
+                        console.log(data);
+                        meerkat.util.alert.showSuccess(data.status, data.body);
                         meerkat.util.loading.off();
                     }
                 });
@@ -100,6 +172,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: MASTER_JSON_URL,
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load master information.", errorThrown);
@@ -123,12 +196,16 @@ var meerkat = (function($) {
                     meerkat.util.format_temp(meerkat.master.master.gpu_temperature);
                 meerkat.master.master.data_size_kb =
                     meerkat.util.format_kb(meerkat.master.master.data_size_kb);
+                meerkat.master.master.image_data_size_kb =
+                    meerkat.util.format_kb(meerkat.master.master.image_data_size_kb);
                 meerkat.master.master.free_space_b =
                     meerkat.util.format_b(meerkat.master.master.free_space_b);
                 meerkat.master.master.available_memory_kb =
                     meerkat.util.format_kb(meerkat.master.master.available_memory_kb);
                 meerkat.master.master.free_memory_kb =
                     meerkat.util.format_kb(meerkat.master.master.free_memory_kb);
+                meerkat.master.master.location =
+                    meerkat.util.format_location(meerkat.master.master.location);
 
                 /* render the data */
                 $('#master').render(meerkat.master.master, meerkat.master.directives.main);
@@ -137,6 +214,18 @@ var meerkat = (function($) {
                 $('#missionControlRegister')
                     .unbind('click')
                     .bind('click', meerkat.master.missionControlRegister);
+
+                $('#kickstartGPS')
+                    .unbind('click')
+                    .bind('click', meerkat.master.kickstartGPS);
+
+                $('#getGPSProcs')
+                    .unbind('click')
+                    .bind('click', meerkat.master.getGPSProcs);
+
+                $('#cleanupGPS')
+                    .unbind('click')
+                    .bind('click', meerkat.master.cleanupGPS);
 
                 $('#masterRefresh')
                     .unbind('click')
@@ -155,18 +244,7 @@ var meerkat = (function($) {
                 }
 
                 /* visual aids */
-                if (meerkat.master.master.status == 'ON') {
-                    $('#masterToggle')
-                        .removeClass('btn-danger')
-                        .addClass('btn-success')
-                        .find('.lbl')
-                        .text('Master ON');
-                    $('#master dl')
-                        .find('dd.status')
-                        .removeClass('text-error')
-                        .addClass('text-success');
-                }
-                else {
+                if (meerkat.master.master.all_on) {
                     $('#masterToggle')
                         .removeClass('btn-success')
                         .addClass('btn-danger')
@@ -176,6 +254,17 @@ var meerkat = (function($) {
                         .find('dd.status')
                         .removeClass('text-success')
                         .addClass('text-error');
+                }
+                else {
+                    $('#masterToggle')
+                        .removeClass('btn-danger')
+                        .addClass('btn-success')
+                        .find('.lbl')
+                        .text('Master ON');
+                    $('#master dl')
+                        .find('dd.status')
+                        .removeClass('text-error')
+                        .addClass('text-success');
                 }
 
                 /* show it */
@@ -192,9 +281,11 @@ var meerkat = (function($) {
                     'dd.sys_temperature': 'sys_temperature',
                     'dd.gpu_temperature': 'gpu_temperature',
                     'dd.data_size': 'data_size_kb',
+                    'dd.image_data_size': 'image_data_size_kb',
                     'dd.free_space': 'free_space_b',
                     'dd.available_memory': 'available_memory_kb',
                     'dd.free_memory': 'free_memory_kb',
+                    'dd.location': 'location',
                     'dd.mission_control a': 'mission_control_url',
                     'dd.mission_control a@href': 'mission_control_url'
                 }
@@ -214,6 +305,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: PROBES_JSON_URL,
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load probes data.", errorThrown);
@@ -256,6 +348,7 @@ var meerkat = (function($) {
                     type: 'POST',
                     data: {'command': command},
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not execute operation.", errorThrown);
@@ -293,6 +386,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: URL_PREFX + '/' + meerkat.probes.probes[p].id + '.json',
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load probe data.", errorThrown);
@@ -511,6 +605,7 @@ var meerkat = (function($) {
                 $.ajax({
                     url: LOG_JSON_URL,
                     dataType: 'json',
+                    timeout: 20000,
                     error: function(jqXHR, textStatus, errorThrown) {
                         /*[TODO: error handling ]*/
                         meerkat.util.alert.show("Could not load log data.", errorThrown);
@@ -538,8 +633,13 @@ var meerkat = (function($) {
             }
         },
         util: {
+            NL_RE: /\n/,
+
             init: function() {
                 meerkat.util.alert.init();
+            },
+            nl2br: function(s) {
+                return s.replace(meerkat.util.NL_RE, '<br/>');
             },
             alert: {
                 init: function() {
@@ -548,11 +648,34 @@ var meerkat = (function($) {
                     $('#alert').hide();
                 },
                 show: function(body, title) {
+                    meerkat.util.alert._set(body, title);
                     $('#alert')
-                        .find('.body').html(body);
+                        .addClass('alert-error');
+                    meerkat.util.alert._show();
+                },
+                showSuccess: function(body, title) {
+                    meerkat.util.alert._set(body, title);
                     $('#alert')
-                        .find('.title').html(title);
-
+                        .addClass('alert-success');
+                    meerkat.util.alert._show();
+                },
+                showInfo: function(body, title) {
+                    meerkat.util.alert._set(body, title);
+                    $('#alert')
+                        .addClass('alert-info');
+                    meerkat.util.alert._show();
+                },
+                _set: function(body, title) {
+                    $('#alert')
+                        .removeClass('alert-error')
+                        .removeClass('alert-success')
+                        .removeClass('alert-info')
+                    $('#alert')
+                        .find('.body').text(title);
+                    $('#alert')
+                        .find('.title').text(body);
+                },
+                _show: function() {
                     $('#alert').show();
                 },
                 hide: function() {
@@ -565,6 +688,7 @@ var meerkat = (function($) {
                 on: function() {
                     meerkat.util.loading._stack++;
                     meerkat.util.loading._setLoading(true);
+                    meerkat.util.alert.hide();
                 },
                 off: function() {
                     meerkat.util.loading._stack--;
@@ -574,16 +698,25 @@ var meerkat = (function($) {
                 },
                 _setLoading: function(on) {
                     if (on) {
-                        $('h1').addClass('loading');
+                        //$('h1').addClass('loading');
+                        $('#loading').show();
                     }
                     else {
-                        $('h1').removeClass('loading');
+                        //$('h1').removeClass('loading');
+                        $('#loading').hide();
                         meerkat.util.loading._stack = 0;
                     }
                 }
             },
             format_timestamp: function(ts) {
                 return meerkat.util.ReadableDateString(new Date(ts)) + "<br/><small>" + ts + "</small>";
+            },
+            format_location: function(location) {
+                console.log(location);
+                if (location.latitude == '?' || location.longitude == '?') {
+                    return '?, ?';
+                }
+                return '<a href="http://www.openstreetmap.org/index.html?mlat=' + location.latitude + '&mlon=' + location.longitude + '&zoom=17">' + location.latitude + ', ' + location.longitude + '</a>';
             },
             ReadableDateString: function(d) {
                 function pad(n){return n<10 ? '0'+n : n}

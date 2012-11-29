@@ -14,11 +14,11 @@
 
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/home/pi/WORKING/meerkat/meerkatd/meerkatd.py
+DAEMON=/home/pi/WORKING/meerkat/meerkatd/server.py
 NAME=meerkatd
 DESC="meerkat server"
 # NOTE: the $PIDFILE path must be the same as the pidfile
-#       argument to the DaemonContext in meerkatd.py
+#       argument to the DaemonContext in server.py
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 

@@ -15,16 +15,17 @@ import json
 def main():
     if len(sys.argv) < 2:
         ret = { "status": "ERROR", "body": "ERROR: No url specified"}
-        print(json.dumps(ret))
+        sys.stdout.write(json.dumps(ret))
         sys.exit(1)
 
     url = sys.argv[1];
     try:
         r = requests.get(url, verify=False)
-        print(r.text)
+        sys.stdout.write(r.text)
+        sys.exit(0)
     except Exception as ex:
         ret = { "status": "ERROR", "body": str(ex) }
-        print(json.dumps(ret))
+        sys.stdout.write(json.dumps(ret))
         sys.exit(2)
 
 

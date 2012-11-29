@@ -10,11 +10,14 @@ config = {
     "datafile": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'data', 'meerkat.db')),
     "imagepath": os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                 '..', 'meerkat', 'http', 'static','img')),
+                                 '..', 'meerkat', 'http', 'static','img', 'capture')),
     "probespath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'meerkat', 'probes', 'bin')),
+    "binpath": os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                 '..', 'bin')),
 
     "debug": True,
+    "hide_dummy_probes": True,
 
     "http_host": "0.0.0.0",
     "http_port": 8080,
@@ -41,7 +44,6 @@ config["probes"].append({
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
-        "meerkat.filters.dummy.Uppercase"
     ]
 })
 
@@ -90,13 +92,38 @@ config["probes"].append({
     ]
 })
 config["probes"].append({
+    "id": "meerkat.probe.wifi_ap_scan",
+    "command": ["wifi_ap_scan.py"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 5,
+    "duration": -1,
+    "data_type": probe.DATA_TYPE_JSON,
+    "auto_start": False,
+    "filters": [
+    ],
+    "error_filters": [
+        "meerkat.filters.wifi_filters.RemoveWarnings"
+    ]
+})
+config["probes"].append({
+    "id": "meerkat.probe.gps_info",
+    "command": ["gps_info.py"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 10,
+    "duration": -1,
+    "data_type": probe.DATA_TYPE_JSON,
+    "auto_start": True,
+    "cache_last": True
+})
+config["probes"].append({
     "id": "meerkat.probe.heartbeat",
     "command": ["heartbeat.py", config["heartbeat"]["url"]],
     "type": probe.TYPE_PERIODIC,
     "interval": config["heartbeat"]["interval"],
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True
+    "auto_start": True,
+    "no_store": True
 })
 config["probes"].append({
     "id": "meerkat.probe.json_tick_sleeper",

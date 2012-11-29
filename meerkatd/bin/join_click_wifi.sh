@@ -17,6 +17,6 @@ if [[ $OUT == http:* ]]; then
     wget -q -O - $OUT
     exec $0
 else
-    killall Xvfb
+    sudo killall Xvfb
     echo "OK"
 fi

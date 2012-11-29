@@ -28,7 +28,8 @@
 </head>
 
 <body>
-  <!-- Page Layout HTML here -->
+  <div id="loading"><img src="/static/img/loading.gif" alt="loading.."/></div>
+
   <header class="navbar" id="header">
     <div class="navbar-inner">
       <h1>meerkat</h1>
@@ -38,15 +39,27 @@
     <div id="alert" class="alert alert-error">
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong class="title"></strong>
-        <span class="body"></span>
+        <pre class="body"></pre>
     </div>
     <section class="row" id="master">
       <h2>
         <i class="icon-info-sign"></i>
         info
-        <button class="btn btn-small pull-right" id="missionControlRegister">Register with mission control</button>
       </h2>
-      <div class="section-body">
+      <div id="system-tools" class="row">
+        <div class="inner">
+          <a href="data.tgz" class="btn" id="masterDownload"><i class="icon-list-alt"></i> Download data</a>
+          <button class="btn" id="missionControlRegister"><i class="icon-bullhorn"></i> Ping mission control</button>
+          <button class="btn" id="getGPSProcs"><i class="icon-globe"></i> Get GPS procs</button>
+          <button class="btn btn-warning" id="kickstartGPS"><i class="icon-globe icon-white"></i> Kickstart GPS</button>
+          <button class="btn btn-warning" id="cleanupGPS"><i class="icon-globe icon-white"></i> Clean up GPS</button>
+        </div>
+      </div>
+      <div class="section-body row">
+        <div id="latest-img">
+          <a href="/static/img/capture/latest.jpg"><img src="/static/img/capture/latest.jpg"/></a>
+        </div>
+
         <dl class="dl-horizontal">
           <dt class="status">status</dt>
           <dd class="status"><!-- [on/off] --></dd>
@@ -66,22 +79,27 @@
           <dd class="gpu_temperature"><!-- [12.34] --></dd>
           <dt class="data_size">data size</dt>
           <dd class="data_size"><!-- [xMB] --></dd>
+          <dt class="image_data_size">image data size</dt>
+          <dd class="image_data_size"><!-- [xMB] --></dd>
           <dt class="free_space">free space</dt>
           <dd class="free_space"><!-- [yMB] --></dd>
           <dt class="available_memory">available RAM</dt>
           <dd class="available_memory"><!-- [xKB] --></dd>
           <dt class="free_memory">free RAM</dt>
           <dd class="free_memory"><!-- [yKB] --></dd>
+          <dt class="lodation">location</dt>
+          <dd class="location"><span class="lat"></span>, <span class="lon"></span></dd>
           <dt class="mission_control">mission control</dt>
           <dd class="mission_control"><a href=""><!--[mission control url]--></a></dd>
         </dl>
-        <button type="button" class="btn btn-warning refresh" id="masterRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
-        <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera icon-white"></i> Capture photo</button>
-
-        <div id="latest-img">
-          <a href="/static/img/latest.jpg"><img src="/static/img/latest.jpg"/></a>
+        <div id="tools" class="row">
+          <div class="inner">
+            <button type="button" class="btn btn-info refresh" id="masterRefresh"><i class="icon-refresh icon-white"></i> Refresh</button>
+            <button type="button" class="btn btn-info" id="masterCapture"><i class="icon-camera icon-white"></i> Capture photo</button>
+          </div>
         </div>
       </div>
+
     </section>
     <section class="row" id="probes">
       <h2>
@@ -112,7 +130,7 @@
                 <dt class="last_error">last error</dt>
                 <dd class="last_error"><pre><!-- [error] --></pre></dd>
               </dl>
-              <button type="button" class="probeRefresh btn btn-warning refresh"><i class="icon-refresh icon-white"></i> refresh</button>
+              <button type="button" class="probeRefresh btn btn-info refresh"><i class="icon-refresh icon-white"></i> refresh</button>
             </div>
             <div class="row data probe-section">
               <h4><i class="icon-th-list"></i> last data</h4>
@@ -142,7 +160,7 @@
     <section class="row" id="log">
       <h2>
         <i class="icon-list"></i> log
-        <button type="button" id="logRefresh" class="btn btn-warning refresh pull-right"><i class="icon-refresh icon-white"></i> refresh</button>
+        <button type="button" id="logRefresh" class="btn btn-info refresh pull-right"><i class="icon-refresh icon-white"></i> refresh</button>
       </h2>
       <div class="section-body">
         <!-- log here -->

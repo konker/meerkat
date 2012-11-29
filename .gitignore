@@ -26,6 +26,4 @@ usb/python/data/*.db
 usb/python/log/*.log
 meerkatd/log/*.log
 meerkatd/data/*.db
-meerkatd/meerkat/http/static/img/meerkat.probe.camera_photo*
-meerkatd/meerkat/http/static/img/camera_photo*
-meerkatd/meerkat/http/static/img/latest.jpg
+meerkatd/meerkat/http/static/img/capture/*

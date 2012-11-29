@@ -9,9 +9,11 @@
 
 import os
 import time
+from datetime import datetime
 import logging
+import re
 from threading import Thread
-from subprocess import check_output
+from subprocess import check_output, Popen, PIPE
 import json
 import socket
 import requests
@@ -48,11 +50,19 @@ class HttpServer(object):
         bottle.route('/meerkat/probe<p:int>.json', method='GET')(self.probe_json)
         bottle.route('/meerkat/probe<p:int>.json', method='POST')(self.probe_control_json)
         bottle.route('/meerkat/log.json', method='GET')(self.log_json)
+        bottle.route('/meerkat/data', method='GET')(self.data_tgz)
+        bottle.route('/meerkat/kickstart_gps.json', method='POST')(self.kickstart_gps_control_json)
+        bottle.route('/meerkat/gps_procs.json', method='GET')(self.gps_procs_json)
+        bottle.route('/meerkat/cleanup_gps.json', method='POST')(self.cleanup_gps_control_json)
 
 
     def start(self):
         self.http_thread = Thread(target=bottle.run,
-                                  kwargs=dict(host=self.config['http_host'], port=self.config['http_port'], server='wsgiref', debug=False, quiet=True),
+                                  kwargs=dict(host=self.config['http_host'],
+                                              port=self.config['http_port'],
+                                              server='wsgiref',
+                                              debug=False,
+                                              quiet=True),
                                   name='http-thread')
         self.http_thread.setDaemon(True)
         self.http_thread.start()
@@ -79,7 +89,7 @@ class HttpServer(object):
                     "probes": probes
                 }
               }
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -87,7 +97,7 @@ class HttpServer(object):
         ret = {"status": "OK",
                 "body": self.helper_get_probe_struct(self.scheduler.probes[p])
               }
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -101,7 +111,7 @@ class HttpServer(object):
             #self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probe', p) )
 
         time.sleep(0.5)
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return self.probe_json(p)
 
 
@@ -121,7 +131,7 @@ class HttpServer(object):
               }
         ret["body"]["id"] = ret["body"]["info"]["host"]
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -130,7 +140,7 @@ class HttpServer(object):
                 "body": self.helper_get_master_struct()
         }
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
     
@@ -144,28 +154,24 @@ class HttpServer(object):
             #self.scheduler.queue.put( (COMMAND_EXEC, 'stop_probes') )
 
         time.sleep(1)
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return self.master_json()
 
     
     def register_control_json(self):
-        ret = {"status": "OK",
-                "body": ""
-              }
         try:
             r = requests.post(self.config["mission_control"]["register_url"], data=self.info_json())
             ret = r.text
         except Exception as ex:
-            ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret = json.dumps({"status": "ERROR", "body": str(ex) })
 
-        response.set_header('Cache-Control', 'No-store')
-        return json.dumps(ret)
+        response.set_header("Cache-Control", "No-store")
+        return ret
 
     
     def capture_control_json(self):
         ret = {"status": "OK",
-                "body": None
+                "body": "Camera image captured"
               }
         try:
             ret["body"] = self.photo_capture.capture()
@@ -173,7 +179,7 @@ class HttpServer(object):
             ret["status"] = "ERROR"
             ret["body"] = str(ex)
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
 
 
@@ -190,13 +196,75 @@ class HttpServer(object):
                 }
               }
 
-        response.set_header('Cache-Control', 'No-store')
+        response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)  
+
+
+    def data_tgz(self):
+        cmd = "tar -czf - -C %s . -C %s ." % (os.path.dirname(self.config["datafile"]), self.config["imagepath"])
+        filename = "%s-data-%s.tgz" % (self.host, datetime.today().isoformat())
+
+        try:
+            proc = Popen(cmd.split(' '), bufsize=0, shell=False, stdout=PIPE)
+
+            response.set_header('Content-Type', 'application/octet-stream')
+            response.set_header('Content-Disposition',
+                                "Attachment;filename=%s" % filename)
+            for l in proc.stdout:
+                yield l
+
+        except Exception as ex:
+            yield str(ex)
+
+
+    def gps_procs_json(self):
+        ret = {"status": "OK",
+               "body": "GPS procs: ?"}
+
+        cmd = os.path.join(self.config["binpath"], 'gps_procs.sh')
+        try:
+            ret["body"] = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
+
+
+    def cleanup_gps_control_json(self):
+        ret = {"status": "OK",
+               "body": "GPS processes cleaned up"}
+
+        cmd = os.path.join(self.config["binpath"], 'cleanup_gps.sh')
+        try:
+            ret["body"] = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
+
+
+    def kickstart_gps_control_json(self):
+        ret = {"status": "OK",
+               "body": "GPS Kickstarted"}
+
+        cmd = os.path.join(self.config["binpath"], 'kickstart_gps.sh')
+        try:
+            output = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
 
 
     def static(self, filepath):
         if 'latest' in filepath:
-            response.set_header('Cache-Control', 'No-store')
+            response.set_header("Cache-Control", "No-store")
 
         return static_file(filepath, root=STATIC_ROOT)
 
@@ -261,6 +329,8 @@ class HttpServer(object):
         ret = {
             "timestamp": time.time() * 1000,
             "status": "OFF",
+            "all_on": self.scheduler.all_probes_on(),
+            "all_off": self.scheduler.all_probes_off(),
             "ip_address": self.ip_address,
             "net_interfaces": self.helper_get_net_interfaces(),
             "host": self.host,
@@ -273,8 +343,10 @@ class HttpServer(object):
             "sys_temperature": self.helper_get_sys_temperature(),
             "gpu_temperature": self.helper_get_gpu_temperature(),
             "data_size_kb": self.helper_get_data_size_kb(),
+            "image_data_size_kb": self.helper_get_image_data_size_kb(),
             "free_space_b": self.helper_get_free_space(),
             "has_camera": self.config["has_camera"],
+            "location": self.helper_get_location(),
             "available_memory_kb": 0,
             "free_memory_kb": 0,
             "mission_control_url": self.config['mission_control']['url'],
@@ -289,6 +361,19 @@ class HttpServer(object):
         ret["free_memory_kb"] = free_mem
 
         return ret
+
+
+    def helper_get_location(self):
+        location = {"latitude": '?', "longitude": '?'}
+
+        AGE_MS = 1000 * 60 * 3
+        cached_location = self.scheduler.cache.get_fresh("meerkat.probe.gps_info", AGE_MS)
+        if cached_location:
+            location["latitude"] = cached_location['latitude']
+            location["longitude"] = cached_location['longitude']
+
+        return location
+
 
     def helper_get_free_space(self):
         # TODO: should this be the where the data file is, not just '/'?
@@ -376,6 +461,13 @@ class HttpServer(object):
 
     def helper_get_data_size_kb(self):
         bytes = os.path.getsize(self.config['datafile'])
+        return bytes / 1024
+
+
+    def helper_get_image_data_size_kb(self):
+        bytes = 0
+        for root, dirs, files in os.walk(self.config['imagepath']):
+            bytes = sum(os.path.getsize(os.path.join(root, image)) for image in files)
         return bytes / 1024
 
 

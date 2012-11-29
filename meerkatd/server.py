@@ -20,7 +20,7 @@ import daemon
 
 # NOTE: edit config.rb as appropriate
 from config.config import config
-from meerkat.scheduler import Scheduler
+from meerkat.scheduler.scheduler import Scheduler
 from meerkat.http.http import HttpServer
 from util.pidfile import PidFile
 
@@ -77,14 +77,13 @@ def meerkatd(options):
                                 datefmt='%Y-%m-%d %H:%M:%S')
 
     # initialize the scheduler
-    scheduler = Scheduler(config["datafile"], config["probespath"], config["probes"])
+    scheduler = Scheduler(config["datafile"], config["probespath"], config["probes"], config["hide_dummy_probes"])
 
     # start http server
     http_server = HttpServer(scheduler, config)
     http_server.start()
 
     # register with mission control
-    #r = requests.post(config["mission_control"]["register_url"], data=http_server.info_json())
     r = http_server.register_control_json()
     logging.info("Registered with mission control: %s" % r)
 
