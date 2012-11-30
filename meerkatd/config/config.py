@@ -94,7 +94,7 @@ config["probes"].append({
     "id": "meerkat.probe.wifi_ap_scan",
     "command": ["wifi_ap_scan.py"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 5,
+    "interval": 10,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,

@@ -25,6 +25,7 @@ DATA_TYPE_JSON = 8
 DATA_TYPE_TEXT = 16
 DATA_TYPE_DATA = 32
 
+TWO_MINS_MS = 1000 * 60 * 2
 
 class Probe(object):
     def __init__(self, id, index, storage, cache, probe_conf, timeout=-1):
@@ -300,6 +301,13 @@ class Probe(object):
         # store
         if self.storage:
             if not self.no_store:
+                # FIXME: XXX: hardcoded GPS info from cache.
+                # This should be configured via config.py
+                if self.id != 'meerkat.probe.gps_info':
+                    extra_data = self.cache.get_fresh('meerkat.probe.gps_info', TWO_MINS_MS)
+                    if extra_data:
+                        data.append(extra_data)
+
                 logging.debug("[%s] -> %s" % (self.id, data))
                 self.storage.write_str(self.id, data)
             else:
