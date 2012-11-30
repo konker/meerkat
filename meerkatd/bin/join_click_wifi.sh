@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo wpa_cli select_network 4
+sudo wpa_cli select_network 5
 
 PHANTOMJS=`which phantomjs`
 if [ -z "$PHANTOMJS" ]; then

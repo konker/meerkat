@@ -23,6 +23,8 @@ from storage.sqlite import Storage
 from util.photo_capture import PhotoCapture
 #from meerkat.scheduler import COMMAND_EXEC
 
+THREE_MINS_MS = 1000 * 60 * 3
+
 bottle.TEMPLATE_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), 'views')),
 STATIC_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), 'static'))
 
@@ -398,9 +400,10 @@ class HttpServer(object):
     def helper_get_location(self):
         location = {"latitude": '?', "longitude": '?'}
 
-        AGE_MS = 1000 * 60 * 3
-        cached_location = self.scheduler.cache.get_fresh("meerkat.probe.gps_info", AGE_MS)
+        print self.scheduler.cache.cache
+        cached_location = self.scheduler.cache.get_fresh("meerkat.probe.gps_info", THREE_MINS_MS)
         if cached_location:
+            cached_location = cached_location[0]
             location["latitude"] = cached_location['latitude']
             location["longitude"] = cached_location['longitude']
 
@@ -420,7 +423,7 @@ class HttpServer(object):
             net_interfaces = check_output(cmd, shell=True).split(',')
             net_interfaces.pop()
             net_interfaces.pop()
-        except IOError:
+        except:
             pass
 
         return net_interfaces
@@ -433,7 +436,7 @@ class HttpServer(object):
                 secs = f.readline()
 
             uptime = float(secs.split()[0])
-        except IOError:
+        except:
             pass
 
         return uptime
@@ -441,10 +444,10 @@ class HttpServer(object):
 
     def helper_get_gpu_temperature(self):
         gpu_temperature = '?'
-        cmd = '/opt/vc/bin/vcgencmd measure_temp | egrep "[0-9.]{4,}" -o'
+        cmd = '/opt/vc/bin/vcgencmd measure_temp | egrep "[0-9.]*" -o'
         try:
             gpu_temperature = check_output(cmd, shell=True)
-        except IOError:
+        except:
             pass
 
         return float(gpu_temperature)
@@ -457,7 +460,7 @@ class HttpServer(object):
                 sys_temperature = f.readline()
 
             sys_temperature = float(sys_temperature) / 1000
-        except IOError:
+        except:
             pass
 
         return sys_temperature
@@ -471,7 +474,7 @@ class HttpServer(object):
 
             loadavg = loadavg.split(' ')
             loadavg = loadavg[:-2]
-        except IOError:
+        except:
             pass
 
         return loadavg
@@ -485,7 +488,7 @@ class HttpServer(object):
                 free_mem = f.readline()
 
             meminfo = (int(available_mem.split()[1]), int(free_mem.split()[1]))
-        except IOError:
+        except:
             pass
 
         return meminfo
