@@ -2383,7 +2383,7 @@ class WSGIRefServer(ServerAdapter):
 class CherryPyServer(ServerAdapter):
     def run(self, handler): # pragma: no cover
         from cherrypy import wsgiserver
-        server = wsgiserver.CherryPyWSGIServer((self.host, self.port), handler)
+        server = wsgiserver.CherryPyWSGIServer((self.host, self.port), handlernumthreads=3)
         try:
             server.start()
         finally:
