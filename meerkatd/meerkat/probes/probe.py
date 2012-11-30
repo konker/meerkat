@@ -306,7 +306,11 @@ class Probe(object):
                 if self.id != 'meerkat.probe.gps_info':
                     extra_data = self.cache.get_fresh('meerkat.probe.gps_info', TWO_MINS_MS)
                     if extra_data:
-                        data.append(extra_data)
+                        if self.data_type == DATA_TYPE_JSON:
+                            try:
+                                data = json.dumps(json.loads(data).append(extra_data))
+                            except:
+                                logging.debug("[%s] Error appending cached data: %s" % (self.id, traceback.format_exc()))
 
                 logging.debug("[%s] -> %s" % (self.id, data))
                 self.storage.write_str(self.id, data)
