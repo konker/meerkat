@@ -53,6 +53,8 @@ class HttpServer(object):
         bottle.route('/meerkat/data', method='GET')(self.data_tgz)
         bottle.route('/meerkat/kickstart_gps.json', method='POST')(self.kickstart_gps_control_json)
         bottle.route('/meerkat/gps_procs.json', method='GET')(self.gps_procs_json)
+        bottle.route('/meerkat/join_click_wifi.json', method='GET')(self.join_click_wifi)
+        bottle.route('/meerkat/join_city_wifi.json', method='GET')(self.join_city_wifi)
         bottle.route('/meerkat/cleanup_gps.json', method='POST')(self.cleanup_gps_control_json)
 
 
@@ -60,7 +62,7 @@ class HttpServer(object):
         self.http_thread = Thread(target=bottle.run,
                                   kwargs=dict(host=self.config['http_host'],
                                               port=self.config['http_port'],
-                                              server='wsgiref',
+                                              server='cherrypy',
                                               debug=False,
                                               quiet=True),
                                   name='http-thread')
@@ -222,6 +224,36 @@ class HttpServer(object):
                "body": "GPS procs: ?"}
 
         cmd = os.path.join(self.config["binpath"], 'gps_procs.sh')
+        try:
+            ret["body"] = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
+
+
+    def join_click_wifi(self):
+        ret = {"status": "OK",
+               "body": "GPS procs: ?"}
+
+        cmd = os.path.join(self.config["binpath"], 'join_click_wifi.sh')
+        try:
+            ret["body"] = check_output(cmd, shell=True)
+        except Exception as ex:
+            ret["status"] = "ERROR"
+            ret["body"] = str(ex)
+
+        response.set_header("Cache-Control", "No-store")
+        return json.dumps(ret)
+
+
+    def join_city_wifi(self):
+        ret = {"status": "OK",
+               "body": "GPS procs: ?"}
+
+        cmd = os.path.join(self.config["binpath"], 'join_city_wifi.sh')
         try:
             ret["body"] = check_output(cmd, shell=True)
         except Exception as ex:

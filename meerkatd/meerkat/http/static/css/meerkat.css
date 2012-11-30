@@ -141,12 +141,19 @@ section {
   .probe .probeToggle {
     margin-top: 0.35em;
     }
-#latest-img {
-  position: absolute;
-  left: 40%;
-  width: 35%;
+#img-holder {
+    position: absolute;
+    left: 40%;
+    width: 35%;
+    display: none;
+    }
+#capture-img {
   border: 6px solid #aaa;
-  display: none;
+  margin-bottom: 1.0em;
+  }
+#latest-img {
+  border: 6px solid #aaa;
+  margin-bottom: 1.0em;
   }
   .section-body {
       position: relative;

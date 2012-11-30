@@ -30,6 +30,7 @@ class RemoveErrors(BaseFilter):
 class CreateLatestLink(BaseFilter):
     def filter(self, data):
         struct = json.loads(data)
+        struct = struct[0]
         if struct["status"] == "OK":
             dir, file = os.path.split(struct["image_path"])
             filename, ext = os.path.splitext(file)
@@ -44,6 +45,7 @@ class CreateLatestLink(BaseFilter):
 class DetectPedestrians(BaseFilter):
     def filter(self, data):
         struct = json.loads(data)
+        struct = struct[0]
 
         storage = cv.CreateMemStorage(0)
         img = cv.LoadImage(struct["image_path"])

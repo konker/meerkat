@@ -8,6 +8,7 @@
 #
 
 import os
+import traceback
 import fcntl
 import logging
 from subprocess import Popen, PIPE
@@ -73,8 +74,13 @@ class Probe(object):
             logging.warning("[%s] Start when already running. Skipping" % (self.id))
             return
 
-        self.set_interval()
+        self.restart()
         self.running = True
+
+
+    def restart(self):
+        self.active = False
+        self.set_interval()
 
 
     def stop(self):
@@ -118,8 +124,12 @@ class Probe(object):
         # create a sub-process for the probe command, listen to stdout and stderr
         # NOTE: shell must be False, otherwise duration_cb cannot terminate it properly
         # (cannot terminate child processes of the shell process, e.g. #!/bin/python)
-        self.process = Popen(self.command, bufsize=0, shell=False, stdout=PIPE, stderr=PIPE)
-        self.pid = self.process.pid
+        try:
+            self.process = Popen(self.command, bufsize=0, shell=False, stdout=PIPE, stderr=PIPE)
+            self.pid = self.process.pid
+        except:
+            self.handle_error(traceback.format_exc())
+            return
 
         self.buf = []
         self.err_buf = []
@@ -144,63 +154,48 @@ class Probe(object):
         data = self.process.stdout.read()
 
         # process the data and re-start the interval
-        # if not waiting for a duration
-        if self.duration < 0:
+        # when all data has been read
+        if data == '': # EOF
             # cancel outstanding watchers
             self.cancel_all()
 
-            self.process_data(data)
-            self.last_error = None
+            data = self.process_data(self.buf)
+            if self.is_data(data):
+                self.handle_data(data)
 
-            self.active = False
-            self.set_interval()
+            self.restart()
         else:
-            if data == '':
-                # EOF
-                self.cancel_io()
-            else:
-                self.buf.append(data)
+            self.buf.append(data)
 
 
     # read any data available from stderr pipe
     def io_stderr_cb(self, watcher, revents):
         logging.debug("[%s] Stderr ready" % (self.id))
-        # [XXX: if blocking, wifi_scan blocks the event loop,
-        # but others will only get the first line of stack trace?
-        # Pos. have err_buf like stdout buf and collect stderr before processing?]
         self.make_nonoblocking(self.process.stderr)
 
         # read in error data
         error = self.process.stderr.read()
 
-        if self.duration < 0:
-            error = self.process_error(error)
+        if error == '': # EOF
+            # cancel outstanding watchers
+            self.cancel_all()
+
+            error = self.process_error(self.err_buf)
             if self.is_error(error):
                 self.handle_error(error)
+
+            self.restart()
         else:
-            if error == '':
-                # EOF
-                error = self.process_error(self.err_buf)
-                if self.is_error(error):
-                    self.handle_error(error)
-            else:
+            # XXX: error filters are different from data filters. Data filters are only
+            #      applied when all data has been read, before storage. Error filters
+            #      are applied as soon as any stderr comes in, and when all errors have
+            #      been read. Annoying inconsistency.
+            # NOTE: Apply error filters as errors come in, rather than just at the end
+            error = self.process_error(error)
+            if self.is_error(error):
+                # NOTE: any error overrides data that may have been read
+                self.cancel_stdout()
                 self.err_buf.append(error)
-
-
-    def handle_error(self, error):
-        self.last_error = error
-        logging.error("Error in probe: %s: %s" % (self.id, self.last_error))
-
-        # cancel outstanding watchers
-        self.cancel_all()
-
-        # start the interval again
-        self.active = False
-        self.set_interval()
-
-
-    def is_error(self, error):
-        return (error != '' and error != None)
 
 
     def duration_cb(self, watcher, revents):
@@ -213,17 +208,17 @@ class Probe(object):
         self.terminate_command()
 
         # check for error
+        # NOTE: any error overrides data that may have been read
         error = self.process_error(self.err_buf)
         if self.is_error(error):
             self.handle_error(error)
         else:
             # OK - deal with the collected data
-            self.last_error = None
-            self.process_data(self.buf)
+            data = self.process_data(self.buf)
+            if self.is_data(data):
+                self.handle_data(data)
 
-            # start the interval again
-            self.active = False
-            self.set_interval()
+        self.restart()
 
 
     def timeout_cb(self, watcher, revents):
@@ -236,46 +231,17 @@ class Probe(object):
         self.kill_command()
 
         # check for error
+        # NOTE: any error overrides data that may have been read
         error = self.process_error(self.err_buf)
         if self.is_error(error):
             self.handle_error(error)
         else:
             # OK - deal with the collected data
-            self.last_error = None
             self.process_data(self.buf)
+            if self.is_data(data):
+                self.handle_data(data)
 
-            # start the interval again
-            self.active = False
-            self.set_interval()
-
-
-    # set the given pipe to be in non-blocking mode
-    def make_nonoblocking(self, pipe):
-        fd = pipe.fileno()
-        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-
-
-    # terminate the command SIGTERM
-    def terminate_command(self):
-        logging.debug("[%s] terminate command: SIGTERM %s" % (self.id, self.pid))
-
-        try:
-            if self.process:
-                self.process.terminate()
-        except OSError as ex:
-            logging.error("Could not terminate command: %s: %s" % (self.id, self.pid))
-
-
-    # kill the command SIGKILL
-    def kill_command(self):
-        logging.debug("[%s] kill command: SIGKILL %s" % (self.id, self.pid))
-
-        try:
-            if self.process:
-                self.process.kill()
-        except OSError as ex:
-            logging.error("Could not kill command: %s: %s" % (self.id, self.pid))
+        self.restart()
 
 
     def process_error(self, error):
@@ -287,8 +253,16 @@ class Probe(object):
         for filter in self.error_filters:
             error = filter.filter(error)
 
-        self.last_error = error
         return error
+
+
+    def handle_error(self, error):
+        self.last_error = error
+        logging.error("Error in probe: %s: %s" % (self.id, self.last_error))
+
+
+    def is_error(self, error):
+        return (error != '' and error != None)
 
 
     def process_data(self, data):
@@ -307,14 +281,26 @@ class Probe(object):
                 data = b''.join(data)
 
         # apply filters
-        for filter in self.filters:
-            data = filter.filter(data)
+        try:
+            for filter in self.filters:
+                data = filter.filter(data)
+        except:
+            self.handle_error(traceback.format_exc())
+            return None
+
+        return data
+
+
+    def handle_data(self, data):
+        self.last_error = None
 
         # store
         if self.storage:
             if not self.no_store:
                 logging.debug("[%s] -> %s" % (self.id, data))
                 self.storage.write_str(self.id, data)
+            else:
+                logging.debug("[%s] ->| %s" % (self.id, data))
 
         # cache
         if self.cache_last:
@@ -322,6 +308,39 @@ class Probe(object):
                 self.cache.put(self.id, json.loads(data))
             else:
                 self.cache.put(self.id, data)
+
+
+    def is_data(self, data):
+        return (data != '' and data != None)
+
+
+    # Set the given pipe to be in non-blocking mode
+    def make_nonoblocking(self, pipe):
+        fd = pipe.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
+
+    # Terminate the command SIGTERM
+    def terminate_command(self):
+        logging.debug("[%s] terminate command: SIGTERM %s" % (self.id, self.pid))
+
+        try:
+            if self.process:
+                self.process.terminate()
+        except OSError as ex:
+            logging.error("Could not terminate command: %s: %s" % (self.id, self.pid))
+
+
+    # Kill the command SIGKILL
+    def kill_command(self):
+        logging.debug("[%s] kill command: SIGKILL %s" % (self.id, self.pid))
+
+        try:
+            if self.process:
+                self.process.kill()
+        except OSError as ex:
+            logging.error("Could not kill command: %s: %s" % (self.id, self.pid))
 
 
     def cancel_all(self):
@@ -395,9 +414,17 @@ class Probe(object):
 
 
     def cancel_io(self):
+        self.cancel_stdout()
+        self.cancel_stderr()
+
+
+    def cancel_stdout(self):
         if self.watchers["io"]["stdout"]:
             logging.debug("[%s] Cancel stdout I/O watcher" % (self.id))
             self.watchers["io"]["stdout"].stop()
+
+
+    def cancel_stderr(self):
         if self.watchers["io"]["stderr"]:
             logging.debug("[%s] Cancel stderr I/O watcher" % (self.id))
             self.watchers["io"]["stderr"].stop()

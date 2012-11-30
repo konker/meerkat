@@ -27,7 +27,7 @@ class PhotoCapture(object):
         self.imagepath = imagepath
 
 
-    def capture(self, filename='latest', format=DEFAULT_FORMAT, width=DEFAULT_IMAGE_WIDTH, height=DEFAULT_IMAGE_HEIGHT):
+    def capture(self, filename='manual_capture', format=DEFAULT_FORMAT, width=DEFAULT_IMAGE_WIDTH, height=DEFAULT_IMAGE_HEIGHT):
 
         filename = "%s.%s" % (filename, format)
         filename = os.path.realpath(os.path.join(self.imagepath, filename))

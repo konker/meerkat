@@ -27,8 +27,8 @@ config = {
         "register_url": "http://meerkat.0-9.fi/meerkat/register.json"
     },
     "heartbeat": {
-        "interval": 30,
-        "url": "https://localhost/meerkat/heartbeat.json"
+        "interval": 60,
+        "url": "https://127.0.0.1/meerkat/heartbeat.json"
     },
 
     "has_camera": True,
@@ -46,12 +46,11 @@ config["probes"].append({
     "filters": [
     ]
 })
-
 config["probes"].append({
     "id": "meerkat.probe.camera_photo",
     "command": ["camera_photo.py", "meerkat.probe.camera_photo"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 30,
+    "interval": 20,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": False,
     "filters": [
@@ -109,7 +108,7 @@ config["probes"].append({
     "id": "meerkat.probe.gps_info",
     "command": ["gps_info.py"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 10,
+    "interval": 60,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": True,
@@ -152,6 +151,19 @@ config["probes"].append({
     "interval": 5,
     "data_type": probe.DATA_TYPE_TEXT,
     "dummy": True,
+    "auto_start": False,
+    "error_filters": [
+        "meerkat.filters.util.Null"
+    ]
+})
+config["probes"].append({
+    "id": "meerkat.probe.dummy_error",
+    "command": ["dummy_error.py"],
+    "type": probe.TYPE_PERIODIC,
+    "interval": 15,
+    "data_type": probe.DATA_TYPE_JSON,
+    "dummy": True,
+    "no_store": True,
     "auto_start": False
 })
 
