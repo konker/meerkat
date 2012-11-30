@@ -42,7 +42,7 @@ config["probes"].append({
     "interval": 30,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": False,
+    "auto_start": True,
     "filters": [
     ]
 })
@@ -52,7 +52,7 @@ config["probes"].append({
     "type": probe.TYPE_PERIODIC,
     "interval": 20,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": False,
+    "auto_start": True,
     "filters": [
         "meerkat.filters.cv_filters.CreateLatestLink"
     ],
@@ -83,7 +83,7 @@ config["probes"].append({
     "interval": 20,
     "duration": 60,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": False,
+    "auto_start": True,
     "filters": [
     ],
     "error_filters": [
@@ -97,7 +97,7 @@ config["probes"].append({
     "interval": 10,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": False,
+    "auto_start": True,
     "filters": [
     ],
     "error_filters": [
