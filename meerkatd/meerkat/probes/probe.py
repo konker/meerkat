@@ -267,11 +267,14 @@ class Probe(object):
 
     def process_data(self, data):
         # deal with a buffer
+        # basically want to end up with an array (JSON data type)
         if type(data) == list:
             if self.data_type == DATA_TYPE_JSON:
-                # XXX: bit of a hack
+                # XXX: a bit messy
                 if len(data) == 1 and data[0].startswith('['):
                     data = data[0]
+                elif data[0].startswith('['):
+                    data = ''.join(data)
                 else:
                     data = '[' + ','.join(data) + ']'
             elif self.data_type == DATA_TYPE_TEXT:

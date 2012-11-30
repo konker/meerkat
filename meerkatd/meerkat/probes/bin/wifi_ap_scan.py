@@ -18,8 +18,8 @@ def main():
     cmd = ['sudo', 'iwlist', 'wlan0', 'scan']
     raw = check_output(cmd, shell=False)
 
-    info = parse_raw(raw)
-    sys.stdout.write(json.dumps(info))
+    data = parse_raw(raw)
+    sys.stdout.write(json.dumps(data))
 
 
 def parse_raw(raw):
@@ -40,7 +40,6 @@ def parse_raw(raw):
         ret.append(cur_cell)
 
     return ret
-
 
 def handle_cell_start(l, cur_cell):
     x,l = l.split(' - ')
