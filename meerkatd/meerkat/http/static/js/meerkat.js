@@ -543,7 +543,7 @@ var meerkat = (function($) {
                                         }
                                     }
                                 }
-                                dataimage.src = '/static/img/' + data[r].data[rr].image_path;
+                                dataimage.src = '/static/img/capture/' + data[r].data[rr].image_path;
                             }
                         }
                     }

@@ -400,12 +400,13 @@ class HttpServer(object):
     def helper_get_location(self):
         location = {"latitude": '?', "longitude": '?'}
 
-        print self.scheduler.cache.cache
         cached_location = self.scheduler.cache.get_fresh("meerkat.probe.gps_info", THREE_MINS_MS)
         if cached_location:
             cached_location = cached_location[0]
-            location["latitude"] = cached_location['latitude']
-            location["longitude"] = cached_location['longitude']
+            if 'latitude' in cached_location and 'longitude' in cached_location:
+
+                location["latitude"] = cached_location['latitude']
+                location["longitude"] = cached_location['longitude']
 
         return location
 
