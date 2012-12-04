@@ -16,7 +16,7 @@ config = {
     "binpath": os.path.realpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'bin')),
 
-    "debug": True,
+    "debug": False,
     "hide_dummy_probes": True,
 
     "http_host": "0.0.0.0",
