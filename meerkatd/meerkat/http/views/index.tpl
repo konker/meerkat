@@ -48,7 +48,7 @@
       </h2>
       <div id="system-tools" class="row">
         <div class="inner">
-          <a href="data.tgz" class="btn" id="masterDownload"><i class="icon-list-alt"></i> Download data</a>
+          <a href="data" class="btn" id="masterDownload"><i class="icon-list-alt"></i> Download data</a>
           <button class="btn" id="missionControlRegister"><i class="icon-bullhorn"></i> Ping mission control</button>
           <button class="btn" id="joinClickWifi"><i class="icon-globe"></i> Join click wifi</button>
           <button class="btn" id="joinCityWifi"><i class="icon-globe"></i> Join city wifi</button>
