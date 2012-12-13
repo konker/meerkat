@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="wifi-diagram.svg">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lend"
+       style="overflow:visible;">
+      <path
+         id="path4045"
+         style="fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) rotate(180) translate(1,0)" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective2985" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="396.16768"
+     inkscape:cy="520"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="991"
+     inkscape:window-x="1280"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3853"
+       transform="translate(-132.83506,-59.093924)">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path3015"
+         d="m 163.13964,458.89756 c 12.78189,-8.69273 28.3047,-5.11377 32.82995,0"
+         style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:transform-center-y="6.9130555"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path3015-3"
+         d="m 153.89686,445.50989 c 20.17562,-12.64495 44.67768,-7.14758 51.82057,0"
+         style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:transform-center-y="7.6482346"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path3015-3-6"
+         d="m 144.06331,432.50465 c 30.88879,-22.06948 62.28663,-8.22736 71.48767,0"
+         style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:transform-center-y="9.9627969"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path3015-3-6-5"
+         d="m 137.05266,420.34218 c 37.82014,-28.74831 76.26356,-10.71718 87.52929,0"
+         style="fill:none;stroke:#000000;stroke-width:7.03894949;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g4738"
+       inkscape:export-filename="/home/fs/markus/WORKING/isoveli/meerkat/doc/wifi-diagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         y="455.8671"
+         x="335.87064"
+         height="46.972092"
+         width="27.274118"
+         id="rect3001"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+      <rect
+         y="460.43311"
+         x="339.91632"
+         height="36.870567"
+         width="19.192898"
+         id="rect3013"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <g
+         transform="matrix(0.28432399,0,0,0.29463988,286.48534,317.94448)"
+         id="g3853-7">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 163.13964,458.89756 c 12.78189,-8.69273 28.3047,-5.11377 32.82995,0"
+           id="path3015-8"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 153.89686,445.50989 c 20.17562,-12.64495 44.67768,-7.14758 51.82057,0"
+           id="path3015-3-3"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:transform-center-y="6.9130555" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 144.06331,432.50465 c 30.88879,-22.06948 62.28663,-8.22736 71.48767,0"
+           id="path3015-3-6-4"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:transform-center-y="7.6482346" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:7.03894949;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 137.05266,420.34218 c 37.82014,-28.74831 76.26356,-10.71718 87.52929,0"
+           id="path3015-3-6-5-6"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:transform-center-y="9.9627969" />
+      </g>
+      <g
+         transform="translate(-7.5761441,66.670068)"
+         id="g3915">
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.85165048;stroke-opacity:1"
+           id="rect3891"
+           width="86.011314"
+           height="57.22197"
+           x="199.43095"
+           y="455.28784" />
+        <path
+           sodipodi:type="arc"
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           id="path3893"
+           sodipodi:cx="267.4379"
+           sodipodi:cy="501.07144"
+           sodipodi:rx="6.3134532"
+           sodipodi:ry="4.7982244"
+           d="m 273.75135,501.07144 c 0,2.64999 -2.82663,4.79823 -6.31345,4.79823 -3.48683,0 -6.31346,-2.14824 -6.31346,-4.79823 0,-2.64998 2.82663,-4.79822 6.31346,-4.79822 3.48682,0 6.31345,2.14824 6.31345,4.79822 z" />
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           id="rect3895"
+           width="5.5558391"
+           height="31.819805"
+           x="205.06097"
+           y="423.05746" />
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           id="rect3895-0"
+           width="5.5558391"
+           height="31.819805"
+           x="273.49881"
+           y="423.28967" />
+      </g>
+      <g
+         transform="translate(12.121831,14.142136)"
+         id="g4007">
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           id="rect3921"
+           width="76.266518"
+           height="37.880722"
+           x="398.00009"
+           y="507.88995" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.87548739;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           id="rect3921-1"
+           width="69.319962"
+           height="31.944319"
+           x="401.47336"
+           y="510.85815" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 398.50518,545.77068 75.76144,1.01016 16.16244,22.72843 -108.59139,1.01016 z"
+           id="path3962"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="ccccc" />
+        <g
+           id="g4002"
+           transform="matrix(1,0,0.57967702,1,-323.47066,0)">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3964"
+             d="m 399.53564,551.57905 c 73.41924,0 73.41924,0 73.41924,0"
+             style="fill:none;stroke:#000000;stroke-width:3.62491322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.62491322, 3.62491322;stroke-dashoffset:11.96221361" />
+          <path
+             inkscape:connector-curvature="0"
+             id="path3964-3"
+             d="m 399.67628,557.89251 c 73.41924,0 73.41924,0 73.41924,0"
+             style="fill:none;stroke:#000000;stroke-width:3.62491322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.62491322, 3.62491322;stroke-dashoffset:11.96221361" />
+          <path
+             inkscape:connector-curvature="0"
+             id="path3964-3-6"
+             d="m 400.18136,564.4585 c 73.41924,0 73.41924,0 73.41924,0"
+             style="fill:none;stroke:#000000;stroke-width:3.62491322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.62491322, 3.62491322;stroke-dashoffset:11.96221361" />
+        </g>
+      </g>
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         inkscape:connector-type="polyline"
+         id="path4016"
+         d="m 277.71583,522.6133 58.23602,-33.99236"
+         style="fill:none;stroke:#000000;stroke-width:0.84776014px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+      <path
+         inkscape:connector-curvature="0"
+         inkscape:connector-type="polyline"
+         id="path4018"
+         d="M 411.67469,536.71684 362.60724,488.15446"
+         style="fill:none;stroke:#000000;stroke-width:0.92494982px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text4646"
+         y="418.49149"
+         x="338.90622"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="418.49149"
+           x="338.90622"
+           id="tspan4648"
+           sodipodi:role="line">Smartphone providing</tspan><tspan
+           id="tspan4717"
+           y="430.99149"
+           x="338.90622"
+           sodipodi:role="line">Androtown Wi-Fi hotspot</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4646-3"
+         y="598.02692"
+         x="448.53311"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="598.02692"
+           x="450.12491"
+           id="tspan4648-3"
+           sodipodi:role="line">Laptop connected to </tspan><tspan
+           id="tspan4715"
+           y="610.52692"
+           x="448.53311"
+           sodipodi:role="line">Androtown hotspot</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4646-3-8"
+         y="592.9762"
+         x="229.59692"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="592.9762"
+           x="231.18872"
+           id="tspan4648-3-4"
+           sodipodi:role="line">Device auto-connected to </tspan><tspan
+           id="tspan4713"
+           y="605.4762"
+           x="229.59692"
+           sodipodi:role="line">Androtown hotspot</tspan></text>
+    </g>
+  </g>
+</svg>
