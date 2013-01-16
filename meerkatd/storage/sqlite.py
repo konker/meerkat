@@ -83,7 +83,7 @@ class Storage(BaseStorage):
     def _ddl(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS probe_data
                             (
-                               probe_id,    VARCHAR,
+                               probe_id     VARCHAR,
                                timestamp    REAL,
                                length       INT,
                                data         BLOB
