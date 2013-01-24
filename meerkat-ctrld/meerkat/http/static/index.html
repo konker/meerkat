@@ -100,6 +100,15 @@
               <dd class="free_memory">{{format_kb node.info.free_memory_kb}}</dd>
               <dt class="dashboard">dashboard</dt>
               <dd class="dashboard"><a {{bindAttr href="node.info.dashboard_url"}}>{{node.info.dashboard_url}}</a></dd>
+
+              <dt class="dashboard_short_host"></dt>
+              <dd class="dashboard"><a {{bindAttr href="node.info.dashboard_url_short_host"}}>{{node.info.dashboard_url_short_host}}</a></dd>
+
+              <dt class="dashboard_ip_address"></dt>
+              <dd class="dashboard"><a {{bindAttr href="node.info.dashboard_url_ip_address"}}>{{node.info.dashboard_url_ip_address}}</a></dd>
+
+              <dt class="dashboard_ip_address2"></dt>
+              <dd class="dashboard"><a {{bindAttr href="node.info.dashboard_url_ip_address2"}}>{{node.info.dashboard_url_ip_address2}}</a></dd>
             </dl>
             <div id="latest-img">
                 <a {{bindAttr href="node.info.latest_img_url"}}><img {{bindAttr src="node.info.latest_img_url"}} /></a>
