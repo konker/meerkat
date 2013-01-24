@@ -39,7 +39,7 @@ class HttpServer(object):
         self.host = socket.gethostname()
         self.short_host = self.helper_get_short_host()
         self.ip_address = socket.gethostbyname(self.host)
-        self.ip_address2 =  self.helper_get_ip_address2()
+        self.ip_address2 = self.helper_get_ip_address2()
 
         # set up the routes manually
         bottle.route('/static/<filepath:path>', method='GET')(self.static)
@@ -430,7 +430,7 @@ class HttpServer(object):
         ip_address2 = '?'
         cmd = 'hostname -I'
         try:
-            ip_address2 = check_output(cmd, shell=True)
+            ip_address2 = check_output(cmd, shell=True).strip()
         except:
             pass
 
@@ -454,7 +454,7 @@ class HttpServer(object):
         short_host = '?'
         cmd = 'hostname -s'
         try:
-            short_host = check_output(cmd, shell=True)
+            short_host = check_output(cmd, shell=True).strip()
         except:
             pass
 
