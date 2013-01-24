@@ -8,6 +8,7 @@
 #
 
 import os
+import traceback
 import time
 import logging
 from threading import Thread
@@ -54,9 +55,9 @@ class HttpServer(object):
             r = requests.get(self.nodes[id]["info"]["info_url"], verify=False)
             ret["body"] = r.text
             logging.info("Fetched: %s", r.text)
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         return json.dumps(ret)
 
@@ -78,14 +79,17 @@ class HttpServer(object):
             if node.get("status", False):
                 node = node["body"]
 
+            # add server timestamp
+            node["info"]["server_timestamp"] = time.time() * 1000
+
             self.nodes[node["id"]] = node
             logging.info("Registered node: %s", node["id"])
-        except ValueError as ex:
-            ret = {"status": "ERROR", "body": str(ex)}
-            logging.info(str(ex))
+        except:
+            ret = {"status": "ERROR", "body": traceback.format_exc()}
+            logging.error(traceback.format_exc())
             return json.dumps(ret)
 
-        ret = {"status": "OK", "body": ""}
+        ret = {"status": "OK", "body": "Contact made with mission control"}
         return json.dumps(ret)
 
 
