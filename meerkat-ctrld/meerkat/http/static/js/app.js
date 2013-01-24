@@ -179,11 +179,17 @@ App.reopen({
         },
         format_timestamp_helper: function(property, options) {
             var ts = Ember.Handlebars.get(this, property, options);
-            return new Handlebars.SafeString(App.util.ReadableDateString(new Date(ts)) + "<br/><small>" + ts + "</small>");
+            return new Handlebars.SafeString(App.util.format_timestamp(ts));
         },
+        format_timestamp: function(ts) {
+            var d = new Date(ts);
+            return jQuery.timeago(d) + "<br/><small>" + App.util.ReadableDateString(d) + "</small><br/><small>" + ts + "</small>";
+        },
+        /*
         format_timestamp: function(ts) {
             return App.util.ReadableDateString(new Date(ts)) + "<br/><small>" + ts + "</small>";
         },
+        */
         ReadableDateString: function(d) {
             function pad(n){return n<10 ? '0'+n : n}
                 return d.getFullYear()+'-'
