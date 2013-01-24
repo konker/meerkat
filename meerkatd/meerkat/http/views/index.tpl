@@ -72,8 +72,12 @@
           <dd class="status"><!-- [on/off] --></dd>
           <dt class="ip_address">ip address</dt>
           <dd class="ip_address"><!-- [ip.address] --></dd>
+          <dt class="ip_address2">ip address 2</dt>
+          <dd class="ip_address2"><!-- [ip.address2] --></dd>
           <dt class="net_interfaces">net interfaces</dt>
           <dd class="net_interfaces"><!-- [net_interfaces] --></dd>
+          <dt class="cur_essid">current ESSID</dt>
+          <dd class="cur_essid"><!-- [cur_essid] --></dd>
           <dt class="host">host</dt>
           <dd class="host"><!-- [host] --></dd>
           <dt class="uptime">uptime</dt>

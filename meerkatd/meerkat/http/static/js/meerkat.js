@@ -326,7 +326,9 @@ var meerkat = (function($) {
                 main: {
                     'dd.status': 'status',
                     'dd.ip_address': 'ip_address',
+                    'dd.ip_address2': 'ip_address2',
                     'dd.net_interfaces': 'net_interfaces',
+                    'dd.cur_essid': 'cur_essid',
                     'dd.host': 'host',
                     'dd.uptime': 'uptime_secs',
                     'dd.load_average': 'load_average',

@@ -8,6 +8,7 @@
 #
 
 import os
+import traceback
 import time
 from datetime import datetime
 import logging
@@ -36,7 +37,9 @@ class HttpServer(object):
         self.photo_capture = PhotoCapture(config["imagepath"])
 
         self.host = socket.gethostname()
+        self.short_host = self.helper_get_short_host()
         self.ip_address = socket.gethostbyname(self.host)
+        self.ip_address2 =  self.helper_get_ip_address2()
 
         # set up the routes manually
         bottle.route('/static/<filepath:path>', method='GET')(self.static)
@@ -167,7 +170,7 @@ class HttpServer(object):
             r = requests.post(self.config["mission_control"]["register_url"], data=self.info_json())
             ret = r.text
         except Exception as ex:
-            ret = json.dumps({"status": "ERROR", "body": str(ex) })
+            ret = json.dumps({"status": "ERROR", "body": traceback.format_exc() })
 
         response.set_header("Cache-Control", "No-store")
         return ret
@@ -179,9 +182,9 @@ class HttpServer(object):
               }
         try:
             ret["body"] = self.photo_capture.capture()
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
@@ -217,8 +220,8 @@ class HttpServer(object):
             for l in proc.stdout:
                 yield l
 
-        except Exception as ex:
-            yield str(ex)
+        except:
+            yield traceback.format_exc()
 
 
     def gps_procs_json(self):
@@ -228,9 +231,9 @@ class HttpServer(object):
         cmd = os.path.join(self.config["binpath"], 'gps_procs.sh')
         try:
             ret["body"] = check_output(cmd, shell=True)
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
@@ -243,9 +246,9 @@ class HttpServer(object):
         cmd = os.path.join(self.config["binpath"], 'join_click_wifi.sh')
         try:
             ret["body"] = check_output(cmd, shell=True)
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
@@ -258,9 +261,9 @@ class HttpServer(object):
         cmd = os.path.join(self.config["binpath"], 'join_city_wifi.sh')
         try:
             ret["body"] = check_output(cmd, shell=True)
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
@@ -273,9 +276,9 @@ class HttpServer(object):
         cmd = os.path.join(self.config["binpath"], 'cleanup_gps.sh')
         try:
             ret["body"] = check_output(cmd, shell=True)
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
@@ -288,9 +291,9 @@ class HttpServer(object):
         cmd = os.path.join(self.config["binpath"], 'kickstart_gps.sh')
         try:
             output = check_output(cmd, shell=True)
-        except Exception as ex:
+        except:
             ret["status"] = "ERROR"
-            ret["body"] = str(ex)
+            ret["body"] = traceback.format_exc()
 
         response.set_header("Cache-Control", "No-store")
         return json.dumps(ret)
@@ -366,11 +369,17 @@ class HttpServer(object):
             "all_on": self.scheduler.all_probes_on(),
             "all_off": self.scheduler.all_probes_off(),
             "ip_address": self.ip_address,
+            "ip_address2": self.ip_address2,
             "net_interfaces": self.helper_get_net_interfaces(),
+            "cur_essid": self.helper_get_cur_essid(),
             "host": self.host,
+            "short_host": self.short_host,
             "heartbeat_url": "https://%s/meerkat/heartbeat.json" % (self.host),
             "info_url": "https://%s/meerkat/info.json" % (self.host),
             "dashboard_url": "https://%s/meerkat/" % (self.host),
+            "dashboard_url_short_host": "https://%s/meerkat/" % (self.short_host),
+            "dashboard_url_ip_address": "https://%s/meerkat/" % (self.ip_address),
+            "dashboard_url_ip_address2": "https://%s/meerkat/" % (self.ip_address2),
             "latest_img_url": "https://%s/static/img/latest.jpg?%s" % (self.host, time.time()),
             "uptime_secs": self.helper_get_uptime_secs(),
             "load_average": self.helper_get_load_average(),
@@ -415,6 +424,41 @@ class HttpServer(object):
         # TODO: should this be the where the data file is, not just '/'?
         stat = os.statvfs('/')
         return stat.f_bsize * stat.f_bavail
+
+
+    def helper_get_ip_address2(self):
+        ip_address2 = '?'
+        cmd = 'hostname -I'
+        try:
+            ip_address2 = check_output(cmd, shell=True)
+        except:
+            pass
+
+        return ip_address2
+
+
+    def helper_get_cur_essid(self):
+        cur_essid = '?'
+        cmd = 'sudo wpa_cli list_networks | grep CURRENT | cut -f 2'
+        try:
+            cur_essid = check_output(cmd, shell=True)
+            if cur_essid == '':
+                cur_essid = '?'
+        except:
+            pass
+
+        return cur_essid
+
+
+    def helper_get_short_host(self):
+        short_host = '?'
+        cmd = 'hostname -s'
+        try:
+            short_host = check_output(cmd, shell=True)
+        except:
+            pass
+
+        return short_host
 
 
     def helper_get_net_interfaces(self):
