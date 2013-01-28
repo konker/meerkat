@@ -237,7 +237,9 @@ class Scheduler(object):
             return probe.Probe(probe_conf["id"], index, storage, self.cache, probe_conf, timeout)
 
         elif probe_conf["type"] == probe.TYPE_CONTINUOUS:
-            raise NotImplementedError("Probe type not yet implemented: %s" % probe_conf["type"])
+            probe_conf["interval"] = -1
+            probe_conf["duration"] = -1
+            return probe.Probe(probe_conf["id"], index, storage, self.cache, probe_conf, timeout)
 
         else:
             raise NotImplementedError("No such probe type: %s" % probe_conf["type"])

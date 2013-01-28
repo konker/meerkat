@@ -315,10 +315,10 @@ class HttpServer(object):
             record = {
                 "metadata": {
                     "probe_id": r[0],
-                    "timestamp": r[2],
-                    "length": r[3],
+                    "timestamp": r[1],
+                    "length": r[2],
                 },
-                "data": str(r[4]).encode('utf-8')
+                "data": str(r[3]).encode('utf-8')
             }
             if (record["data"].startswith('{') or record["data"].startswith('[')):
                 try:

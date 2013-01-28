@@ -42,7 +42,7 @@ config["probes"].append({
     "interval": 30,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True,
+    "auto_start": False,
     "filters": [
     ]
 })
@@ -52,7 +52,7 @@ config["probes"].append({
     "type": probe.TYPE_PERIODIC,
     "interval": 20,
     "data_type": probe.DATA_TYPE_JSON,
-    "auto_start": True,
+    "auto_start": False,
     "filters": [
         "meerkat.filters.cv_filters.CreateLatestLink"
     ],
@@ -79,9 +79,7 @@ config["probes"].append({
 config["probes"].append({
     "id": "meerkat.probe.wifi_client_scan",
     "command": ["wifi_client_scan.py"],
-    "type": probe.TYPE_DURATION,
-    "interval": 20,
-    "duration": 60,
+    "type": probe.TYPE_CONTINUOUS,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": True,
     "filters": [
@@ -94,7 +92,7 @@ config["probes"].append({
     "id": "meerkat.probe.wifi_ap_scan",
     "command": ["wifi_ap_scan.py"],
     "type": probe.TYPE_PERIODIC,
-    "interval": 10,
+    "interval": 3,
     "duration": -1,
     "data_type": probe.DATA_TYPE_JSON,
     "auto_start": True,

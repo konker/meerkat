@@ -41,6 +41,7 @@ def parse_raw(raw):
 
     return ret
 
+
 def handle_cell_start(l, cur_cell):
     x,l = l.split(' - ')
     handle_cell_item(l, cur_cell)

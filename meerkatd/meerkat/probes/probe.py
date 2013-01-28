@@ -34,6 +34,7 @@ class Probe(object):
         self.storage = storage
         self.cache = cache
         self.command = probe_conf["command"]
+        self.type = probe_conf["type"]
         self.data_type = probe_conf["data_type"]
         self.filters = probe_conf["filters"]
         self.error_filters = probe_conf["error_filters"]
@@ -81,7 +82,10 @@ class Probe(object):
 
     def restart(self):
         self.active = False
-        self.set_interval()
+        if self.type != TYPE_CONTINUOUS:
+            self.set_interval()
+        else:
+            self.start_command()
 
 
     def stop(self):
@@ -122,29 +126,7 @@ class Probe(object):
         self.active = True
         self.cancel_interval()
 
-        # create a sub-process for the probe command, listen to stdout and stderr
-        # NOTE: shell must be False, otherwise duration_cb cannot terminate it properly
-        # (cannot terminate child processes of the shell process, e.g. #!/bin/python)
-        try:
-            self.process = Popen(self.command, bufsize=0, shell=False, stdout=PIPE, stderr=PIPE)
-            self.pid = self.process.pid
-        except:
-            self.handle_error(traceback.format_exc())
-            return
-
-        self.buf = []
-        self.err_buf = []
-
-        # initialize I/O watchers
-        self.set_io()
-
-        # set up a watcher to kill the process after the duration
-        if self.duration > 0:
-            self.set_duration()
-
-        # set up a watcher to kill the process after a global timeout
-        if self.timeout > 0:
-            self.set_timeout()
+        self.start_command()
 
 
     # read any data available from stdout pipe
@@ -157,16 +139,24 @@ class Probe(object):
         # process the data and re-start the interval
         # when all data has been read
         if data == '': # EOF
-            # cancel outstanding watchers
-            self.cancel_all()
+            if self.type != TYPE_CONTINUOUS:
+                # cancel outstanding watchers
+                self.cancel_all()
 
-            data = self.process_data(self.buf)
-            if self.is_data(data):
-                self.handle_data(data)
+                data = self.process_data(self.buf)
+                if self.is_data(data):
+                    self.handle_data(data)
 
-            self.restart()
+                self.restart()
         else:
             self.buf.append(data)
+
+            if self.type == TYPE_CONTINUOUS:
+                data = self.process_data(self.buf)
+                if self.is_data(data):
+                    self.handle_data(data)
+
+                self.buf = []
 
 
     # read any data available from stderr pipe
@@ -277,7 +267,7 @@ class Probe(object):
                 elif data[0].startswith('['):
                     data = ''.join(data)
                 else:
-                    data = '[' + ','.join(data) + ']'
+                    data = '[' + ','.join(map(lambda x: x.strip(), data)) + ']'
             elif self.data_type == DATA_TYPE_TEXT:
                 # [FIXME: do we need this?]
                 data = ''.join(data)
@@ -336,6 +326,32 @@ class Probe(object):
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
 
+    def start_command(self):
+        # create a sub-process for the probe command, listen to stdout and stderr
+        # NOTE: shell must be False, otherwise duration_cb cannot terminate it properly
+        # (cannot terminate child processes of the shell process, e.g. #!/bin/python)
+        try:
+            self.process = Popen(self.command, bufsize=0, shell=False, stdout=PIPE, stderr=PIPE)
+            self.pid = self.process.pid
+        except:
+            self.handle_error(traceback.format_exc())
+            return
+
+        self.buf = []
+        self.err_buf = []
+
+        # initialize I/O watchers
+        self.set_io()
+
+        # set up a watcher to kill the process after the duration
+        if self.duration > 0:
+            self.set_duration()
+
+        # set up a watcher to kill the process after a global timeout
+        if self.timeout > 0:
+            self.set_timeout()
+
+
     # Terminate the command SIGTERM
     def terminate_command(self):
         logging.debug("[%s] terminate command: SIGTERM %s" % (self.id, self.pid))
@@ -380,18 +396,20 @@ class Probe(object):
 
 
     def init_interval(self):
-        self.watchers["interval"] = pyev.Timer(self.interval, 0.0, self.loop, self.interval_cb)
+        if self.interval > 0:
+            self.watchers["interval"] = pyev.Timer(self.interval, 0.0, self.loop, self.interval_cb)
 
 
     def set_interval(self):
-        logging.debug("[%s] Adding interval timer: %s secs." % (self.id, self.interval))
+        if self.interval > 0:
+            logging.debug("[%s] Adding interval timer: %s secs." % (self.id, self.interval))
 
-        if not self.watchers["interval"]:
-            self.init_interval()
-        else:
-            self.watchers["interval"].set(self.interval, 0.0)
+            if not self.watchers["interval"]:
+                self.init_interval()
+            else:
+                self.watchers["interval"].set(self.interval, 0.0)
 
-        self.watchers["interval"].start()
+            self.watchers["interval"].start()
 
 
     def cancel_interval(self):
