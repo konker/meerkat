@@ -7,11 +7,22 @@
 #
 
 import sys
+import re
 import time
 import sqlite3
 import logging
 
 from storage import BaseStorage
+
+
+CREATE_TABLE_RE = re.compile('CREATE TABLE [^\(]+\(', re.IGNORECASE)
+END_CREATE_TABLE_RE = re.compile('\)$', re.MULTILINE)
+DDL = """CREATE TABLE IF NOT EXISTS probe_data(
+             probe_id     VARCHAR,
+             timestamp    REAL,
+             length       INT,
+             data         BLOB);"""
+
 
 """
 Implements storage of data records in a sqlite3 database.
@@ -69,6 +80,30 @@ class Storage(BaseStorage):
             yield row
 
 
+    def get_records_by_table(self, table, n=-1):
+        if n > 0:
+            sql = "SELECT * FROM %s = ? ORDER BY timestamp DESC LIMIT ?" % table
+            args = (n,)
+        else:
+            sql = "SELECT * FROM %s ORDER BY timestamp DESC" % table
+            args = ()
+
+        for row in self.cursor.execute(sql, args):
+            yield row
+
+
+    def get_fields(self, table):
+        sql = "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?"
+        args = (table,)
+        self.cursor.execute(sql, args)
+        r = self.cursor.fetchone()
+
+        fields = END_CREATE_TABLE_RE.sub('', CREATE_TABLE_RE.sub('', r[0])).split(',')
+        fields = map(lambda x: x.strip(), fields)
+        fields = map(lambda x: x.split()[0], fields)
+        return fields
+
+
     def reader(self):
         for row in self.cursor.execute('SELECT * FROM probe_data'):
             yield row
@@ -81,12 +116,6 @@ class Storage(BaseStorage):
 
 
     def _ddl(self):
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS probe_data
-                            (
-                               probe_id     VARCHAR,
-                               timestamp    REAL,
-                               length       INT,
-                               data         BLOB
-                            )''')
+        self.cursor.execute(DDL)
         self.conn.commit()
 
