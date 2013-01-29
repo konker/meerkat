@@ -15,6 +15,7 @@ import json
 from storage.sqlite import Storage
 import util
 
+
 FIX_RE = re.compile('}[\s\r]*{')
 
 DDL = """CREATE TABLE IF NOT EXISTS wifi_client(
@@ -22,19 +23,19 @@ DDL = """CREATE TABLE IF NOT EXISTS wifi_client(
             utc_datetime VARCHAR,
             utc_time VARCHAR,
             mac_addr VARCHAR,
-            destination_addr VARCHAR,
-            SSID VARCHAR,
-            packet_subtype INT,
-            signal_dBm INT,
+            destination_addr VARCHAR NULL,
+            SSID VARCHAR NULL,
+            packet_subtype INT NULL,
+            signal_dBm INT NULL,
             device_id VARCHAR,
             location_id VARCHAR,
             trial_id VARCHAR,
             latitude REAL NULL,
             longitude REAL NULL);"""
 
-ROW_SQL = "INSERT INTO wifi_client(timestamp, utc_datetime, utc_time, mac_addr, destination_addr, SSID, packet_subtype, signal_dBm, device_id, location_id, trial_id, latitude, longitude) VALUES(%f, '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', '%s', '%s', %f, %f);"
+ROW_SQL = "INSERT INTO wifi_client(timestamp, utc_datetime, utc_time, mac_addr, destination_addr, SSID, packet_subtype, signal_dBm, device_id, location_id, trial_id, latitude, longitude) VALUES(%f, '%s', '%s', '%s', '%s', '%s', %s, %s, '%s', '%s', '%s', %f, %f);"
 
-ROW_SQL_NO_LOC = "INSERT INTO wifi_client(timestamp, utc_datetime, utc_time, mac_addr, destination_addr, SSID, packet_subtype, signal_dBm, device_id, location_id, trial_id, latitude, longitude) VALUES(%f, '%s', '%s', '%s', '%s', '%s', %d, %s, '%s', '%s', '%s', NULL, NULL);"
+ROW_SQL_NO_LOC = "INSERT INTO wifi_client(timestamp, utc_datetime, utc_time, mac_addr, destination_addr, SSID, packet_subtype, signal_dBm, device_id, location_id, trial_id, latitude, longitude) VALUES(%f, '%s', '%s', '%s', '%s', '%s', %s, %s, '%s', '%s', '%s', NULL, NULL);"
 
 
 def main():
@@ -56,7 +57,7 @@ def main():
         if data:
             if r[7] == None or r[8] == None:
                 for d in data:
-                    print ROW_SQL_NO_LOC % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d.get('MAC_Address', d.get('MAC_Addres', '')), d.get('Destination', ''), d.get('SSID', ''), d.get('Subtype', ''), d.get('Signal_dBm', ''), r[4], r[5], r[6])
+                    print ROW_SQL_NO_LOC % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d.get('MAC_Address', d.get('MAC_Addres', '')), d.get('Destination', ''), d.get('SSID', ''), d.get('Subtype', 'NULL'), d.get('Signal_dBm', 'NULL'), r[4], r[5], r[6])
             else:
                 for d in data:
                     print ROW_SQL % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d.get('MAC_Address', d.get('MAC_Addres', '')), d.get('Destination', ''), d.get('SSID', ''), d.get('Subtype', ''), d.get('Signal_dBm', ''), r[4], r[5], r[6], r[7], r[8])

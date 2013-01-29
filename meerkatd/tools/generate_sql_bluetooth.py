@@ -15,6 +15,7 @@ import json
 from storage.sqlite import Storage                                            
 import util
 
+
 DDL = """CREATE TABLE IF NOT EXISTS bluetooth(
             timestamp REAL,
             utc_datetime VARCHAR,
