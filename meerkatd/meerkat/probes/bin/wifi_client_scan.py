@@ -34,7 +34,7 @@ def sniffCallback(p):
                 unique.append(p.addr2)
             '''
             sys.stdout.write(json.dumps({
-                "MAC_Addres": p.addr2,
+                "MAC_Address": p.addr2,
                 "Destination": p.addr1,
                 "SSID": p.getlayer(Dot11Elt, 1).info,
                 "Subtype": p.subtype,
