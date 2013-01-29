@@ -38,7 +38,7 @@ def main():
 
     storage = Storage(sys.argv[1])
     for r in storage.get_records_by_probe_id('meerkat.probe.bluetooth'):
-        data = str(r[4]).encode('utf-8')
+        data = str(r[3]).encode('utf-8')
 
         try:
             data = json.loads(data)
@@ -49,26 +49,26 @@ def main():
             exit(1)
 
         if data:
-            if r[8] == None or r[9] == None:
+            if r[7] == None or r[8] == None:
                 for d in data:
                     try:
-                        print ROW_SQL_NO_LOC % (r[2], util.ts2dates(r[2]), util.ts2times(r[2]), d['DEVICE_CLASS'], util.esc(d['NAME']), d['ADDRESS'], r[5], r[6], r[7])
+                        print ROW_SQL_NO_LOC % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d.get('DEVICE_CLASS', ''), util.esc(d.get('NAME')), d.get('ADDRESS', ''), r[4], r[5], r[6])
                     except Exception as ex:
                         try:
-                            print ROW_SQL_NO_LOC % (r[2], util.ts2dates(r[2]), util.ts2times(r[2]), d['device_class'], d['name'], d['address'], r[5], r[6], r[7])
+                            print ROW_SQL_NO_LOC % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d['device_class'], d['name'], d['address'], r[5], r[6], r[7])
                         except Exception as ex:
-                            sys.stderr.write("%f" % r[2])
+                            sys.stderr.write("%f" % r[1])
                             sys.stderr.write("\n")
                             sys.stderr.write("Error in DATA: %s\n" % ex)
             else:
                 for d in data:
                     try:
-                        print ROW_SQL % (r[2], util.ts2dates(r[2]), util.ts2times(r[2]), d['DEVICE_CLASS'], util.esc(d['NAME']), d['ADDRESS'], r[5], r[6], r[7], r[8], r[9])
+                        print ROW_SQL % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d.get('DEVICE_CLASS', ''), util.esc(d.get('NAME', '')), d.get('ADDRESS', ''), r[4], r[5], r[6], r[7], r[8])
                     except Exception as ex:
                         try:
-                            print ROW_SQL % (r[2], util.ts2dates(r[2]), util.ts2times(r[2]), d['device_class'], d['name'], d['address'], r[5], r[6], r[7], r[8], r[9])
+                            print ROW_SQL % (r[1], util.ts2dates(r[1]), util.ts2times(r[1]), d.get('device_class', ''), d.get('name', ''), d.get('address', ''), r[4], r[5], r[6], r[7], r[8])
                         except Exception as ex:
-                            sys.stderr.write("%f" % r[2])
+                            sys.stderr.write("%f" % r[1])
                             sys.stderr.write("\n")
                             sys.stderr.write("Error in DATA: %s\n" % ex)
 

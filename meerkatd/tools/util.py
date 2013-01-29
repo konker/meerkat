@@ -36,6 +36,12 @@ def dt2ts(dt):
     return timegm(dt.utctimetuple())*1000
 
 
-def d2ts(yy, mm, dd, h, m, s):
-    return dt2ts(datetime(yy, mm, dd, h, m, s, 0, UTC))
+def d2ts(yy, mm, dd, h, m, s, ms=0):
+    return dt2ts(datetime(yy, mm, dd, h, m, s, ms, UTC))
+
+
+def dates2ts(dates):
+    return dt2ts(datetime.strptime(dates, '%Y-%m-%d %H:%M:%S'))
+
+
 
